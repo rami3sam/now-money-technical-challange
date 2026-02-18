@@ -1,0 +1,7 @@
+orchestrator/node_modules
+fx-quote-service/node_modules
+payout-partner-simulator
+
+orchestrator/package-lock.json
+fx-quote-service/package-lock.json
+payout-partner-package-lock.json

@@ -1,7 +1,8 @@
 
 import { z } from "zod";
+import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
 
-export const transferSchema = z.object({
+export const createTransferSchema = z.object({
   sender: z.object({
     senderId: z.string().min(1, "senderId is required"),
     name: z.string().min(1, "sender name is required"),
@@ -9,10 +10,11 @@ export const transferSchema = z.object({
   recipient: z.object({
     name: z.string().min(1, "recipient name is required"),
     country: z.string().min(2, "country code is required"),
-    payoutMethod: z.enum(["bank", "cash"]),
+    payoutMethod: z.enum([PayoutMethods.Bank, PayoutMethods.Cash]),
     payoutDetails: z.object({
       accountNumber: z.string().optional(),
-      cashLocation: z.string().optional()
+      personalIDNumber: z.string().optional(),
+      personalIDType: z.string().optional()
     }),
   }),
   sendAmount: z.number().positive("Amount must be positive"),

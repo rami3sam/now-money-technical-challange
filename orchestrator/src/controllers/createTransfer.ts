@@ -7,6 +7,7 @@ const createTransfer = (req: Request, res: Response) => {
     try {
         const transfer = createTransferSchema.parse(req.body);
         const { recipient, recipient: { payoutDetails, payoutMethod } } = transfer
+        
         const bankInfoNotOk = payoutMethod == PayoutMethods.Bank &&
             payoutDetails.accountNumber == undefined
 

@@ -13,6 +13,7 @@ export enum TransferStatus {
   FAILED = "FAILED",
 
   REFUNDED = "REFUNDED",
+  CANELLED = "CANCELLED",
 }
 
 export const TransferStatusValues = Object.values(TransferStatus) as string[];

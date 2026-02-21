@@ -9,7 +9,7 @@ const createTransfer = (req: Request, res: Response) => {
     try {
         const transfer = createTransferSchema.parse(req.body);
         const { recipient, recipient: { payoutDetails, payoutMethod } } = transfer
-        
+
         const bankInfoNotOk = payoutMethod == PayoutMethods.Bank &&
             payoutDetails.accountNumber == undefined
 
@@ -19,7 +19,7 @@ const createTransfer = (req: Request, res: Response) => {
 
         if (bankInfoNotOk || cashInfoNotOk) throw Error("You must specify recipient details correctly")
 
-        const dbTransfer = new Transfer({...transfer, status: TransferStatus.CREATED})
+        const dbTransfer = new Transfer({ ...transfer, status: TransferStatus.CREATED })
         dbTransfer.save()
         res.status(200).json(dbTransfer)
     } catch (err: any) {
@@ -27,4 +27,16 @@ const createTransfer = (req: Request, res: Response) => {
     }
 }
 
-export { createTransfer }
+const getTransfer = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params
+        const transfer = await Transfer.findById(id)
+        if (!transfer) throw Error("Transfer not found")
+        res.status(200).json({ transfer })
+    }
+    catch (err: any) {
+        res.status(400).json({ message: err.message });
+    }
+}
+
+export { createTransfer, getTransfer }

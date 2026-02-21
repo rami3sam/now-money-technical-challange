@@ -24,3 +24,5 @@ export const createTransferSchema = z.object({
   sendCurrency: z.string().length(3).refine((currency) => currencyCodes.includes(currency), "Currency should be 3 letter ISO Code"),
   payoutCurrency: z.string().length(3).refine((currency) => currencyCodes.includes(currency), "Currency should be 3 letter ISO Code"),
 });
+
+export type createTransferSchema = z.infer<typeof createTransferSchema>

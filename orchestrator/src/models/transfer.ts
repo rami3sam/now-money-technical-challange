@@ -1,7 +1,18 @@
 import mongoose from "mongoose";
 import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
 
-const transferSchema = new mongoose.Schema(
+export interface ITransfer {
+    sender: { senderId: string, name: string }
+    recipient: {
+        name: string, country: string, payoutMethod: string,
+        payoutDetails: { accountNumber?: string, personalIDNumner?: string, personalIDType?: string },
+    },
+    sendAmount: number,
+    sendCurrency: string,
+    payoutCurrency: string
+}
+
+const transferSchema = new mongoose.Schema<ITransfer>(
     {
         sender: {
             senderId: {
@@ -68,4 +79,4 @@ const transferSchema = new mongoose.Schema(
     }
 );
 
-export const Transfer = mongoose.model("Transfer", transferSchema);
+export const Transfer = mongoose.model<ITransfer>("Transfer", transferSchema);

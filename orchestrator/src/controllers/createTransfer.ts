@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { createTransferSchema } from "../validations/createTransfer.ts";
 import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
 import { errorMonitor } from "node:events";
+import { Transfer } from "../models/transfer.ts";
 
 const createTransfer = (req: Request, res: Response) => {
     try {
@@ -17,6 +18,8 @@ const createTransfer = (req: Request, res: Response) => {
 
         if (bankInfoNotOk || cashInfoNotOk) throw Error("You must specify recipient details correctly")
 
+        const dbTransfer = new Transfer(transfer)
+        dbTransfer.save()
         res.status(200).json(transfer)
     } catch (err: any) {
         res.status(400).json(err.message);

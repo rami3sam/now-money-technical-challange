@@ -1,0 +1,18 @@
+export enum TransferStatus {
+  CREATED = "CREATED",
+  QUOTED = "QUOTED",
+  CONFIRMED = "CONFIRMED",
+
+  COMPLIANCE_PENDING = "COMPLIANCE_PENDING",
+  COMPLIANCE_APPROVED = "COMPLIANCE_APPROVED",
+  COMPLIANCE_REJECTED = "COMPLIANCE_REJECTED",
+
+  PAYOUT_PENDING = "PAYOUT_PENDING",
+
+  PAID = "PAID",
+  FAILED = "FAILED",
+
+  REFUNDED = "REFUNDED",
+}
+
+export const TransferStatusValues = Object.values(TransferStatus) as string[];

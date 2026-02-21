@@ -1,9 +1,9 @@
 
 import { z } from "zod";
 import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
-import PersonalIDTypes from "../enums/personalIDTypes.ts";
-import countryCodesAlpha3 from "../constants/countryCodes.ts";
-import currencyCodes from "../constants/currencyCodes.ts";
+import { PersonalIDTypesValues } from "../enums/personalIDTypes.enum.ts";
+import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
 
 export const createTransferSchema = z.object({
   sender: z.object({
@@ -12,17 +12,17 @@ export const createTransferSchema = z.object({
   }),
   recipient: z.object({
     name: z.string().min(1, "recipient name is required"),
-    country: z.string().length(3).refine((country) => countryCodesAlpha3.includes(country), "Country should be 3 letter ISO Code"),
+    country: z.string().length(3).refine((country) => CountryCodesValues.includes(country), "Country should be 3 letter ISO Code"),
     payoutMethod: z.enum([PayoutMethods.Bank, PayoutMethods.Cash]),
     payoutDetails: z.object({
       accountNumber: z.string().optional(),
       personalIDNumber: z.string().optional(),
-      personalIDType: z.enum([PersonalIDTypes.Passport, PersonalIDTypes.NationalID]).optional()
+      personalIDType: z.enum(PersonalIDTypesValues).optional()
     }),
   }),
   sendAmount: z.int().positive("Amount must be positive"),
-  sendCurrency: z.string().length(3).refine((currency) => currencyCodes.includes(currency), "Currency should be 3 letter ISO Code"),
-  payoutCurrency: z.string().length(3).refine((currency) => currencyCodes.includes(currency), "Currency should be 3 letter ISO Code"),
+  sendCurrency: z.string().length(3).refine((currency) => CurrencyCodesValues.includes(currency), "Currency should be 3 letter ISO Code"),
+  payoutCurrency: z.string().length(3).refine((currency) => CurrencyCodesValues.includes(currency), "Currency should be 3 letter ISO Code"),
 });
 
 export type createTransferSchema = z.infer<typeof createTransferSchema>

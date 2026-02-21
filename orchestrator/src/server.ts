@@ -8,7 +8,6 @@ const app = express()
 app.use(json())
 app.use(transfersRoutes)
 
-app.listen(8000)
 async function startServer() {
     await connectDB();
 

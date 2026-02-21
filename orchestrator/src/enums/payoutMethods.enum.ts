@@ -4,3 +4,5 @@ enum PayoutMethods {
 }
 
 export { PayoutMethods }
+
+export const PayoutMethodsValues = Object.values(PayoutMethods) as string[];

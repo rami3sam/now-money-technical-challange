@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec node --loader ts-node/esm src/server.ts"
+    "dev": "nodemon --exec node  --loader ts-node/esm  src/server.ts"
   },
   "dependencies": {
     "express": "^5.2.1",

@@ -1,18 +1,10 @@
 import mongoose from "mongoose";
-import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
+import {  PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
+import { TransferStatusValues } from "../enums/transferStatus.enum.ts";
+import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
 
-export interface ITransfer {
-    sender: { senderId: string, name: string }
-    recipient: {
-        name: string, country: string, payoutMethod: string,
-        payoutDetails: { accountNumber?: string, personalIDNumner?: string, personalIDType?: string },
-    },
-    sendAmount: number,
-    sendCurrency: string,
-    payoutCurrency: string
-}
-
-const transferSchema = new mongoose.Schema<ITransfer>(
+const transferSchema = new mongoose.Schema(
     {
         sender: {
             senderId: {
@@ -32,12 +24,13 @@ const transferSchema = new mongoose.Schema<ITransfer>(
             },
             country: {
                 type: String,
+                enum: CountryCodesValues,
                 required: true,
                 minlength: 2,
             },
             payoutMethod: {
                 type: String,
-                enum: [PayoutMethods.Bank, PayoutMethods.Cash], // or Object.values(PayoutMethods)
+                enum: PayoutMethodsValues,
                 required: true,
             },
 
@@ -62,6 +55,7 @@ const transferSchema = new mongoose.Schema<ITransfer>(
 
         sendCurrency: {
             type: String,
+            enum: CurrencyCodesValues,
             required: true,
             minlength: 3,
             maxlength: 3,
@@ -69,14 +63,20 @@ const transferSchema = new mongoose.Schema<ITransfer>(
 
         payoutCurrency: {
             type: String,
+            enum: CurrencyCodesValues,
             required: true,
             minlength: 3,
             maxlength: 3,
         },
+        status: {
+            type: String,
+            enum: TransferStatusValues,
+            required: true,
+        }
     },
     {
         timestamps: true,
     }
 );
 
-export const Transfer = mongoose.model<ITransfer>("Transfer", transferSchema);
+export const Transfer = mongoose.model("Transfer", transferSchema);

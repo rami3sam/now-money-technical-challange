@@ -1,8 +1,8 @@
 import { execPath } from "node:process"
 
 enum PersonalIDTypes {
-    Passport = "passport",
-    NationalID = "national_id",
+    Passport = "PASSPORT",
+    NationalID = "NATIONAL_ID",
 }
 
 export default PersonalIDTypes

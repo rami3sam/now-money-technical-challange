@@ -16,4 +16,23 @@ export enum TransferStatus {
   CANELLED = "CANCELLED",
 }
 
+
+export const allowedTransitions: Record<TransferStatus, TransferStatus[]> = {
+  [TransferStatus.CREATED]: [TransferStatus.QUOTED],
+  [TransferStatus.QUOTED]: [TransferStatus.CONFIRMED],
+  [TransferStatus.CONFIRMED]: [TransferStatus.COMPLIANCE_PENDING, TransferStatus.PAYOUT_PENDING],
+  [TransferStatus.COMPLIANCE_PENDING]: [TransferStatus.COMPLIANCE_APPROVED, TransferStatus.COMPLIANCE_REJECTED],
+  [TransferStatus.COMPLIANCE_APPROVED]: [TransferStatus.PAYOUT_PENDING],
+  [TransferStatus.COMPLIANCE_REJECTED]: [TransferStatus.REFUNDED],
+  [TransferStatus.PAYOUT_PENDING]: [TransferStatus.PAID, TransferStatus.FAILED],
+  [TransferStatus.PAID]: [],
+  [TransferStatus.FAILED]: [TransferStatus.REFUNDED],
+  [TransferStatus.REFUNDED]: [],
+  [TransferStatus.CANELLED]: []
+};
+
+export function assertTransferStatusTransition(from: TransferStatus, to: TransferStatus) {
+  if (!from.includes(to)) throw Error(`Invalid transfer status transition from "${from}" to "${to}`)
+}
+
 export const TransferStatusValues = Object.values(TransferStatus) as string[];

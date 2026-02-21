@@ -1,6 +1,6 @@
 enum PayoutMethods {
-    Bank = 'bank',
-    Cash = 'cash'
+    Bank = 'BANK',
+    Cash = 'CASH'
 }
 
 export { PayoutMethods }

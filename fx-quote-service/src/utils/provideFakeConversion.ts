@@ -48,11 +48,16 @@ const ratesToUSD: Record<string, number> = {
 export function getFXRate(base: CurrencyCodes, counter: CurrencyCodes): number {
   const baseInUSD = ratesToUSD[base];
   const counterInUSD = ratesToUSD[counter];
-
+  let rate: number
+  
   if (!baseInUSD || !counterInUSD) {
-    return 3; // Default FX rate for unsupported currencies
+    rate = 3; // Default FX rate for unsupported currencies
+  }else{
+    rate =  (1 / baseInUSD) * counterInUSD;
   }
 
-  return (1 / baseInUSD) * counterInUSD;
+  rate = rate * (Math.random() * (1.02 - 0.98) + 0.98);
+
+   return parseFloat(rate.toFixed(2))
 }
 

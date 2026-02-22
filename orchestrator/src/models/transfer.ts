@@ -1,11 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, { Mongoose, Schema } from "mongoose";
 import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
 import { TransferStatusValues } from "../enums/transferStatus.enum.ts";
 import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
 import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
-import { minLength } from "zod";
-import { isValid } from "zod/v3";
-import { isValidMoney } from "../utils/validatorFunctions.ts";
+import {
+  allValuesProvidedValidator,
+  isValidMoney,
+} from "../utils/validatorFunctions.ts";
+import { quoteSchema } from "./quote.ts";
 
 const transferSchema = new mongoose.Schema(
   {
@@ -60,6 +62,14 @@ const transferSchema = new mongoose.Schema(
       },
     },
 
+    quote: {
+      type: quoteSchema,
+      validate: {
+        validator: allValuesProvidedValidator(quoteSchema),
+        message: "quote must be either fully null or fully provided",
+      },
+    },
+
     sendCurrency: {
       type: String,
       enum: CurrencyCodesValues,
@@ -86,4 +96,4 @@ const transferSchema = new mongoose.Schema(
   },
 );
 
-export const Transfer = mongoose.model("Transfer", transferSchema);
+export const Transfer = mongoose.model("Transfers", transferSchema);

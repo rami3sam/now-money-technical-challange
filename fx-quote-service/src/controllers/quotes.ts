@@ -3,8 +3,9 @@ import { generateQuoteSchema } from "../validations/genearteQuote.ts";
 import currency from "currency.js";
 import { getFXRate } from "../utils/provideFakeConversion.ts";
 import type { CurrencyCodes } from "../enums/currencyCodes.enum.ts";
+import { Quote } from "../models/quotes.ts";
 
-const generateQuote = (req: Request, res: Response) => {
+const generateQuote = async (req: Request, res: Response) => {
   try {
     const fxInfo = generateQuoteSchema.parse(req.body);
     const fxRate: number = getFXRate(
@@ -18,9 +19,19 @@ const generateQuote = (req: Request, res: Response) => {
     const payoutAmount: currency = currency(fxInfo.sendAmount)
       .subtract(feeAmount)
       .multiply(fxRate);
-      
+
     const quoteExpiry = new Date(Date.now() + 60 * 1000);
-    res.status(200).json({ fxRate, feeAmount, payoutAmount, quoteExpiry });
+
+    const quote = new Quote({
+      ...fxInfo,
+      fxRate: fxRate.toString(),
+      feeAmount: feeAmount.toString(),
+      payoutAmount: payoutAmount.toString(),
+      quoteExpiry,
+    });
+
+    await quote.save();
+    res.status(200).json(quote);
   } catch (err: any) {
     res.status(400).json(err.message);
   }

@@ -4,6 +4,9 @@ import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
 import { PersonalIDTypesValues } from "../enums/personalIDTypes.enum.ts";
 import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
 import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
+import { isValidMoney } from "../utils/validatorFunctions.ts";
+
+
 
 export const createTransferSchema = z.object({
   sender: z.object({
@@ -20,9 +23,9 @@ export const createTransferSchema = z.object({
       personalIDType: z.enum(PersonalIDTypesValues).optional()
     }),
   }),
-  sendAmount: z.int().positive("Amount must be positive"),
+  sendAmount: z.string().min(1, "sendAmount is required").refine(isValidMoney, "sendAmount should be a valid money format (e.g., 100.00)"),
   sendCurrency: z.string().length(3).refine((currency) => CurrencyCodesValues.includes(currency), "Currency should be 3 letter ISO Code"),
   payoutCurrency: z.string().length(3).refine((currency) => CurrencyCodesValues.includes(currency), "Currency should be 3 letter ISO Code"),
-});
+})
 
 export type createTransferSchema = z.infer<typeof createTransferSchema>

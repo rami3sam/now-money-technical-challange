@@ -11,10 +11,12 @@
     "dev": "nodemon --exec node  --loader ts-node/esm  src/server.ts"
   },
   "dependencies": {
+    "currency.js": "^2.0.4",
     "express": "^5.2.1",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/mongoose": "^5.11.96",
     "@types/node": "^25.3.0",
     "nodemon": "^3.1.13",
     "ts-node": "^10.9.2",

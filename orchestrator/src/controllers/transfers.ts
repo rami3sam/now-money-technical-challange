@@ -1,10 +1,14 @@
 import type { Request, Response } from "express";
 import { createTransferSchema } from "../validations/createTransfer.ts";
 import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
-import { Transfer } from "../models/transfer.ts";
-import { TransferStatus } from "../enums/transferStatus.enum.ts";
+import { Transfer, type TransferType } from "../models/transfer.ts";
+import { assertTransferStatusTransition, TransferStatus } from "../enums/transferStatus.enum.ts";
 import axios from "axios";
 import { quoteResponseSchema } from "../validations/quote.ts";
+import { LinkedQueue } from "../utils/queue.ts";
+import { addToTransferQueue } from "../queues/transferQueue.ts";
+
+
 
 const createTransfer = async (req: Request, res: Response) => {
   try {
@@ -33,25 +37,9 @@ const createTransfer = async (req: Request, res: Response) => {
 
     await dbTransfer.save();
 
-    const quoteResponse = await axios.post("http://localhost:8001/quote", {
-      sendAmount: transfer.sendAmount,
-      sendCurrency: transfer.sendCurrency,
-      payoutCurrency: transfer.payoutCurrency,
-      destinationCountry: recipient.country,
-      payoutMethod: recipient.payoutMethod,
-    });
+    addToTransferQueue(dbTransfer.id);
 
-    const quote = quoteResponseSchema.parse(quoteResponse.data);
-
-    dbTransfer.quote = {
-      rate: quote.fxRate,
-      fee: quote.feeAmount,
-      payoutAmount: quote.payoutAmount,
-      expiry: quote.quoteExpiry,
-    };
-
-    dbTransfer.status = TransferStatus.QUOTED;
-    await dbTransfer.save();
+    
 
     res.status(200).json(dbTransfer);
   } catch (err: any) {
@@ -84,7 +72,7 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
       throw Error("Quote has expired");
 
     transfer.immutableQuoteSnapshot = {...transfer.quote};
-
+    assertTransferStatusTransition(transfer.status, TransferStatus.CONFIRMED);
     transfer.status = TransferStatus.CONFIRMED;
     await transfer.save();
     res.status(200).json({ transfer });

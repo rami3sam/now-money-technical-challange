@@ -17,7 +17,7 @@ export enum TransferStatus {
 }
 
 
-export const allowedTransitions: Record<TransferStatus, TransferStatus[]> = {
+export const allowedTransitions: Record<string, string[]> = {
   [TransferStatus.CREATED]: [TransferStatus.QUOTED],
   [TransferStatus.QUOTED]: [TransferStatus.CONFIRMED],
   [TransferStatus.CONFIRMED]: [TransferStatus.COMPLIANCE_PENDING, TransferStatus.PAYOUT_PENDING],
@@ -31,8 +31,9 @@ export const allowedTransitions: Record<TransferStatus, TransferStatus[]> = {
   [TransferStatus.CANELLED]: []
 };
 
-export function assertTransferStatusTransition(from: TransferStatus, to: TransferStatus) {
-  if (!from.includes(to)) throw Error(`Invalid transfer status transition from "${from}" to "${to}`)
+export function assertTransferStatusTransition(from: string, to: string) {
+  if(!Object.keys(allowedTransitions).includes(from)) throw Error(`Invalid from status "${from}"`);
+  if (!allowedTransitions[from]!.includes(to)) throw Error(`Invalid transfer status transition from "${from}" to "${to}"`);
 }
 
 export const TransferStatusValues = Object.values(TransferStatus) as string[];

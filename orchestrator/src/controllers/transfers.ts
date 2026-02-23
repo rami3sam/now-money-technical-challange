@@ -61,7 +61,6 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const transfer = await Transfer.findById(id);
-
     if (!transfer) throw Error("Transfer not found");
 
     if (transfer.status !== TransferStatus.QUOTED)
@@ -79,6 +78,8 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
       { $set: transfer },
       { returnDocument: "after" },
     ).exec();
+
+    addToTransferQueue(transfer.id);
 
     res.status(200).json({ newTransfer });
   } catch (err: any) {

@@ -1,7 +1,10 @@
 import { TransferStatus } from "../enums/transferStatus.enum.ts";
 import { Transfer } from "../models/transfer.ts";
 import { LinkedQueue } from "../utils/queue.ts";
-import { quoteTransferWorker } from "./worker/transferWorkers.ts";
+import {
+  checkTransferCompliance,
+  quoteTransferWorker,
+} from "./workers/transferWorkers.ts";
 
 const TransferQueue = new LinkedQueue<string>();
 let isRunning = false;
@@ -23,11 +26,15 @@ async function runQueueWorker() {
     try {
       if (transfer?.status === TransferStatus.CREATED) {
         await quoteTransferWorker(transferId);
+      } else if (transfer?.status === TransferStatus.CONFIRMED) {
+        await checkTransferCompliance(transferId);
       }
     } catch (err) {
       console.error(`Error processing transfer with id ${transferId}:`, err);
     }
   }
+
+  isRunning = false;
 }
 
 export { addToTransferQueue, runQueueWorker };

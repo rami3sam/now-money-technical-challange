@@ -178,7 +178,14 @@ export enum CurrencyCodes {
   YER = "YER",
   ZAR = "ZAR",
   ZMW = "ZMW",
-  ZWL = "ZWL"
+  ZWL = "ZWL",
+}
+
+export function getCurrencyEnum(value: string): CurrencyCodes | undefined {
+  if (Object.values(CurrencyCodes).includes(value as CurrencyCodes)) {
+    return value as CurrencyCodes;
+  }
+  return undefined;
 }
 
 export const CurrencyCodesValues = Object.values(CurrencyCodes) as string[];

@@ -9,4 +9,8 @@ const bannedCountries: string[] = [
   CountryCodes.CUB,
 ];
 
-export { bannedCountries };
+const bannedPeople: string[] = ["Osama Bin Laden", "Adolf Hitler"].map((name) =>
+  name.toLowerCase().replace(/\s+/g, " ").trim(),
+);
+
+export { bannedCountries, bannedPeople };

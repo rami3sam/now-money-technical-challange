@@ -6,9 +6,7 @@ import {
   assertTransferStatusTransition,
   TransferStatus,
 } from "../enums/transferStatus.enum.ts";
-import axios from "axios";
-import { quoteResponseSchema } from "../validations/quote.ts";
-import { LinkedQueue } from "../utils/queue.ts";
+
 import { addToTransferQueue } from "../queues/transferQueue.ts";
 
 const createTransfer = async (req: Request, res: Response) => {
@@ -87,4 +85,98 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
   }
 };
 
-export { createTransfer, getTransfer, confirmTransferQuote };
+const cancelTransfer = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const transfer = await Transfer.findById(id);
+    if (!transfer) throw Error("Transfer not found");
+
+    assertTransferStatusTransition(transfer.status, TransferStatus.CANCELLED);
+    transfer.status = TransferStatus.CANCELLED;
+    const newTransfer = await Transfer.findOneAndUpdate(
+      {
+        _id: id,
+        status: {
+          $in: [
+            TransferStatus.CREATED,
+            TransferStatus.QUOTED,
+            TransferStatus.CONFIRMED,
+          ],
+        },
+      },
+      { $set: transfer },
+      { returnDocument: "after" },
+    ).exec();
+
+    addToTransferQueue(transfer.id);
+
+    res.status(200).json({ newTransfer });
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const approveTransfer = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const transfer = await Transfer.findById(id);
+    if (!transfer) throw Error("Transfer not found");
+
+    assertTransferStatusTransition(
+      transfer.status,
+      TransferStatus.COMPLIANCE_APPROVED,
+    );
+    transfer.status = TransferStatus.COMPLIANCE_APPROVED;
+    const newTransfer = await Transfer.findOneAndUpdate(
+      {
+        _id: id,
+        status: TransferStatus.COMPLIANCE_PENDING,
+      },
+      { $set: transfer },
+      { returnDocument: "after" },
+    ).exec();
+
+    addToTransferQueue(transfer.id);
+
+    res.status(200).json({ newTransfer });
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const rejectTransfer = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const transfer = await Transfer.findById(id);
+    if (!transfer) throw Error("Transfer not found");
+
+    assertTransferStatusTransition(
+      transfer.status,
+      TransferStatus.COMPLIANCE_REJECTED,
+    );
+    transfer.status = TransferStatus.COMPLIANCE_REJECTED;
+    const newTransfer = await Transfer.findOneAndUpdate(
+      {
+        _id: id,
+        status: TransferStatus.COMPLIANCE_PENDING,
+      },
+      { $set: transfer },
+      { returnDocument: "after" },
+    ).exec();
+
+    addToTransferQueue(transfer.id);
+
+    res.status(200).json({ newTransfer });
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+export {
+  createTransfer,
+  getTransfer,
+  confirmTransferQuote,
+  cancelTransfer,
+  approveTransfer,
+  rejectTransfer,
+};

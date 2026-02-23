@@ -5,8 +5,11 @@ import {
   assertTransferStatusTransition,
   TransferStatus,
 } from "../../enums/transferStatus.enum.ts";
-import { bannedCountries } from "../../constants/constants.ts";
-import { getComplianceMaximum } from "../../utils/utilFunctions.ts";
+import { bannedCountries, bannedPeople } from "../../constants/constants.ts";
+import {
+  checkForNameInList,
+  getComplianceMaximum,
+} from "../../utils/utilFunctions.ts";
 import {
   CurrencyCodes,
   getCurrencyEnum,
@@ -45,7 +48,6 @@ export async function quoteTransferWorker(transferId: string) {
 }
 
 export async function checkTransferCompliance(transferId: string) {
-  console.log(`Checking compliance for transfer with id ${transferId}`);
   const transfer = await Transfer.findById(transferId);
   if (!transfer) throw Error(`Transfer with id ${transferId} not found`);
 
@@ -59,11 +61,29 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_REJECTED;
-    await Transfer.findOneAndUpdate(
+    const newTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
-      transfer,
+      { $set: transfer },
     ).exec();
-    return;
+
+    if (!newTransfer)
+      throw new Error(
+        "Failed to update transfer status to COMPLIANCE_REJECTED",
+      );
+  } else if (checkForNameInList(recipient.name, bannedPeople)) {
+    assertTransferStatusTransition(
+      transfer.status,
+      TransferStatus.COMPLIANCE_PENDING,
+    );
+
+    transfer.status = TransferStatus.COMPLIANCE_PENDING;
+    const newTransfer = await Transfer.findOneAndUpdate(
+      { _id: transfer.id, status: TransferStatus.CONFIRMED },
+      { $set: transfer },
+    ).exec();
+
+    if (!newTransfer)
+      throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
   } else if (
     currency(transfer.sendAmount) <
     currency(getComplianceMaximum(transfer.sendCurrency as CurrencyCodes))
@@ -74,11 +94,15 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_APPROVED;
-    await Transfer.findOneAndUpdate(
+    const newTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
-      transfer,
+      { $set: transfer },
     ).exec();
-    return;
+
+    if (!newTransfer)
+      throw new Error(
+        "Failed to update transfer status to COMPLIANCE_APPROVED",
+      );
   } else {
     assertTransferStatusTransition(
       transfer.status,
@@ -86,10 +110,12 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_PENDING;
-    await Transfer.findOneAndUpdate(
+    const newTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
-      transfer,
+      { $set: transfer },
     ).exec();
-    return;
+
+    if (!newTransfer)
+      throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
   }
 }

@@ -27,7 +27,9 @@ function getComplianceMaximum(currency: CurrencyCodes): number {
   }
 }
 
+function checkForNameInList(name: string, list: string[]): Boolean {
+  const normalized = name.toLowerCase().replace(/\s+/g, " ").trim();
+  return list.includes(normalized);
+}
 
-
-
-export { getComplianceMaximum };
+export { getComplianceMaximum, checkForNameInList };

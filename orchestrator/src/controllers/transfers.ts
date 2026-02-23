@@ -8,6 +8,7 @@ import {
 } from "../enums/transferStatus.enum.ts";
 
 import { addToTransferQueue } from "../queues/transferQueue.ts";
+import { ComplianceDecisions } from "../enums/complianceDecisions.ts";
 
 const createTransfer = async (req: Request, res: Response) => {
   try {
@@ -127,6 +128,12 @@ const approveTransfer = async (req: Request, res: Response) => {
       TransferStatus.COMPLIANCE_APPROVED,
     );
     transfer.status = TransferStatus.COMPLIANCE_APPROVED;
+    transfer.complianceDecisions.push({
+      decision: ComplianceDecisions.APPROVED,
+      triggeredRule: `Transfer approved by manual review`,
+      reviewerId: "1",
+    });
+
     const newTransfer = await Transfer.findOneAndUpdate(
       {
         _id: id,
@@ -155,6 +162,11 @@ const rejectTransfer = async (req: Request, res: Response) => {
       TransferStatus.COMPLIANCE_REJECTED,
     );
     transfer.status = TransferStatus.COMPLIANCE_REJECTED;
+    transfer.complianceDecisions.push({
+      decision: ComplianceDecisions.REJECTED,
+      triggeredRule: `Transfer rejected by manual review`,
+      reviewerId: "1",
+    });
     const newTransfer = await Transfer.findOneAndUpdate(
       {
         _id: id,

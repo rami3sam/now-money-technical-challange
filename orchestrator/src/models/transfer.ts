@@ -9,6 +9,7 @@ import {
 } from "../utils/validatorFunctions.ts";
 import { quoteSchema } from "./quote.ts";
 import { immutableQuoteSchema } from "./immutableQuote.ts";
+import { complianceDecisionSchema } from "./complianceDecision.ts";
 
 const transferSchema = new mongoose.Schema(
   {
@@ -104,6 +105,10 @@ const transferSchema = new mongoose.Schema(
       type: String,
       enum: TransferStatusValues,
       required: true,
+    },
+
+    complianceDecisions: {
+      type: [complianceDecisionSchema],
     },
   },
   {

@@ -15,6 +15,7 @@ import {
   getCurrencyEnum,
 } from "../../enums/currencyCodes.enum.ts";
 import currency from "currency.js";
+import { ComplianceDecisions } from "../../enums/complianceDecisions.ts";
 
 export async function quoteTransferWorker(transferId: string) {
   const transfer = await Transfer.findById(transferId);
@@ -61,6 +62,11 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_REJECTED;
+    transfer.complianceDecisions.push({
+      decision: ComplianceDecisions.REJECTED,
+      triggeredRule: `Recipient country ${recipient.country} is banned`,
+    });
+
     const newTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
@@ -77,6 +83,10 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_PENDING;
+    transfer.complianceDecisions.push({
+      decision: ComplianceDecisions.PENDING,
+      triggeredRule: `Recipient name ${recipient.name} is banned`,
+    });
     const newTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
@@ -94,6 +104,10 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_APPROVED;
+    transfer.complianceDecisions.push({
+      decision: ComplianceDecisions.APPROVED,
+      triggeredRule: `amount ${transfer.sendAmount} is below compliance threshold`,
+    });
     const newTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
@@ -110,6 +124,10 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_PENDING;
+     transfer.complianceDecisions.push({
+      decision: ComplianceDecisions.PENDING,
+      triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
+    });
     const newTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },

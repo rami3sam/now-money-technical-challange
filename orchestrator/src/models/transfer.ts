@@ -1,4 +1,4 @@
-import mongoose, { Mongoose, Schema } from "mongoose";
+import mongoose, { Mongoose, Schema, type InferSchemaType } from "mongoose";
 import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
 import { TransferStatusValues } from "../enums/transferStatus.enum.ts";
 import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
@@ -8,6 +8,7 @@ import {
   isValidMoney,
 } from "../utils/validatorFunctions.ts";
 import { quoteSchema } from "./quote.ts";
+import { immutableQuoteSchema } from "./immutableQuote.ts";
 
 const transferSchema = new mongoose.Schema(
   {
@@ -65,8 +66,22 @@ const transferSchema = new mongoose.Schema(
     quote: {
       type: quoteSchema,
       validate: {
-        validator: allValuesProvidedValidator(quoteSchema),
+        validator: allValuesProvidedValidator(Object.keys(quoteSchema.paths)),
         message: "quote must be either fully null or fully provided",
+      },
+    },
+
+    immutableQuoteSnapshot: {
+      type: immutableQuoteSchema,
+      immutable: (value: TransferType) => {
+        return value.immutableQuoteSnapshot !== undefined;
+      },
+      validate: {
+        validator: allValuesProvidedValidator(
+          Object.keys(immutableQuoteSchema.paths),
+        ),
+        message:
+          "immutableQuoteSnapshot must be either fully null or fully provided",
       },
     },
 
@@ -97,3 +112,5 @@ const transferSchema = new mongoose.Schema(
 );
 
 export const Transfer = mongoose.model("Transfers", transferSchema);
+
+export type TransferType = InferSchemaType<typeof transferSchema>;

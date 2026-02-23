@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { type InferSchemaType } from "mongoose";
 
 export const quoteSchema = new mongoose.Schema(
   {

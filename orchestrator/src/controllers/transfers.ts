@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { createTransferSchema } from "../validations/createTransfer.ts";
 import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
-import { errorMonitor } from "node:events";
 import { Transfer } from "../models/transfer.ts";
 import { TransferStatus } from "../enums/transferStatus.enum.ts";
 import axios from "axios";
@@ -32,6 +31,8 @@ const createTransfer = async (req: Request, res: Response) => {
       status: TransferStatus.CREATED,
     });
 
+    await dbTransfer.save();
+
     const quoteResponse = await axios.post("http://localhost:8001/quote", {
       sendAmount: transfer.sendAmount,
       sendCurrency: transfer.sendCurrency,
@@ -41,7 +42,7 @@ const createTransfer = async (req: Request, res: Response) => {
     });
 
     const quote = quoteResponseSchema.parse(quoteResponse.data);
-    
+
     dbTransfer.quote = {
       rate: quote.fxRate,
       fee: quote.feeAmount,
@@ -49,8 +50,9 @@ const createTransfer = async (req: Request, res: Response) => {
       expiry: quote.quoteExpiry,
     };
 
-
+    dbTransfer.status = TransferStatus.QUOTED;
     await dbTransfer.save();
+
     res.status(200).json(dbTransfer);
   } catch (err: any) {
     res.status(400).json(err.message);
@@ -68,4 +70,29 @@ const getTransfer = async (req: Request, res: Response) => {
   }
 };
 
-export { createTransfer, getTransfer };
+const confirmTransferQuote = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const transfer = await Transfer.findById(id);
+
+    if (!transfer) throw Error("Transfer not found");
+
+    if(transfer.status !== TransferStatus.QUOTED)
+      throw Error("Transfer status is not quoted");
+
+    if(transfer.quote?.expiry && new Date(transfer.quote.expiry) < new Date())
+      throw Error("Quote has expired");
+
+    transfer.immutableQuoteSnapshot = {...transfer.quote};
+
+    transfer.status = TransferStatus.CONFIRMED;
+    await transfer.save();
+    res.status(200).json({ transfer });
+  } catch (err: any) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+
+
+export { createTransfer, getTransfer , confirmTransferQuote};

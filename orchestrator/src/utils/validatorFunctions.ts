@@ -6,10 +6,9 @@ export function isValidMoney(value: string): boolean {
   return moneyRegex.test(value);
 }
 
-export function allValuesProvidedValidator(t: mongoose.Schema) {
+export function allValuesProvidedValidator(objectKeys: string[]) {
   return (value: Record<string, any>) => {
-    const keys = Object.keys(t.paths).filter((key) => !["_id", "__v"].includes(key));
-
+    const keys = objectKeys.filter((key) => !["_id", "__v"].includes(key));
     return keys.every((key) => value?.[key] != null);
   };
 }

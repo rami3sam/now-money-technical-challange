@@ -30,5 +30,9 @@ export async function quoteTransferWorker(transferId: string) {
 
   assertTransferStatusTransition(transfer.status, TransferStatus.QUOTED);
   transfer.status = TransferStatus.QUOTED;
-  await transfer.save();
+
+  await Transfer.findOneAndUpdate(
+    { _id: transfer.id, status: TransferStatus.CREATED },
+    transfer,
+  ).exec();
 }

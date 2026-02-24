@@ -5,3 +5,7 @@ payout-partner-simulator
 orchestrator/package-lock.json
 fx-quote-service/package-lock.json
 payout-partner-package-lock.json
+.env
+.env.*
+*/.env
+*/.env.*

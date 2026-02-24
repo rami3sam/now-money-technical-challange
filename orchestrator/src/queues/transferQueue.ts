@@ -24,7 +24,7 @@ async function runQueueWorker() {
       continue;
     }
     try {
-      if (transfer?.status === TransferStatus.CREATED) {
+      if (transfer?.status === TransferStatus.CREATED || transfer?.status === TransferStatus.QUOTE_EXPIRED) {
         await quoteTransferWorker(transferId);
       } else if (transfer?.status === TransferStatus.CONFIRMED) {
         await checkTransferCompliance(transferId);

@@ -65,22 +65,42 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
     if (transfer.status !== TransferStatus.QUOTED)
       throw Error("Transfer status is not quoted");
 
-    if (transfer.quote?.expiry && new Date(transfer.quote.expiry) < new Date())
+    if (
+      transfer.quote?.expiry &&
+      new Date(transfer.quote.expiry) > new Date()
+    ) {
+      transfer.immutableQuoteSnapshot = { ...transfer.quote };
+      assertTransferStatusTransition(transfer.status, TransferStatus.CONFIRMED);
+      transfer.status = TransferStatus.CONFIRMED;
+
+      const newTransfer = await Transfer.findOneAndUpdate(
+        { _id: id, status: TransferStatus.QUOTED },
+        { $set: transfer },
+        { returnDocument: "after" },
+      ).exec();
+
+      if (newTransfer) addToTransferQueue(transfer.id);
+      else throw Error("Failed to update transfer status to CONFIRMED");
+
+      res.status(200).json({ newTransfer });
+    } else {
+      assertTransferStatusTransition(
+        transfer.status,
+        TransferStatus.QUOTE_EXPIRED,
+      );
+      transfer.status = TransferStatus.QUOTE_EXPIRED;
+      transfer.quote = null;
+      const newTransfer = await Transfer.findOneAndUpdate(
+        { _id: id, status: TransferStatus.QUOTED },
+        { $set: transfer },
+        { returnDocument: "after" },
+      ).exec();
+
+      if (newTransfer) addToTransferQueue(transfer.id);
+      else throw Error("Failed to update transfer status to QUOTE_EXPIRED");
+
       throw Error("Quote has expired");
-
-    transfer.immutableQuoteSnapshot = { ...transfer.quote };
-    assertTransferStatusTransition(transfer.status, TransferStatus.CONFIRMED);
-    transfer.status = TransferStatus.CONFIRMED;
-
-    const newTransfer = await Transfer.findOneAndUpdate(
-      { _id: id, status: TransferStatus.QUOTED },
-      { $set: transfer },
-      { returnDocument: "after" },
-    ).exec();
-
-    addToTransferQueue(transfer.id);
-
-    res.status(200).json({ newTransfer });
+    }
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }

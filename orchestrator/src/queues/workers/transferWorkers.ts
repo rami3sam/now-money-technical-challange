@@ -43,7 +43,10 @@ export async function quoteTransferWorker(transferId: string) {
   transfer.status = TransferStatus.QUOTED;
 
   await Transfer.findOneAndUpdate(
-    { _id: transfer.id, status: TransferStatus.CREATED },
+    {
+      _id: transfer.id,
+      status: { $in: [TransferStatus.CREATED, TransferStatus.QUOTE_EXPIRED] },
+    },
     transfer,
   ).exec();
 }
@@ -124,7 +127,7 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_PENDING;
-     transfer.complianceDecisions.push({
+    transfer.complianceDecisions.push({
       decision: ComplianceDecisions.PENDING,
       triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
     });

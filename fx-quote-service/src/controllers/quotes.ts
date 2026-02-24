@@ -4,6 +4,7 @@ import currency from "currency.js";
 import { getFXRate } from "../utils/provideFakeConversion.ts";
 import type { CurrencyCodes } from "../enums/currencyCodes.enum.ts";
 import { Quote } from "../models/quotes.ts";
+import { quoteExpiryTimeInSeconds } from "../constants/constants.ts";
 
 const generateQuote = async (req: Request, res: Response) => {
   try {
@@ -20,7 +21,7 @@ const generateQuote = async (req: Request, res: Response) => {
       .subtract(feeAmount)
       .multiply(fxRate);
 
-    const quoteExpiry = new Date(Date.now() + 60 * 1000);
+    const quoteExpiry = new Date(Date.now() + quoteExpiryTimeInSeconds);
 
     const quote = new Quote({
       ...fxInfo,

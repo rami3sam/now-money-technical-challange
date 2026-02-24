@@ -9,8 +9,6 @@ import {
 
 import { addToTransferQueue } from "../queues/transferQueue.ts";
 import { ComplianceDecisions } from "../enums/complianceDecisions.ts";
-import { v7 as uuidv7 } from "uuid";
-import { quoteTransferWorker } from "../queues/workers/transferWorkers.ts";
 import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 
 const createTransfer = async (req: Request, res: Response) => {
@@ -43,10 +41,8 @@ const createTransfer = async (req: Request, res: Response) => {
     await dbTransfer.save();
 
     addToTransferQueue({
-      id: uuidv7(),
-      executeAt: new Date(),
       taskHandler: TaskHandlers.QUOTE_TRANSFER,
-      payload: dbTransfer.id,
+      payload: dbTransfer.id
     });
 
     res.status(200).json(dbTransfer);
@@ -92,10 +88,8 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
 
       if (newTransfer)
         addToTransferQueue({
-          id: uuidv7(),
-          executeAt: new Date(),
           taskHandler: TaskHandlers.CHECK_COMPLIANCE,
-          payload: newTransfer.id,
+          payload: newTransfer.id
         });
       else throw Error("Failed to update transfer status to CONFIRMED");
 
@@ -116,10 +110,8 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
 
       if (newTransfer)
         addToTransferQueue({
-          id: uuidv7(),
-          executeAt: new Date(),
           taskHandler: TaskHandlers.QUOTE_TRANSFER,
-          payload: newTransfer.id,
+          payload: newTransfer.id
         });
       else throw Error("Failed to update transfer status to QUOTE_EXPIRED");
 
@@ -155,10 +147,8 @@ const cancelTransfer = async (req: Request, res: Response) => {
     ).exec();
     if (newTransfer)
       addToTransferQueue({
-        id: uuidv7(),
-        executeAt: new Date(),
         taskHandler: TaskHandlers.CANCEL_TRANSFER,
-        payload: newTransfer.id,
+        payload: newTransfer.id
       });
     else throw new Error("Failed to update transfer status to CANCELLED");
 
@@ -197,15 +187,10 @@ const approveTransfer = async (req: Request, res: Response) => {
 
     if (newTransfer)
       addToTransferQueue({
-        id: uuidv7(),
-        executeAt: new Date(),
         taskHandler: TaskHandlers.INITIATE_PAYOUT,
-        payload: newTransfer.id,
+        payload: newTransfer.id
       });
-    else
-      throw new Error(
-        "Failed to update transfer status to COMPLIANCE_APPROVED",
-      );
+    else throw new Error("Failed to update transfer status to COMPLIANCE_APPROVED");
 
     res.status(200).json({ newTransfer });
   } catch (err: any) {
@@ -239,17 +224,12 @@ const rejectTransfer = async (req: Request, res: Response) => {
       { returnDocument: "after" },
     ).exec();
 
-    if (newTransfer)
-      addToTransferQueue({
-        id: uuidv7(),
-        executeAt: new Date(),
-        taskHandler: TaskHandlers.REJECT_TRANSFER,
-        payload: newTransfer.id,
-      });
-    else
-      throw new Error(
-        "Failed to update transfer status to COMPLIANCE_REJECTED",
-      );
+    if(newTransfer) addToTransferQueue({
+
+      taskHandler: TaskHandlers.REJECT_TRANSFER,
+      payload: newTransfer.id
+    });
+    else throw new Error("Failed to update transfer status to COMPLIANCE_REJECTED");
 
     res.status(200).json({ newTransfer });
   } catch (err: any) {

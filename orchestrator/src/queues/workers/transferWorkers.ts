@@ -126,12 +126,11 @@ export async function checkTransferCompliance(transferId: string) {
         "Failed to update transfer status to COMPLIANCE_APPROVED",
       );
 
-    addToTransferQueue({
-      id: transfer.id,
-      executeAt: new Date(),
-      taskHandler: TaskHandlers.INITIATE_PAYOUT,
-      payload: newTransfer.id,
-    });
+    addToTransferQueue(
+     { taskHandler: TaskHandlers.INITIATE_PAYOUT,
+      payload: newTransfer.id}
+    );
+
   } else {
     assertTransferStatusTransition(
       transfer.status,

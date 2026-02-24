@@ -2,7 +2,7 @@ import express, { json, response } from "express";
 import transfersRoutes from "./routes/transfersRoutes.ts";
 import connectDB from "./utils/connectDB.ts";
 import { EnvVariables } from "./constants/config.ts";
-import { runQueueWorker } from "./queues/transferQueue.ts";
+import { runQueueWorker } from "./queues/taskQueue.ts";
 import webhooksRoutes from "./routes/webhooks.ts";
 
 const PORT = EnvVariables.PORT;

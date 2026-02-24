@@ -1,5 +1,4 @@
 import { CountryCodes } from "../enums/countryCodes.enum.ts";
-import { CurrencyCodes } from "../enums/currencyCodes.enum.ts";
 
 const bannedCountries: string[] = [
   CountryCodes.IRN,
@@ -12,7 +11,5 @@ const bannedCountries: string[] = [
 const bannedPeople: string[] = ["Osama Bin Laden", "Adolf Hitler"].map((name) =>
   name.toLowerCase().replace(/\s+/g, " ").trim(),
 );
-
-
 
 export { bannedCountries, bannedPeople };

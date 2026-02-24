@@ -32,11 +32,6 @@ export const immutableQuoteSchema = new mongoose.Schema(
   },
 );
 
-export const ImmutableQuote = mongoose.model(
-  "ImmutableQuote",
-  immutableQuoteSchema,
-);
-
 interface ImmutableQuoteType {
   rate?: string | undefined;
   fee?: string | undefined;

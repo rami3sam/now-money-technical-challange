@@ -1,12 +1,10 @@
 import { Router, type Request, type Response } from "express";
-import {
-  approveTransfer,
-  cancelTransfer,
-  confirmTransferQuote,
-  createTransfer,
-  getTransfer,
-  rejectTransfer,
-} from "../controllers/transfers.ts";
+import { createTransfer } from "../controllers/transfers/createTransfer.ts";
+import { getTransfer } from "../controllers/transfers/getTransfer.ts";
+import { confirmTransferQuote } from "../controllers/transfers/confirmTransferQuote.ts";
+import { cancelTransfer } from "../controllers/transfers/cancelTransfer.ts";
+import { approveTransfer } from "../controllers/transfers/approveTransfer.ts";
+import { rejectTransfer } from "../controllers/transfers/rejectTransfer.ts";
 
 const transfersRoutes = Router();
 

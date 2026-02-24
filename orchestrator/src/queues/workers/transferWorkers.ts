@@ -41,6 +41,7 @@ export async function quoteTransferWorker(transferId: string) {
 
   assertTransferStatusTransition(transfer.status, TransferStatus.QUOTED);
   transfer.status = TransferStatus.QUOTED;
+  transfer.stateHistory.push({state: TransferStatus.QUOTED});
 
   await Transfer.findOneAndUpdate(
     {
@@ -65,6 +66,7 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_REJECTED;
+    transfer.stateHistory.push({state: TransferStatus.COMPLIANCE_REJECTED});
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.REJECTED,
       triggeredRule: `Recipient country ${recipient.country} is banned`,
@@ -86,6 +88,7 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_PENDING;
+    transfer.stateHistory.push({state: TransferStatus.COMPLIANCE_PENDING});
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.PENDING,
       triggeredRule: `Recipient name ${recipient.name} is banned`,
@@ -107,6 +110,7 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_APPROVED;
+    transfer.stateHistory.push({state: TransferStatus.COMPLIANCE_APPROVED});
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.APPROVED,
       triggeredRule: `amount ${transfer.sendAmount} is below compliance threshold`,
@@ -127,6 +131,7 @@ export async function checkTransferCompliance(transferId: string) {
     );
 
     transfer.status = TransferStatus.COMPLIANCE_PENDING;
+    transfer.stateHistory.push({state: TransferStatus.COMPLIANCE_PENDING});
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.PENDING,
       triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,

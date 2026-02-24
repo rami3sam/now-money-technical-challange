@@ -43,5 +43,3 @@ interface ImmutableQuoteType {
   payoutAmount?: string | undefined;
   expiry?: Date | undefined;
 }
-
-// export type ImmutableQuoteType = InferSchemaType<typeof immutableQuoteSchema>;

@@ -22,8 +22,3 @@ export const complianceDecisionSchema = new mongoose.Schema(
     _id: false,
   },
 );
-
-export const ComplianceDecision = mongoose.model(
-  "ComplianceDecision",
-  complianceDecisionSchema,
-);

@@ -10,6 +10,7 @@ import {
 import { quoteSchema } from "./quote.ts";
 import { immutableQuoteSchema } from "./immutableQuote.ts";
 import { complianceDecisionSchema } from "./complianceDecision.ts";
+import { transferStateHistorySchema } from "./transferStateHistory.ts";
 
 const transferSchema = new mongoose.Schema(
   {
@@ -109,6 +110,10 @@ const transferSchema = new mongoose.Schema(
 
     complianceDecisions: {
       type: [complianceDecisionSchema],
+    },
+
+    stateHistory: {
+      type: [transferStateHistorySchema],
     },
   },
   {

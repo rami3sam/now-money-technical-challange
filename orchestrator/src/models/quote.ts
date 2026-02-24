@@ -19,5 +19,3 @@ export const quoteSchema = new mongoose.Schema(
     _id: false,
   },
 );
-
-export const Quote = mongoose.model("Quote", quoteSchema);

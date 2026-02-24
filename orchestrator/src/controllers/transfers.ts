@@ -35,6 +35,8 @@ const createTransfer = async (req: Request, res: Response) => {
       status: TransferStatus.CREATED,
     });
 
+    dbTransfer.stateHistory.push(({ state: TransferStatus.CREATED }));
+
     await dbTransfer.save();
 
     addToTransferQueue(dbTransfer.id);
@@ -72,6 +74,7 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
       transfer.immutableQuoteSnapshot = { ...transfer.quote };
       assertTransferStatusTransition(transfer.status, TransferStatus.CONFIRMED);
       transfer.status = TransferStatus.CONFIRMED;
+      transfer.stateHistory.push({ state: TransferStatus.CONFIRMED });
 
       const newTransfer = await Transfer.findOneAndUpdate(
         { _id: id, status: TransferStatus.QUOTED },
@@ -89,6 +92,7 @@ const confirmTransferQuote = async (req: Request, res: Response) => {
         TransferStatus.QUOTE_EXPIRED,
       );
       transfer.status = TransferStatus.QUOTE_EXPIRED;
+      transfer.stateHistory.push({ state: TransferStatus.QUOTE_EXPIRED });
       transfer.quote = null;
       const newTransfer = await Transfer.findOneAndUpdate(
         { _id: id, status: TransferStatus.QUOTED },
@@ -113,6 +117,7 @@ const cancelTransfer = async (req: Request, res: Response) => {
     if (!transfer) throw Error("Transfer not found");
 
     assertTransferStatusTransition(transfer.status, TransferStatus.CANCELLED);
+    transfer.stateHistory.push({ state: TransferStatus.CANCELLED });
     transfer.status = TransferStatus.CANCELLED;
     const newTransfer = await Transfer.findOneAndUpdate(
       {
@@ -148,6 +153,7 @@ const approveTransfer = async (req: Request, res: Response) => {
       TransferStatus.COMPLIANCE_APPROVED,
     );
     transfer.status = TransferStatus.COMPLIANCE_APPROVED;
+    transfer.stateHistory.push({ state: TransferStatus.COMPLIANCE_APPROVED });
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.APPROVED,
       triggeredRule: `Transfer approved by manual review`,
@@ -182,6 +188,7 @@ const rejectTransfer = async (req: Request, res: Response) => {
       TransferStatus.COMPLIANCE_REJECTED,
     );
     transfer.status = TransferStatus.COMPLIANCE_REJECTED;
+    transfer.stateHistory.push({ state: TransferStatus.COMPLIANCE_REJECTED });
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.REJECTED,
       triggeredRule: `Transfer rejected by manual review`,

@@ -6,6 +6,10 @@ import {
   isValidMoney,
 } from "../utils/validatorFunctions.ts";
 import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
+import {
+  PayoutStatus,
+  PayoutStatusValues,
+} from "../enums/payoutStatus.enum.ts";
 
 const payoutSchema = new mongoose.Schema(
   {
@@ -74,7 +78,7 @@ const payoutSchema = new mongoose.Schema(
 
     partnerPayoutId: {
       type: String,
-      immutable: true
+      immutable: true,
     },
 
     payoutId: {
@@ -82,6 +86,11 @@ const payoutSchema = new mongoose.Schema(
       immutable: (value: any) => {
         return value.payoutId !== undefined;
       },
+    },
+    payoutStatus: {
+      type: String,
+      enum: PayoutStatusValues,
+      default: PayoutStatus.PENDING,
     },
   },
   {

@@ -1,5 +1,4 @@
 import { Router, type Request, type Response } from "express";
-import { createTransferSchema } from "../validations/createTransfer.ts";
 import {
   approveTransfer,
   cancelTransfer,

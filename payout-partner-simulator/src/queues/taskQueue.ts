@@ -1,15 +1,12 @@
 import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task} from "../models/task.ts";
-import {
-  checkTransferCompliance,
-  initaitePayout,
-  quoteTransferWorker,
-} from "./workers/transferWorkers.ts";
+import { Task } from "../models/task.ts";
+import { providePayoutStatusWorker } from "./workers/payout/providePayoutStatus.ts";
+import { processPayout } from "./workers/payout/processPayout.ts";
 
 let isRunning = false;
 
-async function addToTransferQueue(task: {
+async function addToTaskQueue(task: {
   taskHandler: TaskHandlers;
   payload: any;
   executeAt?: Date;
@@ -45,12 +42,12 @@ async function runQueueWorker() {
           status: TaskStatus.RUNNING,
         }).exec();
 
-        if (task.taskHandler === TaskHandlers.QUOTE_TRANSFER) {
-          await quoteTransferWorker(task.payload);
-        } else if (task.taskHandler === TaskHandlers.CHECK_COMPLIANCE) {
-          await checkTransferCompliance(task.payload);
-        } else if (task.taskHandler === TaskHandlers.INITIATE_PAYOUT) {
-          await initaitePayout(task.payload);
+        if (task.taskHandler === TaskHandlers.PROVIDE_PAYOUT_STATUS) {
+          const { payoutId } = task.payload;
+          await providePayoutStatusWorker(payoutId);
+        } else if (task.taskHandler === TaskHandlers.PROCESS_PAYOUT) {
+          const { payoutId } = task.payload;
+          await processPayout(payoutId);
         }
 
         await Task.findByIdAndUpdate(task._id, {
@@ -73,4 +70,4 @@ async function runQueueWorker() {
   isRunning = false;
 }
 
-export { addToTransferQueue, runQueueWorker };
+export { addToTaskQueue, runQueueWorker };

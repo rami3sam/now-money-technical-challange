@@ -17,6 +17,8 @@ import { v7 as uuidv7 } from "uuid";
 import { addToTransferQueue } from "../transferQueue.ts";
 import { sensitiveHeaders } from "node:http2";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
+import { payoutStatusSchema } from "../../validations/payoutStatus.ts";
+import { PayoutStatus } from "../../enums/payoutStatus.enum.ts";
 
 export async function quoteTransferWorker(transferId: string) {
   const transfer = await Transfer.findById(transferId);
@@ -126,11 +128,10 @@ export async function checkTransferCompliance(transferId: string) {
         "Failed to update transfer status to COMPLIANCE_APPROVED",
       );
 
-    addToTransferQueue(
-     { taskHandler: TaskHandlers.INITIATE_PAYOUT,
-      payload: newTransfer.id}
-    );
-
+    addToTransferQueue({
+      taskHandler: TaskHandlers.INITIATE_PAYOUT,
+      payload: newTransfer.id,
+    });
   } else {
     assertTransferStatusTransition(
       transfer.status,
@@ -196,4 +197,11 @@ export async function initaitePayout(transferId: string) {
     "http://localhost:8002/partner/payouts",
     payout,
   );
+
+  const payoutFromPartner = payoutStatusSchema.parse(payoutResponse.data);
+
+  await Transfer.findOneAndUpdate(
+    { _id: transfer.id, status: TransferStatus.PAYOUT_PENDING },
+    { $set: { partnerPayoutId: payoutFromPartner.partnerPayoutId } },
+  ).exec();
 }

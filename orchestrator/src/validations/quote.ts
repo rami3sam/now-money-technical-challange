@@ -8,21 +8,18 @@ import { isValidMoney, validateDate } from "../utils/validatorFunctions.ts";
 export const quoteResponseSchema = z.object({
   fxRate: z
     .string()
-    .min(1, "sendAmount is required")
     .refine(
       isValidMoney,
       "sendAmount should be a valid money format (e.g., 100.00)",
     ),
   feeAmount: z
     .string()
-    .min(1, "sendAmount is required")
     .refine(
       isValidMoney,
       "sendAmount should be a valid money format (e.g., 100.00)",
     ),
   payoutAmount: z
     .string()
-    .min(1, "sendAmount is required")
     .refine(
       isValidMoney,
       "sendAmount should be a valid money format (e.g., 100.00)",

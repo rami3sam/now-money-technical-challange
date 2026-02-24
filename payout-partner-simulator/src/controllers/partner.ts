@@ -2,6 +2,9 @@ import type { Request, Response } from "express";
 import { initatePayoutSchema } from "../validations/initiatePayout.ts";
 import { Payout } from "../models/payout.ts";
 import { v7 as uuidv7 } from "uuid";
+import { PayoutStatus } from "../enums/payoutStatus.enum.ts";
+import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
+import { addToTaskQueue } from "../queues/taskQueue.ts";
 const partnerPayoutController = async (req: Request, res: Response) => {
   try {
     const payoutResponse = initatePayoutSchema.parse(req.body);
@@ -28,11 +31,19 @@ const partnerPayoutController = async (req: Request, res: Response) => {
     });
 
     await payout.save();
-    if(!payout  ) throw new Error("Failed to save payout to database");
+    if (!payout) throw new Error("Failed to save payout to database");
 
+    addToTaskQueue({
+      taskHandler: TaskHandlers.PROCESS_PAYOUT,
+      payload: {
+        payoutId: payout._id,
+      },
+      executeAt: new Date(Date.now() + 5000),
+    });
 
-
-    res.status(200).json({ partnerPayoutId: payout.payoutId , status: "PENDING" });
+    res
+      .status(200)
+      .json({ partnerPayoutId: payout.payoutId, status: PayoutStatus.PENDING });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

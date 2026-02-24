@@ -14,7 +14,6 @@ export const createTransferSchema = z.object({
     name: z.string().min(1, "recipient name is required"),
     country: z
       .string()
-      .length(3,"Country should be 3 letter ISO Code")
       .refine(
         (country) => CountryCodesValues.includes(country),
         "Country should be 3 letter ISO Code",
@@ -28,21 +27,18 @@ export const createTransferSchema = z.object({
   }),
   sendAmount: z
     .string()
-    .min(1, "sendAmount is required")
     .refine(
       isValidMoney,
       "sendAmount should be a valid money format (e.g., 100.00)",
     ),
   sendCurrency: z
     .string()
-    .length(3,"Currency should be 3 letter ISO Code")
     .refine(
       (currency) => CurrencyCodesValues.includes(currency),
       "Currency should be 3 letter ISO Code",
     ),
   payoutCurrency: z
     .string()
-    .length(3,"Currency should be 3 letter ISO Code")
     .refine(
       (currency) => CurrencyCodesValues.includes(currency),
       "Currency should be 3 letter ISO Code",

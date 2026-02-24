@@ -7,5 +7,5 @@ fx-quote-service/package-lock.json
 payout-partner-package-lock.json
 .env
 .env.*
-*/.env
-*/.env.*
+**/.env
+**/.env.*

@@ -1,24 +1,15 @@
 import mongoose, { Mongoose, Schema, type InferSchemaType } from "mongoose";
 import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
-import { TransferStatusValues } from "../enums/transferStatus.enum.ts";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
 import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
 import {
   allValuesProvidedValidator,
   isValidMoney,
 } from "../utils/validatorFunctions.ts";
-import { quoteSchema } from "./quote.ts";
-import { immutableQuoteSchema } from "./immutableQuote.ts";
-import { complianceDecisionSchema } from "./complianceDecision.ts";
-import { transferStateHistorySchema } from "./transferStateHistory.ts";
+import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
 
-const transferSchema = new mongoose.Schema(
+const payoutSchema = new mongoose.Schema(
   {
     sender: {
-      senderId: {
-        type: String,
-        required: true,
-      },
       name: {
         type: String,
         required: true,
@@ -65,28 +56,6 @@ const transferSchema = new mongoose.Schema(
       },
     },
 
-    quote: {
-      type: quoteSchema,
-      validate: {
-        validator: allValuesProvidedValidator(Object.keys(quoteSchema.paths)),
-        message: "quote must be either fully null or fully provided",
-      },
-    },
-
-    immutableQuoteSnapshot: {
-      type: immutableQuoteSchema,
-      immutable: (value: any) => {
-        return value.immutableQuoteSnapshot !== undefined;
-      },
-      validate: {
-        validator: allValuesProvidedValidator(
-          Object.keys(immutableQuoteSchema.paths),
-        ),
-        message:
-          "immutableQuoteSnapshot must be either fully null or fully provided",
-      },
-    },
-
     sendCurrency: {
       type: String,
       enum: CurrencyCodesValues,
@@ -102,18 +71,10 @@ const transferSchema = new mongoose.Schema(
       minlength: 3,
       maxlength: 3,
     },
-    status: {
+
+    partnerPayoutId: {
       type: String,
-      enum: TransferStatusValues,
-      required: true,
-    },
-
-    complianceDecisions: {
-      type: [complianceDecisionSchema],
-    },
-
-    stateHistory: {
-      type: [transferStateHistorySchema],
+      immutable: true
     },
 
     payoutId: {
@@ -122,17 +83,10 @@ const transferSchema = new mongoose.Schema(
         return value.payoutId !== undefined;
       },
     },
-
-    partnerPayoutId: {
-      type: String,
-      immutable: (value: any) => {
-        return value.partnerPayoutId !== undefined;
-      },
-    },
   },
   {
     timestamps: true,
   },
 );
 
-export const Transfer = mongoose.model("Transfers", transferSchema);
+export const Payout = mongoose.model("Payouts", payoutSchema);

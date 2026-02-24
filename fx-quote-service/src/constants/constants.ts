@@ -1,3 +1,3 @@
-const quoteExpiryTimeInSeconds = 15 * 1000;
+const quoteExpiryTimeInSeconds = 60 * 1000;
 
 export { quoteExpiryTimeInSeconds };

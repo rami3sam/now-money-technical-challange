@@ -6,7 +6,7 @@ import { payoutStatusSchema } from "../../../validations/payoutStatus.ts";
 import type { TaskType } from "../../../models/task.ts";
 
 
-export async function initaitePayoutWorker(task: TaskType) {
+export async function initaitePayoutWorker(task: TaskType & { id: string }) {
   const transferId = task.payload
   const transfer = await Transfer.findById(transferId);
   if (!transfer) throw Error(`Transfer with id ${transferId} not found`);

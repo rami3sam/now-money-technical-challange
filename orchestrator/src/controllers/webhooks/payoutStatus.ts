@@ -6,6 +6,8 @@ import {
   assertTransferStatusTransition,
   TransferStatus,
 } from "../../enums/transferStatus.enum.ts";
+import { addToTaskQueue } from "../../queues/taskQueue.ts";
+import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 
 const payoutStatus = async (req: Request, res: Response) => {
   try {
@@ -35,7 +37,7 @@ const payoutStatus = async (req: Request, res: Response) => {
       transfer.status = TransferStatus.FAILED;
       transfer.stateHistory.push({ state: TransferStatus.FAILED });
 
-      const newTransfer = await Transfer.findOneAndUpdate(
+      const updateTransfer = await Transfer.findOneAndUpdate(
         { _id: transfer._id, status: TransferStatus.PAYOUT_PENDING },
         {
           status: TransferStatus.FAILED,
@@ -43,8 +45,12 @@ const payoutStatus = async (req: Request, res: Response) => {
         },
       ).exec();
 
-      if (!newTransfer)
-        throw new Error("Failed to update transfer status to FAILED");
+      if (updateTransfer)
+        addToTaskQueue({
+          taskHandler: TaskHandlers.REFUND_TRANSFER,
+          payload: updateTransfer.id,
+        });
+      else throw new Error("Failed to update transfer status to FAILED");
     }
 
     res.status(200).json({ STATUS: "OK" });

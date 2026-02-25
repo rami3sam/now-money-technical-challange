@@ -18,6 +18,7 @@ const transferSchema = new mongoose.Schema(
       senderId: {
         type: String,
         required: true,
+        index: true,
       },
       name: {
         type: String,
@@ -58,7 +59,6 @@ const transferSchema = new mongoose.Schema(
     sendAmount: {
       type: String,
       required: true,
-      minLength: 1,
       valdate: {
         validator: isValidMoney,
         message: "sendAmount must be a valid money string eg 100.00",
@@ -84,6 +84,30 @@ const transferSchema = new mongoose.Schema(
         ),
         message:
           "immutableQuoteSnapshot must be either fully null or fully provided",
+      },
+    },
+
+    final: {
+      paidAmount: {
+        type: String,
+        valdate: {
+          validator: isValidMoney,
+          message: "sendAmount must be a valid money string eg 100.00",
+        },
+      },
+      refundedAmount: {
+        type: String,
+        valdate: {
+          validator: isValidMoney,
+          message: "refundedAmount must be a valid money string eg 100.00",
+        },
+      },
+      feesCharged: {
+        type: String,
+        valdate: {
+          validator: isValidMoney,
+          message: "feesCharged must be a valid money string eg 100.00",
+        },
       },
     },
 

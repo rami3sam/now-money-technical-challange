@@ -7,7 +7,7 @@ import {
 } from "../../../enums/transferStatus.enum.ts";
 import type { TaskType } from "../../../models/task.ts";
 
-export async function quoteTransferWorker(task: TaskType) {
+export async function quoteTransferWorker(task: TaskType & { id: string }) {
   const transferId = task.payload;
   const transfer = await Transfer.findById(transferId);
   if (!transfer) throw Error(`Transfer with id ${transferId} not found`);

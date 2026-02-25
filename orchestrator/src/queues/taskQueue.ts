@@ -4,6 +4,7 @@ import { Task } from "../models/task.ts";
 import { checkTransferComplianceWorker } from "./workers/transfers/checkTransferComplianceWorker.ts";
 import { initaitePayoutWorker } from "./workers/transfers/initiatePayoutWorker.ts";
 import { quoteTransferWorker } from "./workers/transfers/quoteTransferWorker.ts";
+import { refundTransferWorker } from "./workers/transfers/refundTransferWorker.ts";
 
 let isRunning = false;
 
@@ -49,6 +50,8 @@ async function runQueueWorker() {
           await checkTransferComplianceWorker(task);
         } else if (task.taskHandler === TaskHandlers.INITIATE_PAYOUT) {
           await initaitePayoutWorker(task);
+        } else if (task.taskHandler === TaskHandlers.REFUND_TRANSFER) {
+          await refundTransferWorker(task);
         }
 
         await Task.findByIdAndUpdate(task._id, {

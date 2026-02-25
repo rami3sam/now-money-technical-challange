@@ -15,7 +15,9 @@ import { addToTaskQueue } from "../../taskQueue.ts";
 import { TaskHandlers } from "../../../enums/taskHandlers.enum.ts";
 import type { TaskType } from "../../../models/task.ts";
 
-export async function checkTransferComplianceWorker(task: TaskType) {
+export async function checkTransferComplianceWorker(
+  task: TaskType & { id: string },
+) {
   const transferId = task.payload;
   const transfer = await Transfer.findById(transferId);
   if (!transfer) throw Error(`Transfer with id ${transferId} not found`);
@@ -41,7 +43,12 @@ export async function checkTransferComplianceWorker(task: TaskType) {
       { $set: transfer },
     ).exec();
 
-    if (!updateTransfer)
+    if (updateTransfer)
+      addToTaskQueue({
+        taskHandler: TaskHandlers.REFUND_TRANSFER,
+        payload: updateTransfer.id,
+      });
+    else
       throw new Error(
         "Failed to update transfer status to COMPLIANCE_REJECTED",
       );

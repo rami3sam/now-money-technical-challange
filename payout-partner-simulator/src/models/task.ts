@@ -20,6 +20,7 @@ export const taskSchema = new mongoose.Schema({
   executeAt: {
     type: Date,
     default: Date.now,
+    index: true
   },
 });
 

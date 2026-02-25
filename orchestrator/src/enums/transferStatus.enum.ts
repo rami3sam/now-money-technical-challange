@@ -29,18 +29,23 @@ export const allowedTransitions: Record<string, string[]> = {
     TransferStatus.COMPLIANCE_PENDING,
     TransferStatus.COMPLIANCE_APPROVED,
     TransferStatus.COMPLIANCE_REJECTED,
+    TransferStatus.CANCELLED,
   ],
   [TransferStatus.COMPLIANCE_PENDING]: [
     TransferStatus.COMPLIANCE_APPROVED,
     TransferStatus.COMPLIANCE_REJECTED,
+    TransferStatus.CANCELLED,
   ],
-  [TransferStatus.COMPLIANCE_APPROVED]: [TransferStatus.PAYOUT_PENDING],
+  [TransferStatus.COMPLIANCE_APPROVED]: [
+    TransferStatus.PAYOUT_PENDING,
+    TransferStatus.CANCELLED,
+  ],
   [TransferStatus.COMPLIANCE_REJECTED]: [TransferStatus.REFUNDED],
+  [TransferStatus.CANCELLED]: [TransferStatus.REFUNDED],
   [TransferStatus.PAYOUT_PENDING]: [TransferStatus.PAID, TransferStatus.FAILED],
   [TransferStatus.PAID]: [],
   [TransferStatus.FAILED]: [TransferStatus.REFUNDED],
   [TransferStatus.REFUNDED]: [],
-  [TransferStatus.CANCELLED]: [TransferStatus.REFUNDED],
 };
 
 export function assertTransferStatusTransition(from: string, to: string) {

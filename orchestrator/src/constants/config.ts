@@ -4,4 +4,5 @@ dotenv.config()
 export const EnvVariables = {
   PORT: process.env.PORT || 8000,
   DB_URI: process.env.DB_URI!,
+  CANCELLATION_FEE_PERCENTAGE: Number(process.env.CANCELLATION_FEE_PERCENTAGE) || 1, // 1 percent
 }

@@ -33,7 +33,7 @@ export const rejectTransfer = async (req: Request, res: Response) => {
     ).exec();
 
     if(newTransfer) addToTaskQueue({
-      taskHandler: TaskHandlers.REJECT_TRANSFER,
+      taskHandler: TaskHandlers.REFUND_TRANSFER,
       payload: newTransfer.id
     });
     else throw new Error("Failed to update transfer status to COMPLIANCE_REJECTED");

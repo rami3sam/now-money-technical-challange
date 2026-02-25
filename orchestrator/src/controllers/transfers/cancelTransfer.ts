@@ -1,9 +1,11 @@
 import { Transfer } from "../../models/transfer.ts";
-import { assertTransferStatusTransition, TransferStatus } from "../../enums/transferStatus.enum.ts";
+import {
+  assertTransferStatusTransition,
+  TransferStatus,
+} from "../../enums/transferStatus.enum.ts";
 import { addToTaskQueue } from "../../queues/taskQueue.ts";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 import type { Request, Response } from "express";
-
 
 export const cancelTransfer = async (req: Request, res: Response) => {
   try {
@@ -13,8 +15,10 @@ export const cancelTransfer = async (req: Request, res: Response) => {
 
     assertTransferStatusTransition(transfer.status, TransferStatus.CANCELLED);
     transfer.stateHistory.push({ state: TransferStatus.CANCELLED });
+
     transfer.status = TransferStatus.CANCELLED;
-    const newTransfer = await Transfer.findOneAndUpdate(
+
+    const updateTransfer = await Transfer.findOneAndUpdate(
       {
         _id: id,
         status: {
@@ -22,20 +26,22 @@ export const cancelTransfer = async (req: Request, res: Response) => {
             TransferStatus.CREATED,
             TransferStatus.QUOTED,
             TransferStatus.CONFIRMED,
+            TransferStatus.COMPLIANCE_PENDING,
+            TransferStatus.COMPLIANCE_APPROVED,
           ],
         },
       },
       { $set: transfer },
       { returnDocument: "after" },
     ).exec();
-    if (newTransfer)
+    if (updateTransfer)
       addToTaskQueue({
-        taskHandler: TaskHandlers.CANCEL_TRANSFER,
-        payload: newTransfer.id
+        taskHandler: TaskHandlers.REFUND_TRANSFER,
+        payload: updateTransfer.id,
       });
     else throw new Error("Failed to update transfer status to CANCELLED");
 
-    res.status(200).json({ newTransfer });
+    res.status(200).json({ newTransfer: updateTransfer });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }

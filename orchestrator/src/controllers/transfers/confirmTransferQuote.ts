@@ -1,9 +1,11 @@
 import type { Request, Response } from "express";
 import { Transfer } from "../../models/transfer.ts";
-import { assertTransferStatusTransition, TransferStatus } from "../../enums/transferStatus.enum.ts";
+import {
+  assertTransferStatusTransition,
+  TransferStatus,
+} from "../../enums/transferStatus.enum.ts";
 import { addToTaskQueue } from "../../queues/taskQueue.ts";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
-
 
 export const confirmTransferQuote = async (req: Request, res: Response) => {
   try {
@@ -22,6 +24,7 @@ export const confirmTransferQuote = async (req: Request, res: Response) => {
       assertTransferStatusTransition(transfer.status, TransferStatus.CONFIRMED);
       transfer.status = TransferStatus.CONFIRMED;
       transfer.stateHistory.push({ state: TransferStatus.CONFIRMED });
+      transfer.final = { ...transfer.final, paidAmount: transfer.sendAmount };
 
       const newTransfer = await Transfer.findOneAndUpdate(
         { _id: id, status: TransferStatus.QUOTED },
@@ -32,7 +35,7 @@ export const confirmTransferQuote = async (req: Request, res: Response) => {
       if (newTransfer)
         addToTaskQueue({
           taskHandler: TaskHandlers.CHECK_COMPLIANCE,
-          payload: newTransfer.id
+          payload: newTransfer.id,
         });
       else throw Error("Failed to update transfer status to CONFIRMED");
 
@@ -54,7 +57,7 @@ export const confirmTransferQuote = async (req: Request, res: Response) => {
       if (newTransfer)
         addToTaskQueue({
           taskHandler: TaskHandlers.QUOTE_TRANSFER,
-          payload: newTransfer.id
+          payload: newTransfer.id,
         });
       else throw Error("Failed to update transfer status to QUOTE_EXPIRED");
 

@@ -1,6 +1,3 @@
-import type mongoose from "mongoose";
-import type { Mongoose, Schema } from "mongoose";
-
 export function isValidMoney(value: string): boolean {
   const moneyRegex = /^\d+(\.\d{1,2})?$/;
   return moneyRegex.test(value);

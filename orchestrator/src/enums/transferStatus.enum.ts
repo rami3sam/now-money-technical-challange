@@ -1,7 +1,6 @@
 export enum TransferStatus {
   CREATED = "CREATED",
   QUOTED = "QUOTED",
-  QUOTE_EXPIRED = "QUOTE_EXPIRED",
   CONFIRMED = "CONFIRMED",
   CANCELLED = "CANCELLED",
 
@@ -26,10 +25,6 @@ export const allowedTransitions: Record<string, string[]> = {
   [TransferStatus.QUOTED]: [
     TransferStatus.CONFIRMED,
     TransferStatus.CANCELLED,
-    TransferStatus.QUOTE_EXPIRED,
-  ],
-  [TransferStatus.QUOTE_EXPIRED]: [
-    TransferStatus.QUOTED,
     TransferStatus.FAILED,
   ],
   [TransferStatus.CONFIRMED]: [
@@ -46,11 +41,9 @@ export const allowedTransitions: Record<string, string[]> = {
   [TransferStatus.COMPLIANCE_APPROVED]: [
     TransferStatus.PAYOUT_PENDING,
     TransferStatus.CANCELLED,
-    TransferStatus.FAILED,
   ],
-  [TransferStatus.COMPLIANCE_REJECTED]: [
-    TransferStatus.REFUNDED,
-  ],
+  [TransferStatus.COMPLIANCE_REJECTED]: [TransferStatus.REFUNDED],
+
   [TransferStatus.CANCELLED]: [TransferStatus.REFUNDED],
   [TransferStatus.PAYOUT_PENDING]: [TransferStatus.PAID, TransferStatus.FAILED],
   [TransferStatus.PAID]: [],

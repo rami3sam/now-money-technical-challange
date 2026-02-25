@@ -3,16 +3,17 @@ import { processPayoutWorker } from "../queues/workers/payout/processPayoutWorke
 import { providePayoutStatusWorker } from "../queues/workers/payout/providePayoutStatus.ts";
 import { TaskHandlers } from "./taskHandlers.enum.ts";
 
-const emptyErrorHandler = async (task: TaskType & { id: string }) => {
-  console.log(`No handler is specified for task  type ${task.taskHandler}`);
-};
-
-export const taskHandlerFunctions = {
+export const taskHandlerFunctions: Record<
+  string,
+  (task: TaskType & { id: string }) => Promise<void>
+> = {
   [TaskHandlers.PROCESS_PAYOUT]: processPayoutWorker,
   [TaskHandlers.PROVIDE_PAYOUT_STATUS]: providePayoutStatusWorker,
 };
 
-export const taskHandlerFailFunctions = {
-  [TaskHandlers.PROCESS_PAYOUT]: emptyErrorHandler,
-  [TaskHandlers.PROVIDE_PAYOUT_STATUS]: emptyErrorHandler,
+export const taskHandlerFailFunctions: Record<
+  string,
+  (task: TaskType & { id: string }) => Promise<void>
+> = {
+  //add here the task error handlers
 };

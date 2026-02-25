@@ -45,7 +45,8 @@ async function runQueueWorker() {
           status: TaskStatus.RUNNING,
         }).exec();
 
-        await taskHandlerFunctions[task.taskHandler](task);
+        if (taskHandlerFunctions[task.taskHandler])
+          await taskHandlerFunctions[task.taskHandler]!(task);
 
         await Task.findByIdAndUpdate(task._id, {
           status: TaskStatus.FINISHED,
@@ -58,8 +59,8 @@ async function runQueueWorker() {
               status: TaskStatus.FAILED,
             },
           ).exec();
-          if (updateTask)
-            await taskHandlerFailFunctions[task.taskHandler](task);
+          if (updateTask && taskHandlerFunctions[task.taskHandler])
+            await taskHandlerFunctions[task.taskHandler]!(task);
         } else {
           await Task.findOneAndUpdate(
             { _id: task._id, status: TaskStatus.RUNNING },

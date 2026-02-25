@@ -6,10 +6,6 @@ import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
 import { Task } from "../models/task.ts";
 import { getBackoffTime } from "../utils/utilFunctions.ts";
-import { checkTransferComplianceWorker } from "./workers/transfers/checkTransferComplianceWorker.ts";
-import { initaitePayoutWorker } from "./workers/transfers/initiatePayoutWorker.ts";
-import { quoteTransferWorker } from "./workers/transfers/quoteTransferWorker.ts";
-import { refundTransferWorker } from "./workers/transfers/refundTransferWorker.ts";
 
 let isRunning = false;
 
@@ -48,8 +44,8 @@ async function runQueueWorker() {
         const updatedTask = await Task.findByIdAndUpdate(task._id, {
           status: TaskStatus.RUNNING,
         }).exec();
-
-        await taskHandlerFunctions[task.taskHandler](task);
+        if (taskHandlerFunctions[task.taskHandler])
+          await taskHandlerFunctions[task.taskHandler]!(task);
 
         await Task.findByIdAndUpdate(task._id, {
           status: TaskStatus.FINISHED,
@@ -62,7 +58,8 @@ async function runQueueWorker() {
               status: TaskStatus.FAILED,
             },
           ).exec();
-          await taskHandlerFailFunctions[task.taskHandler](task);
+          if (updatedTask && taskHandlerFailFunctions[task.taskHandler])
+            await taskHandlerFailFunctions[task.taskHandler]!(task);
         } else {
           const updatedTask = await Task.findOneAndUpdate(
             { _id: task._id, status: TaskStatus.RUNNING },

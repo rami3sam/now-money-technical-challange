@@ -37,7 +37,7 @@ export async function quoteTransferWorker(task: TaskType & { id: string }) {
   const updatedTransfer = await Transfer.findOneAndUpdate(
     {
       _id: transfer.id,
-      status: { $in: [TransferStatus.CREATED, TransferStatus.QUOTE_EXPIRED] },
+      status: { $in: [TransferStatus.CREATED] },
     },
     transfer,
   ).exec();

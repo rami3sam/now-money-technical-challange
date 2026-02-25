@@ -1,10 +1,8 @@
-import currency from "currency.js";
 import {
   assertTransferStatusTransition,
   TransferStatus,
 } from "../../../enums/transferStatus.enum.ts";
 import { Transfer } from "../../../models/transfer.ts";
-import { EnvVariables } from "../../../constants/config.ts";
 import type { TaskType } from "../../../models/task.ts";
 import { addToTaskQueue } from "../../taskQueue.ts";
 import { TaskHandlers } from "../../../enums/taskHandlers.enum.ts";
@@ -28,12 +26,7 @@ export async function markTransferFailedWorker(
         $in: [
           TransferStatus.CREATED,
           TransferStatus.QUOTED,
-          TransferStatus.QUOTE_EXPIRED,
-          TransferStatus.CONFIRMED,
-          TransferStatus.COMPLIANCE_PENDING,
-          TransferStatus.COMPLIANCE_APPROVED,
           TransferStatus.COMPLIANCE_REJECTED,
-          TransferStatus.PAYOUT_PENDING,
         ],
       },
     },

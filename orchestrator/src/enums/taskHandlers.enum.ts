@@ -5,8 +5,7 @@ export enum TaskHandlers {
   CHECK_COMPLIANCE = "CHECK_COMPLIANCE",
   INITIATE_PAYOUT = "INITIATE_PAYOUT",
   REFUND_TRANSFER = "REFUND_TRANSFER",
+  MARK_TRANSFER_FAILED = "MARK_TRANSFER_FAILED",
 }
-
-
 
 export const TaskHandlerValues = Object.values(TaskHandlers);

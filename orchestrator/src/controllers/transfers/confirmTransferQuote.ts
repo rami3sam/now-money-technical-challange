@@ -14,7 +14,7 @@ export const confirmTransferQuote = async (req: Request, res: Response) => {
     if (!transfer) throw Error("Transfer not found");
 
     if (transfer.status !== TransferStatus.QUOTED)
-      throw Error("Transfer status is not quoted");
+      throw Error(`Transfer status is ${transfer.status} not QUOTED`);
 
     if (
       transfer.quote?.expiry &&
@@ -41,25 +41,11 @@ export const confirmTransferQuote = async (req: Request, res: Response) => {
 
       res.status(200).json({ updateTransfer });
     } else {
-      assertTransferStatusTransition(
-        transfer.status,
-        TransferStatus.QUOTE_EXPIRED,
-      );
-      transfer.status = TransferStatus.QUOTE_EXPIRED;
-      transfer.stateHistory.push({ state: TransferStatus.QUOTE_EXPIRED });
-      transfer.quote = null;
-      const updateTransfer = await Transfer.findOneAndUpdate(
-        { _id: id, status: TransferStatus.QUOTED },
-        { $set: transfer },
-        { returnDocument: "after" },
-      ).exec();
 
-      if (updateTransfer)
-        addToTaskQueue({
-          taskHandler: TaskHandlers.QUOTE_TRANSFER,
-          payload: updateTransfer.id,
-        });
-      else throw Error("Failed to update transfer status to QUOTE_EXPIRED");
+      addToTaskQueue({
+        taskHandler: TaskHandlers.MARK_TRANSFER_FAILED,
+        payload: transfer.id,
+      });
 
       throw Error("Quote has expired");
     }

@@ -32,6 +32,7 @@ export const initatePayoutSchema = z.object({
       isValidMoney,
       "sendAmount should be a valid money format (e.g., 100.00)",
     ),
+
   sendCurrency: z
     .string()
     .length(3, "Currency should be 3 letter ISO Code")
@@ -46,6 +47,7 @@ export const initatePayoutSchema = z.object({
       (currency) => CurrencyCodesValues.includes(currency),
       "Currency should be 3 letter ISO Code",
     ),
+
   payoutAmount: z
     .string()
     .min(1, "payoutAmount is required")
@@ -53,7 +55,7 @@ export const initatePayoutSchema = z.object({
       isValidMoney,
       "payoutAmount should be a valid money format (e.g., 100.00)",
     ),
-    payoutId: z.string().min(1, "payoutId is required"),
+  payoutId: z.string().min(1, "payoutId is required"),
 });
 
 export type initatePayoutSchema = z.infer<typeof initatePayoutSchema>;

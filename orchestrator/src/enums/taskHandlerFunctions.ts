@@ -5,6 +5,7 @@ import { quoteTransferWorker } from "../queues/workers/transfers/quoteTransferWo
 import { refundTransferWorker } from "../queues/workers/transfers/refundTransferWorker.ts";
 import { TaskHandlers } from "./taskHandlers.enum.ts";
 import { markTransferFailedWorker } from "../queues/workers/transfers/markTransferFailedWorker.ts";
+import { transfersReconcilliationWorker } from "../queues/workers/transfers/transferReconcilliationWorker.ts";
 
 export const taskHandlerFunctions: Record<
   string,
@@ -15,6 +16,7 @@ export const taskHandlerFunctions: Record<
   [TaskHandlers.INITIATE_PAYOUT]: initaitePayoutWorker,
   [TaskHandlers.REFUND_TRANSFER]: refundTransferWorker,
   [TaskHandlers.MARK_TRANSFER_FAILED]: markTransferFailedWorker,
+  [TaskHandlers.TRIGGER_RECONCILIATION]: transfersReconcilliationWorker
 };
 
 export const taskHandlerFailFunctions: Record<

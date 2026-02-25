@@ -12,7 +12,7 @@ export async function providePayoutStatusWorker(
 
   if (!payout) throw Error(`Payout with id ${payoutId} not found`);
   const payload = {
-    partnerPayoutId: payout.payoutId,
+    partnerPayoutId: payout.partnerPayoutId,
     status: payout.payoutStatus,
   };
   const signature = signHmac(EnvVariables.WEBHOOK_SECRET, payload);

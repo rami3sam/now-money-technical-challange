@@ -6,6 +6,7 @@ export enum TaskHandlers {
   INITIATE_PAYOUT = "INITIATE_PAYOUT",
   REFUND_TRANSFER = "REFUND_TRANSFER",
   MARK_TRANSFER_FAILED = "MARK_TRANSFER_FAILED",
+  TRIGGER_RECONCILIATION = "TRIGGER_RECONCILIATION",
 }
 
 export const TaskHandlerValues = Object.values(TaskHandlers);

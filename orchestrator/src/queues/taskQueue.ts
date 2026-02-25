@@ -26,6 +26,8 @@ async function addToTaskQueue(task: {
       `Failed to save task to database with info "${JSON.stringify(task)}"`,
     );
   }
+
+  return dbTask;
 }
 
 async function runQueueWorker() {

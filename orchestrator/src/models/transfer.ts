@@ -12,7 +12,7 @@ import { immutableQuoteSchema } from "./immutableQuote.ts";
 import { complianceDecisionSchema } from "./complianceDecision.ts";
 import { transferStateHistorySchema } from "./transferStateHistory.ts";
 
-const transferSchema = new mongoose.Schema(
+export const transferSchema = new mongoose.Schema(
   {
     sender: {
       senderId: {
@@ -165,3 +165,4 @@ const transferSchema = new mongoose.Schema(
 );
 
 export const Transfer = mongoose.model("Transfers", transferSchema);
+export type TransferType = InferSchemaType<typeof transferSchema>;

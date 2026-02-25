@@ -14,7 +14,7 @@ const partnerPayoutController = async (req: Request, res: Response) => {
 
     if (databasePayout) {
       res.status(200).json({
-        partnerPayoutId: databasePayout.partnerPayoutId,
+        partnerPayoutId: databasePayout.payoutIdFromPartner,
         status: databasePayout.payoutStatus,
       });
       return;
@@ -52,7 +52,7 @@ const partnerPayoutController = async (req: Request, res: Response) => {
 
     res
       .status(200)
-      .json({ partnerPayoutId: payout.payoutId, status: PayoutStatus.PENDING });
+      .json({ partnerPayoutId: payout.partnerPayoutId, status: PayoutStatus.PENDING });
   } catch (error: any) {
     res.status(400).json({ error: error.message });
   }

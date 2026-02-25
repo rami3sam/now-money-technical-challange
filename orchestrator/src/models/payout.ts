@@ -54,7 +54,7 @@ const payoutSchema = new mongoose.Schema(
       type: String,
       required: true,
       minLength: 1,
-      validate: {
+      valdate: {
         validator: isValidMoney,
         message: "sendAmount must be a valid money string eg 100.00",
       },
@@ -64,7 +64,7 @@ const payoutSchema = new mongoose.Schema(
       type: String,
       required: true,
       minLength: 1,
-      validate: {
+      valdate: {
         validator: isValidMoney,
         message: "payoutAmount must be a valid money string eg 100.00",
       },
@@ -105,6 +105,7 @@ const payoutSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    _id: false,
   },
 );
 

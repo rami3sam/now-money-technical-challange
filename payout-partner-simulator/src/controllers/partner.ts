@@ -8,6 +8,17 @@ import { addToTaskQueue } from "../queues/taskQueue.ts";
 const partnerPayoutController = async (req: Request, res: Response) => {
   try {
     const payoutResponse = initatePayoutSchema.parse(req.body);
+    const databasePayout = await Payout.findOne({
+      partnerPayoutId: payoutResponse.payoutId,
+    });
+
+    if (databasePayout) {
+      res.status(200).json({
+        partnerPayoutId: databasePayout.partnerPayoutId,
+        status: databasePayout.payoutStatus,
+      });
+      return;
+    }
 
     const payout = new Payout({
       sender: { name: payoutResponse.sender.name },

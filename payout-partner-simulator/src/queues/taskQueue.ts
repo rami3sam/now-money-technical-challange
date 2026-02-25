@@ -1,8 +1,6 @@
 import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
 import { Task } from "../models/task.ts";
-import { providePayoutStatusWorker } from "./workers/payout/providePayoutStatus.ts";
-import { processPayoutWorker } from "./workers/payout/processPayoutWorker.ts";
 import { getBackoffTime } from "../utils/utilFunctions.ts";
 import {
   taskHandlerFailFunctions,

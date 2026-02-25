@@ -1,13 +1,15 @@
-import {v7 as uuidv7} from "uuid";
-import { assertTransferStatusTransition, TransferStatus } from "../../../enums/transferStatus.enum.ts";
+import { v7 as uuidv7 } from "uuid";
+import {
+  assertTransferStatusTransition,
+  TransferStatus,
+} from "../../../enums/transferStatus.enum.ts";
 import { Transfer } from "../../../models/transfer.ts";
 import axios from "axios";
 import { payoutStatusSchema } from "../../../validations/payoutStatus.ts";
 import type { TaskType } from "../../../models/task.ts";
 
-
 export async function initaitePayoutWorker(task: TaskType & { id: string }) {
-  const transferId = task.payload
+  const transferId = task.payload;
   const transfer = await Transfer.findById(transferId);
   if (!transfer) throw Error(`Transfer with id ${transferId} not found`);
 
@@ -21,7 +23,7 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
 
   transfer.status = TransferStatus.PAYOUT_PENDING;
   transfer.stateHistory.push({ state: TransferStatus.PAYOUT_PENDING });
-  transfer.payoutId = uuidv7()
+  transfer.payoutId = uuidv7();
   const updateTransfer = await Transfer.findOneAndUpdate(
     { _id: transfer.id, status: TransferStatus.COMPLIANCE_APPROVED },
     { $set: transfer },
@@ -53,8 +55,13 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
 
   const payoutFromPartner = payoutStatusSchema.parse(payoutResponse.data);
 
-  await Transfer.findOneAndUpdate(
+  const updatedTransfer = await Transfer.findOneAndUpdate(
     { _id: transfer.id, status: TransferStatus.PAYOUT_PENDING },
     { $set: { partnerPayoutId: payoutFromPartner.partnerPayoutId } },
   ).exec();
+
+  if (!updatedTransfer)
+    throw new Error(
+      "Failed to update transfer with partner payout id after initiating payout",
+    );
 }

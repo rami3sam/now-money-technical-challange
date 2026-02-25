@@ -46,10 +46,10 @@ const ReconciliationSchema = new Schema(
       },
     ],
 
-    // Optional summary stats
     totalTransfers: { type: Number, default: 0 },
     totalPayouts: { type: Number, default: 0 },
     totalMatched: { type: Number, default: 0 },
+    totalUnmatched: { type: Number, default: 0 },
     totalOnlyInTransfers: { type: Number, default: 0 },
     totalOnlyInPayouts: { type: Number, default: 0 },
   },

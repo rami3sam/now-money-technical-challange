@@ -39,9 +39,7 @@ export async function transfersReconcilliationWorker(
   while (transfers.length > 0) {
     const transfer = transfers.pop()!;
     const matchingPayout = payouts.filter(
-      (payout) =>
-        payout.partnerPayoutId === transfer.partnerPayoutId ||
-        payout.payoutIdFromPartner == transfer.payoutId,
+      (payout) => payout.partnerPayoutId === transfer.partnerPayoutId,
     )[0];
 
     if (matchingPayout) {
@@ -52,6 +50,7 @@ export async function transfersReconcilliationWorker(
       const matchingCurrencies =
         matchingPayout.sendCurrency === transfer.sendCurrency &&
         matchingPayout.payoutCurrency === transfer.payoutCurrency;
+
       payouts = payouts.filter(
         (p) => p.partnerPayoutId !== transfer.partnerPayoutId,
       );
@@ -93,8 +92,8 @@ export async function transfersReconcilliationWorker(
       payout: payout,
       reason: "no corresponding transfer",
     })),
-    totalTransfers: matched.length + onlyInTransfers.length,
-    totalPayouts: matched.length + onlyInPayouts.length,
+    totalTransfers: matched.length + unmatched.length + onlyInTransfers.length,
+    totalPayouts: matched.length + unmatched.length + onlyInPayouts.length,
     totalMatched: matched.length,
     totalUnmatched: unmatched.length,
     totalOnlyInTransfers: onlyInTransfers.length,

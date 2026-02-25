@@ -11,6 +11,9 @@ import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 export const approveTransfer = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const { reviewerId } = req.query;
+    if (!reviewerId) throw new Error("reviewerId query parameter is required");
+
     const transfer = await Transfer.findById(id);
     if (!transfer) throw Error("Transfer not found");
 
@@ -23,7 +26,7 @@ export const approveTransfer = async (req: Request, res: Response) => {
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.APPROVED,
       triggeredRule: `Transfer approved by manual review`,
-      reviewerId: "1",
+      reviewerId: reviewerId,
     });
 
     const updateTransfer = await Transfer.findOneAndUpdate(

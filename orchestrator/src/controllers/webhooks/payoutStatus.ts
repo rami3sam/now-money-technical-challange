@@ -12,25 +12,34 @@ import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 const payoutStatus = async (req: Request, res: Response) => {
   try {
     const payoutStatusRequest = payoutStatusSchema.parse(req.body);
+
     const transfer = await Transfer.findOne({
       partnerPayoutId: payoutStatusRequest.partnerPayoutId,
     }).exec();
     if (!transfer) throw Error("Transfer not found");
+
+    if (transfer.isPayoutProcessed) {
+      res
+        .status(200)
+        .json({ status: "Payout status already processed for this transfer" });
+      return;
+    }
 
     if (payoutStatusRequest.status === PayoutStatus.PAID) {
       assertTransferStatusTransition(transfer.status, TransferStatus.PAID);
       transfer.status = TransferStatus.PAID;
       transfer.stateHistory.push({ state: TransferStatus.PAID });
 
-      const newTransfer = await Transfer.findOneAndUpdate(
+      const updateTransfer = await Transfer.findOneAndUpdate(
         { _id: transfer._id, status: TransferStatus.PAYOUT_PENDING },
         {
           status: TransferStatus.PAID,
           stateHistory: transfer.stateHistory,
+          isPayoutProcessed: true,
         },
       ).exec();
 
-      if (!newTransfer)
+      if (!updateTransfer)
         throw new Error("Failed to update transfer status to PAID");
     } else if (payoutStatusRequest.status === PayoutStatus.FAILED) {
       assertTransferStatusTransition(transfer.status, TransferStatus.FAILED);
@@ -42,6 +51,7 @@ const payoutStatus = async (req: Request, res: Response) => {
         {
           status: TransferStatus.FAILED,
           stateHistory: transfer.stateHistory,
+          isPayoutProcessed: true,
         },
       ).exec();
 

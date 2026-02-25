@@ -10,7 +10,7 @@ export async function processPayoutWorker(task: TaskType & { id: string }) {
   if (!payout) throw Error(`Payout with id ${payoutId} not found`);
 
   payout.payoutStatus =
-    Math.random() > 0.0 ? PayoutStatus.PAID : PayoutStatus.FAILED;
+    Math.random() > 0.2 ? PayoutStatus.PAID : PayoutStatus.FAILED;
   const newPayout = await payout.save();
 
   if (!newPayout) throw Error(`Failed to update payout with id ${payoutId}`);

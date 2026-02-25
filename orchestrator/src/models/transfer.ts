@@ -147,6 +147,11 @@ const transferSchema = new mongoose.Schema(
       },
     },
 
+    isPayoutProcessed: {
+      type: Boolean,
+      default: false,
+    },
+
     partnerPayoutId: {
       type: String,
       immutable: (value: any) => {

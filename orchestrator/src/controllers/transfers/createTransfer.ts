@@ -35,11 +35,6 @@ export const createTransfer = async (req: Request, res: Response) => {
 
     await dbTransfer.save();
 
-    addToTaskQueue({
-      taskHandler: TaskHandlers.QUOTE_TRANSFER,
-      payload: dbTransfer.id,
-    });
-
     res.status(200).json(dbTransfer);
   } catch (err: any) {
     res.status(400).json(err.message);

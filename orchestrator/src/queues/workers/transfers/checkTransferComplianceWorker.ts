@@ -112,12 +112,12 @@ export async function checkTransferComplianceWorker(
       decision: ComplianceDecisions.PENDING,
       triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
     });
-    const newTransfer = await Transfer.findOneAndUpdate(
+    const updateTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
     ).exec();
 
-    if (!newTransfer)
+    if (!updateTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
   }
 }

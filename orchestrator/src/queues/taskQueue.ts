@@ -1,6 +1,11 @@
+import {
+  taskHandlerFailFunctions,
+  taskHandlerFunctions,
+} from "../enums/taskHandlerFunctions.ts";
 import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
 import { Task } from "../models/task.ts";
+import { getBackoffTime } from "../utils/utilFunctions.ts";
 import { checkTransferComplianceWorker } from "./workers/transfers/checkTransferComplianceWorker.ts";
 import { initaitePayoutWorker } from "./workers/transfers/initiatePayoutWorker.ts";
 import { quoteTransferWorker } from "./workers/transfers/quoteTransferWorker.ts";
@@ -44,21 +49,36 @@ async function runQueueWorker() {
           status: TaskStatus.RUNNING,
         }).exec();
 
-        if (task.taskHandler === TaskHandlers.QUOTE_TRANSFER) {
-          await quoteTransferWorker(task);
-        } else if (task.taskHandler === TaskHandlers.CHECK_COMPLIANCE) {
-          await checkTransferComplianceWorker(task);
-        } else if (task.taskHandler === TaskHandlers.INITIATE_PAYOUT) {
-          await initaitePayoutWorker(task);
-        } else if (task.taskHandler === TaskHandlers.REFUND_TRANSFER) {
-          await refundTransferWorker(task);
-        }
+        await taskHandlerFunctions[task.taskHandler](task);
 
         await Task.findByIdAndUpdate(task._id, {
           status: TaskStatus.FINISHED,
         }).exec();
       } catch (err) {
-        console.error(`Error processing task with id ${task}:`, err);
+        if (task.retryCount > task.maxRetries) {
+          const updatedTask = await Task.findOneAndUpdate(
+            { _id: task._id, status: TaskStatus.RUNNING },
+            {
+              status: TaskStatus.FAILED,
+            },
+          ).exec();
+          await taskHandlerFailFunctions[task.taskHandler](task);
+        } else {
+          const updatedTask = await Task.findOneAndUpdate(
+            { _id: task._id, status: TaskStatus.RUNNING },
+            {
+              status: TaskStatus.PENDING,
+              $inc: { retryCount: 1 },
+              executeAt: new Date(Date.now() + getBackoffTime(task.retryCount)),
+            },
+          ).exec();
+
+          if (!updatedTask)
+            console.error(
+              `Failed to update task with id ${task._id} for retrying.`,
+            );
+        }
+        console.error(`Error processing task with id ${task._id}:`, err);
       }
     }
 

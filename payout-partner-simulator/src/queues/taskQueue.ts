@@ -2,7 +2,12 @@ import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
 import { Task } from "../models/task.ts";
 import { providePayoutStatusWorker } from "./workers/payout/providePayoutStatus.ts";
-import { processPayout } from "./workers/payout/processPayout.ts";
+import { processPayoutWorker } from "./workers/payout/processPayoutWorker.ts";
+import { getBackoffTime } from "../utils/utilFunctions.ts";
+import {
+  taskHandlerFailFunctions,
+  taskHandlerFunctions,
+} from "../enums/taskHandlerFunctions.ts";
 
 let isRunning = false;
 
@@ -42,18 +47,31 @@ async function runQueueWorker() {
           status: TaskStatus.RUNNING,
         }).exec();
 
-        if (task.taskHandler === TaskHandlers.PROVIDE_PAYOUT_STATUS) {
-          const { payoutId } = task.payload;
-          await providePayoutStatusWorker(payoutId);
-        } else if (task.taskHandler === TaskHandlers.PROCESS_PAYOUT) {
-          const { payoutId } = task.payload;
-          await processPayout(payoutId);
-        }
+        await taskHandlerFunctions[task.taskHandler](task);
 
         await Task.findByIdAndUpdate(task._id, {
           status: TaskStatus.FINISHED,
         }).exec();
       } catch (err) {
+        if (task.retryCount > task.maxRetries) {
+          const updateTask = await Task.findOneAndUpdate(
+            { _id: task._id, status: TaskStatus.RUNNING },
+            {
+              status: TaskStatus.FAILED,
+            },
+          ).exec();
+          if (updateTask)
+            await taskHandlerFailFunctions[task.taskHandler](task);
+        } else {
+          await Task.findOneAndUpdate(
+            { _id: task._id, status: TaskStatus.RUNNING },
+            {
+              status: TaskStatus.PENDING,
+              $inc: { retryCount: 1 },
+              executeAt: new Date(Date.now() + getBackoffTime(task.retryCount)),
+            },
+          ).exec();
+        }
         console.error(`Error processing task with id ${task}:`, err);
       }
     }

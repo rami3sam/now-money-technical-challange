@@ -26,20 +26,20 @@ export const confirmTransferQuote = async (req: Request, res: Response) => {
       transfer.stateHistory.push({ state: TransferStatus.CONFIRMED });
       transfer.final = { ...transfer.final, paidAmount: transfer.sendAmount };
 
-      const newTransfer = await Transfer.findOneAndUpdate(
+      const updateTransfer = await Transfer.findOneAndUpdate(
         { _id: id, status: TransferStatus.QUOTED },
         { $set: transfer },
         { returnDocument: "after" },
       ).exec();
 
-      if (newTransfer)
+      if (updateTransfer)
         addToTaskQueue({
           taskHandler: TaskHandlers.CHECK_COMPLIANCE,
-          payload: newTransfer.id,
+          payload: updateTransfer.id,
         });
       else throw Error("Failed to update transfer status to CONFIRMED");
 
-      res.status(200).json({ newTransfer });
+      res.status(200).json({ updateTransfer });
     } else {
       assertTransferStatusTransition(
         transfer.status,
@@ -48,16 +48,16 @@ export const confirmTransferQuote = async (req: Request, res: Response) => {
       transfer.status = TransferStatus.QUOTE_EXPIRED;
       transfer.stateHistory.push({ state: TransferStatus.QUOTE_EXPIRED });
       transfer.quote = null;
-      const newTransfer = await Transfer.findOneAndUpdate(
+      const updateTransfer = await Transfer.findOneAndUpdate(
         { _id: id, status: TransferStatus.QUOTED },
         { $set: transfer },
         { returnDocument: "after" },
       ).exec();
 
-      if (newTransfer)
+      if (updateTransfer)
         addToTaskQueue({
           taskHandler: TaskHandlers.QUOTE_TRANSFER,
-          payload: newTransfer.id,
+          payload: updateTransfer.id,
         });
       else throw Error("Failed to update transfer status to QUOTE_EXPIRED");
 

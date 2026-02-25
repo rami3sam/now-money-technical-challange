@@ -53,7 +53,7 @@ const payoutStatus = async (req: Request, res: Response) => {
       else throw new Error("Failed to update transfer status to FAILED");
     }
 
-    res.status(200).json({ STATUS: "OK" });
+    res.status(200).json({ status: "Transfer processed successfully" });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }

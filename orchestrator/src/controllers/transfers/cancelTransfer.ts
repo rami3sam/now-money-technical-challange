@@ -41,7 +41,7 @@ export const cancelTransfer = async (req: Request, res: Response) => {
       });
     else throw new Error("Failed to update transfer status to CANCELLED");
 
-    res.status(200).json({ newTransfer: updateTransfer });
+    res.status(200).json({ updateTransfer });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }

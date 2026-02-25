@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 import { Transfer } from "../../models/transfer.ts";
-import { assertTransferStatusTransition, TransferStatus } from "../../enums/transferStatus.enum.ts";
+import {
+  assertTransferStatusTransition,
+  TransferStatus,
+} from "../../enums/transferStatus.enum.ts";
 import { ComplianceDecisions } from "../../enums/complianceDecisions.ts";
 import { addToTaskQueue } from "../../queues/taskQueue.ts";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
@@ -23,7 +26,7 @@ export const approveTransfer = async (req: Request, res: Response) => {
       reviewerId: "1",
     });
 
-    const newTransfer = await Transfer.findOneAndUpdate(
+    const updateTransfer = await Transfer.findOneAndUpdate(
       {
         _id: id,
         status: TransferStatus.COMPLIANCE_PENDING,
@@ -32,15 +35,18 @@ export const approveTransfer = async (req: Request, res: Response) => {
       { returnDocument: "after" },
     ).exec();
 
-    if (newTransfer)
+    if (updateTransfer)
       addToTaskQueue({
         taskHandler: TaskHandlers.INITIATE_PAYOUT,
-        payload: newTransfer.id
+        payload: updateTransfer.id,
       });
-    else throw new Error("Failed to update transfer status to COMPLIANCE_APPROVED");
+    else
+      throw new Error(
+        "Failed to update transfer status to COMPLIANCE_APPROVED",
+      );
 
-    res.status(200).json({ newTransfer });
+    res.status(200).json({ updateTransfer });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }
-}; 
+};

@@ -20,7 +20,15 @@ export const taskSchema = new mongoose.Schema({
   executeAt: {
     type: Date,
     default: Date.now,
-    index: true
+    index: true,
+  },
+  maxRetries: {
+    type: Number,
+    default: 5,
+  },
+  retryCount: {
+    type: Number,
+    default: 0,
   },
 });
 

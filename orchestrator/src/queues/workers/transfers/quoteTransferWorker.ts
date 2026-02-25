@@ -34,11 +34,16 @@ export async function quoteTransferWorker(task: TaskType & { id: string }) {
   transfer.status = TransferStatus.QUOTED;
   transfer.stateHistory.push({ state: TransferStatus.QUOTED });
 
-  await Transfer.findOneAndUpdate(
+  const updatedTransfer = await Transfer.findOneAndUpdate(
     {
       _id: transfer.id,
       status: { $in: [TransferStatus.CREATED, TransferStatus.QUOTE_EXPIRED] },
     },
     transfer,
   ).exec();
+
+  if (!updatedTransfer)
+    throw Error(
+      `Failed to update transfer with id ${transferId} to QUOTED status`,
+    );
 }

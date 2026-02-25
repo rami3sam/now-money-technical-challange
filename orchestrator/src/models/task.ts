@@ -1,7 +1,6 @@
 import mongoose, { Schema, type InferSchemaType } from "mongoose";
-import { TaskHandlers, TaskHandlerValues } from "../enums/taskHandlers.enum.ts";
-import { required } from "zod/mini";
 import { TaskStatus, TaskStatusValues } from "../enums/taskStatus.enum.ts";
+import { TaskHandlerValues } from "../enums/taskHandlers.enum.ts";
 
 export const taskSchema = new mongoose.Schema({
   status: {
@@ -21,7 +20,15 @@ export const taskSchema = new mongoose.Schema({
   executeAt: {
     type: Date,
     default: Date.now,
-    index: true
+    index: true,
+  },
+  maxRetries: {
+    type: Number,
+    default: 5,
+  },
+  retryCount: {
+    type: Number,
+    default: 0,
   },
 });
 

@@ -31,7 +31,7 @@ export async function refundTransferWorker(task: TaskType & { id: string }) {
       feesCharged: feesCharged.value.toFixed(2),
     };
 
-    const newTransfer = await Transfer.findOneAndUpdate(
+    const updateTransfer = await Transfer.findOneAndUpdate(
       {
         _id: transferId,
         status: {

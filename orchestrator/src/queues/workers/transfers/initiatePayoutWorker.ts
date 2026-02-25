@@ -22,12 +22,12 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
   transfer.status = TransferStatus.PAYOUT_PENDING;
   transfer.stateHistory.push({ state: TransferStatus.PAYOUT_PENDING });
   transfer.payoutId = uuidv7()
-  const newTransfer = await Transfer.findOneAndUpdate(
+  const updateTransfer = await Transfer.findOneAndUpdate(
     { _id: transfer.id, status: TransferStatus.COMPLIANCE_APPROVED },
     { $set: transfer },
   ).exec();
 
-  if (!newTransfer)
+  if (!updateTransfer)
     throw new Error("Failed to update transfer status to PAYOUT_PENDING");
 
   const payout = {

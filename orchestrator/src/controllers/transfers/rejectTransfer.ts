@@ -1,10 +1,12 @@
 import type { Request, Response } from "express";
 import { Transfer } from "../../models/transfer.ts";
-import { assertTransferStatusTransition, TransferStatus } from "../../enums/transferStatus.enum.ts";
+import {
+  assertTransferStatusTransition,
+  TransferStatus,
+} from "../../enums/transferStatus.enum.ts";
 import { ComplianceDecisions } from "../../enums/complianceDecisions.ts";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 import { addToTaskQueue } from "../../queues/taskQueue.ts";
-
 
 export const rejectTransfer = async (req: Request, res: Response) => {
   try {
@@ -23,7 +25,7 @@ export const rejectTransfer = async (req: Request, res: Response) => {
       triggeredRule: `Transfer rejected by manual review`,
       reviewerId: "1",
     });
-    const newTransfer = await Transfer.findOneAndUpdate(
+    const updateTransfer = await Transfer.findOneAndUpdate(
       {
         _id: id,
         status: TransferStatus.COMPLIANCE_PENDING,
@@ -32,13 +34,17 @@ export const rejectTransfer = async (req: Request, res: Response) => {
       { returnDocument: "after" },
     ).exec();
 
-    if(newTransfer) addToTaskQueue({
-      taskHandler: TaskHandlers.REFUND_TRANSFER,
-      payload: newTransfer.id
-    });
-    else throw new Error("Failed to update transfer status to COMPLIANCE_REJECTED");
+    if (updateTransfer)
+      addToTaskQueue({
+        taskHandler: TaskHandlers.REFUND_TRANSFER,
+        payload: updateTransfer.id,
+      });
+    else
+      throw new Error(
+        "Failed to update transfer status to COMPLIANCE_REJECTED",
+      );
 
-    res.status(200).json({ newTransfer });
+    res.status(200).json({ updateTransfer });
   } catch (err: any) {
     res.status(400).json({ message: err.message });
   }

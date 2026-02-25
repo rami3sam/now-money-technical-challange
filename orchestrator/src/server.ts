@@ -8,7 +8,13 @@ import webhooksRoutes from "./routes/webhooks.ts";
 const PORT = EnvVariables.PORT;
 const app = express();
 
-app.use(json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      (req as any).rawBody = buf;
+    },
+  }),
+);
 app.use("/transfers", transfersRoutes);
 app.use("/webhooks", webhooksRoutes);
 

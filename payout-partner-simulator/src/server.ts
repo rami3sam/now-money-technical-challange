@@ -8,6 +8,7 @@ const PORT = EnvVariables.PORT;
 const app = express();
 
 app.use(json());
+
 app.use(partnerRoutes);
 
 async function startServer() {

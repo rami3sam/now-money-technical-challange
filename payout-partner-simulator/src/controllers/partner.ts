@@ -35,9 +35,7 @@ const partnerPayoutController = async (req: Request, res: Response) => {
 
     addToTaskQueue({
       taskHandler: TaskHandlers.PROCESS_PAYOUT,
-      payload: {
-        payoutId: payout._id,
-      },
+      payload: payout._id,
       executeAt: new Date(Date.now() + 5000),
     });
 

@@ -8,11 +8,11 @@ import { rejectTransfer } from "../controllers/transfers/rejectTransfer.ts";
 
 const transfersRoutes = Router();
 
-transfersRoutes.post("/transfers", createTransfer);
-transfersRoutes.get("/transfers/:id", getTransfer);
-transfersRoutes.post("/transfers/:id/confirm", confirmTransferQuote);
-transfersRoutes.post("/transfers/:id/cancel", cancelTransfer);
-transfersRoutes.post("/transfers/:id/compliance/approve", approveTransfer);
-transfersRoutes.post("/transfers/:id/compliance/reject", rejectTransfer);
+transfersRoutes.post("/", createTransfer);
+transfersRoutes.get("/:id", getTransfer);
+transfersRoutes.post("/:id/confirm", confirmTransferQuote);
+transfersRoutes.post("/:id/cancel", cancelTransfer);
+transfersRoutes.post("/:id/compliance/approve", approveTransfer);
+transfersRoutes.post("/:id/compliance/reject", rejectTransfer);
 
 export default transfersRoutes;

@@ -1,18 +1,18 @@
 import { EnvVariables } from "./constants/config.ts";
-import express, { json } from "express"
+import express, { json } from "express";
 import quotesRoutes from "./routes/quotesRoutes.ts";
 import connectDB from "./utils/connectDB.ts";
-const PORT = EnvVariables.PORT
-const app = express()
+const PORT = EnvVariables.PORT;
+const app = express();
 
-app.use(json())
-app.use(quotesRoutes)
+app.use(json());
+app.use("/quote", quotesRoutes);
 async function startServer() {
-    await connectDB();
+  await connectDB();
 
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 }
 
 startServer();

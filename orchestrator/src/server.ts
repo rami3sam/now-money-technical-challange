@@ -9,8 +9,8 @@ const PORT = EnvVariables.PORT;
 const app = express();
 
 app.use(json());
-app.use(transfersRoutes);
-app.use(webhooksRoutes);
+app.use("/transfers", transfersRoutes);
+app.use("/webhooks", webhooksRoutes);
 
 async function startServer() {
   await connectDB();

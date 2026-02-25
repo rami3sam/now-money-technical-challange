@@ -247,7 +247,7 @@ export enum CountryCodes {
   ESH = "ESH",
   YEM = "YEM",
   ZMB = "ZMB",
-  ZWE = "ZWE"
+  ZWE = "ZWE",
 }
 
 export const CountryCodesValues = Object.values(CountryCodes) as string[];

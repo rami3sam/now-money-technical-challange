@@ -30,7 +30,7 @@ export async function quoteTransferWorker(task: TaskType & { id: string }) {
     expiry: quote.quoteExpiry,
   };
 
-  assertTransferStatusTransition(transfer.status, TransferStatus.QUOTED);
+  assertTransferStatusTransition(transfer.status as TransferStatus, TransferStatus.QUOTED);
   transfer.status = TransferStatus.QUOTED;
   transfer.stateHistory.push({ state: TransferStatus.QUOTED });
 

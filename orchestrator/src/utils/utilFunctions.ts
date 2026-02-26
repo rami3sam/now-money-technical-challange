@@ -32,6 +32,10 @@ function checkForNameInList(name: string, list: string[]): Boolean {
   return list.includes(normalized);
 }
 
+export function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
 export const getBackoffTime = (
   attempt: number = 1,
   baseDelay: number = 500,

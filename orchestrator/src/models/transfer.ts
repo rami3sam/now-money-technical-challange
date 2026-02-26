@@ -12,6 +12,7 @@ import { immutableQuoteSchema } from "./immutableQuote.ts";
 import { complianceDecisionSchema } from "./complianceDecision.ts";
 import { transferStateHistorySchema } from "./transferStateHistory.ts";
 import { PayoutStatus } from "../enums/payoutStatus.enum.ts";
+import { required } from "zod/mini";
 
 export const transferSchema = new mongoose.Schema(
   {
@@ -28,33 +29,42 @@ export const transferSchema = new mongoose.Schema(
     },
 
     recipient: {
-      name: {
-        type: String,
-        required: true,
-      },
-      country: {
-        type: String,
-        enum: CountryCodesValues,
-        required: true,
-        minlength: 2,
-      },
-      payoutMethod: {
-        type: String,
-        enum: PayoutMethodsValues,
-        required: true,
-      },
+      type: {
+        name: {
+          type: String,
+          required: true,
+        },
+        country: {
+          type: String,
+          enum: CountryCodesValues,
+          required: true,
+          minlength: 2,
+        },
+        payoutMethod: {
+          type: String,
+          enum: PayoutMethodsValues,
+          required: true,
+        },
 
-      payoutDetails: {
-        accountNumber: {
-          type: String,
-        },
-        personalIDNumber: {
-          type: String,
-        },
-        personalIDType: {
-          type: String,
+        payoutDetails: {
+          type: {
+            accountNumber: {
+              type: String,
+              required: false,
+            },
+            personalIDNumber: {
+              type: String,
+              required: false,
+            },
+            personalIDType: {
+              type: String,
+              required: false,
+            },
+          },
+          required: true,
         },
       },
+      required: true,
     },
 
     sendAmount: {

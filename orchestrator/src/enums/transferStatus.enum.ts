@@ -16,7 +16,7 @@ export enum TransferStatus {
   REFUNDED = "REFUNDED",
 }
 
-export const allowedTransitions: Record<string, string[]> = {
+export const allowedTransitions: Record<TransferStatus, TransferStatus[]> = {
   [TransferStatus.CREATED]: [
     TransferStatus.QUOTED,
     TransferStatus.CANCELLED,
@@ -50,11 +50,31 @@ export const allowedTransitions: Record<string, string[]> = {
   [TransferStatus.REFUNDED]: [],
 };
 
-export function assertTransferStatusTransition(from: string, to: string) {
+
+
+export function assertTransferStatusTransition(from: TransferStatus, to: TransferStatus) {
   if (!Object.keys(allowedTransitions).includes(from))
     throw Error(`Invalid from status "${from}"`);
   if (!allowedTransitions[from]!.includes(to))
     throw Error(`Invalid transfer status transition from "${from}" to "${to}"`);
 }
+
+function transposeTransitions(transitions: Record<TransferStatus, TransferStatus[]>) {
+  const result: Map<TransferStatus, TransferStatus[]> = new Map();
+
+  for (const [from, toList] of Object.entries(transitions)) {
+    // ensure key exists even if no one points to it
+    if (!result.has(from as TransferStatus)) result.set(from as TransferStatus, []);
+
+    for (const to of toList) {
+      if (!result.has(to as TransferStatus)) result.set(to as TransferStatus, []);
+      result.get(to as TransferStatus)!.push(from as TransferStatus);
+    }
+  }
+
+  return result;
+}
+
+export const reverseTransitions = transposeTransitions(allowedTransitions);
 
 export const TransferStatusValues = Object.values(TransferStatus) as string[];

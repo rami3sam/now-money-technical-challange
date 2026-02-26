@@ -26,7 +26,7 @@ const payoutStatus = async (req: Request, res: Response) => {
     }
 
     if (payoutStatusRequest.status === PayoutStatus.PAID) {
-      assertTransferStatusTransition(transfer.status, TransferStatus.PAID);
+      assertTransferStatusTransition(transfer.status as TransferStatus, TransferStatus.PAID);
       transfer.status = TransferStatus.PAID;
       transfer.stateHistory.push({ state: TransferStatus.PAID });
 
@@ -44,7 +44,7 @@ const payoutStatus = async (req: Request, res: Response) => {
       if (!updateTransfer)
         throw new Error("Failed to update transfer status to PAID");
     } else if (payoutStatusRequest.status === PayoutStatus.FAILED) {
-      assertTransferStatusTransition(transfer.status, TransferStatus.FAILED);
+      assertTransferStatusTransition(transfer.status as TransferStatus, TransferStatus.FAILED);
       transfer.status = TransferStatus.FAILED;
       transfer.stateHistory.push({ state: TransferStatus.FAILED });
 

@@ -13,7 +13,7 @@ export async function refundTransferWorker(task: TaskType & { id: string }) {
   const transfer = await Transfer.findById(transferId);
   if (!transfer) throw Error("Transfer not found");
 
-  assertTransferStatusTransition(transfer.status, TransferStatus.REFUNDED);
+  assertTransferStatusTransition(transfer.status as TransferStatus, TransferStatus.REFUNDED);
   transfer.stateHistory.push({ state: TransferStatus.REFUNDED });
   transfer.status = TransferStatus.REFUNDED;
   if (

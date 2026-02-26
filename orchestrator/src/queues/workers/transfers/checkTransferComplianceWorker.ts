@@ -27,7 +27,7 @@ export async function checkTransferComplianceWorker(
 
   if (bannedCountries.includes(recipient.country)) {
     assertTransferStatusTransition(
-      transfer.status,
+      transfer.status as TransferStatus,
       TransferStatus.COMPLIANCE_REJECTED,
     );
 
@@ -55,7 +55,7 @@ export async function checkTransferComplianceWorker(
       );
   } else if (checkForNameInList(recipient.name, bannedPeople)) {
     assertTransferStatusTransition(
-      transfer.status,
+      transfer.status as TransferStatus,
       TransferStatus.COMPLIANCE_PENDING,
     );
 
@@ -78,7 +78,7 @@ export async function checkTransferComplianceWorker(
     currency(getComplianceMaximum(transfer.sendCurrency as CurrencyCodes))
   ) {
     assertTransferStatusTransition(
-      transfer.status,
+      transfer.status as TransferStatus,
       TransferStatus.COMPLIANCE_APPROVED,
     );
 
@@ -105,7 +105,7 @@ export async function checkTransferComplianceWorker(
     });
   } else {
     assertTransferStatusTransition(
-      transfer.status,
+      transfer.status as TransferStatus,
       TransferStatus.COMPLIANCE_PENDING,
     );
 

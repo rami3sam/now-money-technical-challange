@@ -17,7 +17,7 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
   if (!recipient) throw Error("Transfer recipient not found");
 
   assertTransferStatusTransition(
-    transfer.status,
+    transfer.status as TransferStatus,
     TransferStatus.PAYOUT_PENDING,
   );
 

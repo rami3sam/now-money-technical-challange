@@ -1,7 +1,7 @@
 import mongoose, { Schema, model } from "mongoose";
 import { payoutSchema } from "../validations/payout.ts";
 import { transferSchema } from "./transfer.ts";
-import { ReconciliationStatusValues } from "../enums/reconcilliationStatus.ts";
+import { ReconciliationStatusValues } from "../enums/reconciliationStatus.enum.ts";
 import { required } from "zod/mini";
 
 const ReconciliationSchema = new Schema(
@@ -9,7 +9,7 @@ const ReconciliationSchema = new Schema(
     runId: { type: String, required: true, unique: true },
     runDate: { type: Date, required: true, default: () => new Date() },
 
-    reconcilliationEntries: [
+    reconciliationEntries: [
       {
         transfer: {
           type: transferSchema,

@@ -2,7 +2,8 @@ import { Router } from "express";
 import { payoutStatus } from "../controllers/webhooks/payoutStatus.ts";
 import { verifyHmacMiddleware } from "../middlewares/verifyHmacMiddleware.ts";
 import { EnvVariables } from "../constants/config.ts";
-import { triggerReconcilliation } from "../controllers/webhooks/triggerReconcilliation.ts";
+import { triggerReconciliation } from "../controllers/webhooks/triggerReconcilliation.ts";
+
 
 const webhooksRoutes = Router();
 
@@ -12,8 +13,8 @@ webhooksRoutes.post(
   payoutStatus,
 );
 webhooksRoutes.post(
-  "/reconcilliation",
-  triggerReconcilliation,
+  "/reconciliation",
+  triggerReconciliation,
 );
 
 export default webhooksRoutes;

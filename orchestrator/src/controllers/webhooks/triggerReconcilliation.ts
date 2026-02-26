@@ -3,7 +3,7 @@ import { tr } from "zod/locales";
 import { addToTaskQueue } from "../../queues/taskQueue.ts";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 
-export const triggerReconcilliation = async (req: Request, res: Response) => {
+export const triggerReconciliation = async (req: Request, res: Response) => {
   try {
     const { startDate, endDate } = req.query;
     if (!startDate || !endDate)

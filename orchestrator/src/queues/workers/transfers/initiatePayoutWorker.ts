@@ -27,6 +27,7 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
   const updateTransfer = await Transfer.findOneAndUpdate(
     { _id: transfer.id, status: TransferStatus.COMPLIANCE_APPROVED },
     { $set: transfer },
+    { returnDocument: "after" }
   ).exec();
 
   if (!updateTransfer)
@@ -58,6 +59,7 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
   const updatedTransfer = await Transfer.findOneAndUpdate(
     { _id: transfer.id, status: TransferStatus.PAYOUT_PENDING },
     { $set: { partnerPayoutId: payoutFromPartner.partnerPayoutId } },
+    { returnDocument: "after" }
   ).exec();
 
   if (!updatedTransfer)

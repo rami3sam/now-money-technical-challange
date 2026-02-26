@@ -41,6 +41,7 @@ export async function checkTransferComplianceWorker(
     const updateTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
+      { returnDocument: "after" },
     ).exec();
 
     if (updateTransfer)
@@ -67,6 +68,7 @@ export async function checkTransferComplianceWorker(
     const updateTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
+      { returnDocument: "after" },
     ).exec();
 
     if (!updateTransfer)
@@ -89,6 +91,7 @@ export async function checkTransferComplianceWorker(
     const updateTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
+      { returnDocument: "after" },
     ).exec();
 
     if (!updateTransfer)
@@ -112,12 +115,13 @@ export async function checkTransferComplianceWorker(
       decision: ComplianceDecisions.PENDING,
       triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
     });
-    const updateTransfer = await Transfer.findOneAndUpdate(
+    const updatedTransfer = await Transfer.findOneAndUpdate(
       { _id: transfer.id, status: TransferStatus.CONFIRMED },
       { $set: transfer },
+      { returnDocument: "after" }
     ).exec();
 
-    if (!updateTransfer)
+    if (!updatedTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
   }
 }

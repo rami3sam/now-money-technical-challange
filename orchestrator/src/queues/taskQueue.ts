@@ -1,7 +1,7 @@
 import {
   taskHandlerFailFunctions,
   taskHandlerFunctions,
-} from "../enums/taskHandlerFunctions.ts";
+} from "../enums/taskHandlerFunctions.enum.ts";
 import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
 import { Task } from "../models/task.ts";
@@ -59,6 +59,7 @@ async function runQueueWorker() {
             {
               status: TaskStatus.FAILED,
             },
+            { returnDocument: "after" },
           ).exec();
           if (updatedTask && taskHandlerFailFunctions[task.taskHandler])
             await taskHandlerFailFunctions[task.taskHandler]!(task);
@@ -70,6 +71,7 @@ async function runQueueWorker() {
               $inc: { retryCount: 1 },
               executeAt: new Date(Date.now() + getBackoffTime(task.retryCount)),
             },
+            { returnDocument: "after" },
           ).exec();
 
           if (!updatedTask)

@@ -35,12 +35,12 @@ export function calculateReconciliationDifference(
     transfer.immutableQuoteSnapshot.payoutAmount &&
     Math.abs(
         currency(payout.sendAmount).subtract(transfer.sendAmount).value,
-    ) <= EnvVariables.RECONCILLIATION_TOLERANCE &&
+    ) <= EnvVariables.RECONCILIATION_TOLERANCE &&
     Math.abs(
       currency(payout.payoutAmount).subtract(
         transfer.immutableQuoteSnapshot.payoutAmount,
       ).value,
-    ) <= EnvVariables.RECONCILLIATION_TOLERANCE;
+    ) <= EnvVariables.RECONCILIATION_TOLERANCE;
 
   return {
     payoutAmountDifference,

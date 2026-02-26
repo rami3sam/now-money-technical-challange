@@ -20,7 +20,6 @@ export const allowedTransitions: Record<string, string[]> = {
   [TransferStatus.CREATED]: [
     TransferStatus.QUOTED,
     TransferStatus.CANCELLED,
-    TransferStatus.FAILED,
   ],
   [TransferStatus.QUOTED]: [
     TransferStatus.CONFIRMED,

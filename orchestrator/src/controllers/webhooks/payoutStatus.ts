@@ -38,6 +38,7 @@ const payoutStatus = async (req: Request, res: Response) => {
           isPayoutProcessed: true,
           payoutsStatus: payoutStatusRequest.status,
         },
+        { returnDocument: "after" },
       ).exec();
 
       if (!updateTransfer)
@@ -55,6 +56,7 @@ const payoutStatus = async (req: Request, res: Response) => {
           isPayoutProcessed: true,
           payoutsStatus: payoutStatusRequest.status,
         },
+        { returnDocument: "after" },
       ).exec();
 
       if (updateTransfer)

@@ -6,6 +6,6 @@ export const EnvVariables = {
   DB_URI: process.env.DB_URI!,
   CANCELLATION_FEE_PERCENTAGE: Number(process.env.CANCELLATION_FEE_PERCENTAGE) || 0.01, // 1 percent
   WEBHOOK_SECRET: process.env.WEBHOOK_SECRET!,
-  RECONCILLIATION_TOLERANCE: Number(process.env.RECONCILLIATION_TOLERANCE) || 0.01,
+  RECONCILIATION_TOLERANCE: Number(process.env.RECONCILIATION_TOLERANCE) || 0.01,
 }
 

@@ -3,14 +3,11 @@ import { Transfer, type TransferType } from "../../../models/transfer.ts";
 import type { TaskType } from "../../../models/task.ts";
 import { payoutSchema } from "../../../validations/payout.ts";
 import type { PayoutType } from "../../../models/payout.ts";
-import { Reconciliation } from "../../../models/reconcilliation.ts";
-import currency from "currency.js";
-import { EnvVariables } from "../../../constants/config.ts";
-import { ReconciliationStatus } from "../../../enums/reconcilliationStatus.ts";
-import { only } from "node:test";
-import { calculateReconciliationDifference } from "../../../utils/reconcilliationUtils.ts";
+import { Reconciliation } from "../../../models/reconciliation.ts";
+import { ReconciliationStatus } from "../../../enums/reconciliationStatus.enum.ts";
+import { calculateReconciliationDifference } from "../../../utils/reconciliationUtils.ts";
 
-export async function transfersReconcilliationWorker(
+export async function transfersReconciliationWorker(
   task: TaskType & { id: string },
 ) {
   const startDate: Date = task.payload.startDate;
@@ -139,7 +136,7 @@ export async function transfersReconcilliationWorker(
     runId: task.id,
     runDate: new Date(),
 
-    reconcilliationEntries: reconciliationEntries,
+    reconciliationEntries: reconciliationEntries,
 
     totalTransfers: reconciliationEntries.filter((entry) => entry.transfer)
       .length,

@@ -58,6 +58,7 @@ async function runQueueWorker() {
             {
               status: TaskStatus.FAILED,
             },
+            { returnDocument: "after" },
           ).exec();
           if (updateTask && taskHandlerFunctions[task.taskHandler])
             await taskHandlerFunctions[task.taskHandler]!(task);

@@ -4,8 +4,7 @@ import { initaitePayoutWorker } from "../queues/workers/transfers/initiatePayout
 import { quoteTransferWorker } from "../queues/workers/transfers/quoteTransferWorker.ts";
 import { refundTransferWorker } from "../queues/workers/transfers/refundTransferWorker.ts";
 import { TaskHandlers } from "./taskHandlers.enum.ts";
-import { markTransferFailedWorker } from "../queues/workers/transfers/markTransferFailedWorker.ts";
-import { transfersReconcilliationWorker } from "../queues/workers/transfers/transferReconcilliationWorker.ts";
+import { transfersReconciliationWorker } from "../queues/workers/transfers/transferReconciliationWorker.ts";
 
 export const taskHandlerFunctions: Record<
   string,
@@ -15,13 +14,10 @@ export const taskHandlerFunctions: Record<
   [TaskHandlers.CHECK_COMPLIANCE]: checkTransferComplianceWorker,
   [TaskHandlers.INITIATE_PAYOUT]: initaitePayoutWorker,
   [TaskHandlers.REFUND_TRANSFER]: refundTransferWorker,
-  [TaskHandlers.MARK_TRANSFER_FAILED]: markTransferFailedWorker,
-  [TaskHandlers.TRIGGER_RECONCILIATION]: transfersReconcilliationWorker
+  [TaskHandlers.TRIGGER_RECONCILIATION]: transfersReconciliationWorker,
 };
 
 export const taskHandlerFailFunctions: Record<
   string,
   (task: TaskType & { id: string }) => Promise<void>
-> = {
-  [TaskHandlers.QUOTE_TRANSFER]: markTransferFailedWorker,
-};
+> = {};

@@ -51,7 +51,7 @@ export class TransferController {
 
   approve = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { reviewerId } = req.body;
+    const { reviewerId } = req.query;
 
     if (!id) throw Error("Transfer id is required");
     if (!isString(id)) throw Error("Transfer id must be a string");

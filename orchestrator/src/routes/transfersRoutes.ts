@@ -1,20 +1,19 @@
-import { Router, type Request, type Response } from "express";
-import { TransferRepository } from "../repositories/transfer.repository.ts";
-import { TransferService } from "../services/transfers.service.ts";
+import { Router } from "express";
+import { TransfersService } from "../services/transfers.service.ts";
 import { TransferController } from "../controllers/transfers.controller.ts";
 
-const transfersRoutes = Router();
-const transfersRepo = new TransferRepository();
-const transfersService = new TransferService(transfersRepo);
-const transfersController = new TransferController(transfersService);
+export function transfersRoutes(transfersService: TransfersService) {
+  const transfersRouter = Router();
+  const transfersController = new TransferController(transfersService);
 
-transfersRoutes.post("/", transfersController.createTransfer);
-transfersRoutes.get("/:id", transfersController.getTransfer);
-transfersRoutes.get("/", transfersController.getUserTransfers);
-transfersRoutes.post("/:id/confirm", transfersController.confirm);
-transfersRoutes.post("/:id/cancel", transfersController.cancel);
-transfersRoutes.post("/:id/compliance/approve", transfersController.approve);
-transfersRoutes.post("/:id/compliance/reject", transfersController.reject);
-transfersRoutes.post("/:id/quote", transfersController.quote);
+  transfersRouter.post("/", transfersController.createTransfer);
+  transfersRouter.get("/:id", transfersController.getTransfer);
+  transfersRouter.get("/", transfersController.getUserTransfers);
+  transfersRouter.post("/:id/confirm", transfersController.confirm);
+  transfersRouter.post("/:id/cancel", transfersController.cancel);
+  transfersRouter.post("/:id/compliance/approve", transfersController.approve);
+  transfersRouter.post("/:id/compliance/reject", transfersController.reject);
+  transfersRouter.post("/:id/quote", transfersController.quote);
 
-export default transfersRoutes;
+  return transfersRouter;
+}

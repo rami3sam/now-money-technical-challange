@@ -1,10 +1,10 @@
 import { PayoutMethods } from "../../enums/payoutMethods.enum.ts";
 import { TransferStatus } from "../../enums/transferStatus.enum.ts";
 import { Transfer, type TransferType } from "../../models/transfer.ts";
-import type { TransferRepository } from "../../repositories/transfer.repository.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
 
 export async function createTransfer(
-  transferRepository: TransferRepository,
+  transferRepository: TransfersRepository,
   transfer: TransferType,
 ) {
   const bankInfoOk =

@@ -2,12 +2,14 @@ import {
   assertTransferStatusTransition,
   TransferStatus,
 } from "../../enums/transferStatus.enum.ts";
-import { addToTaskQueue } from "../../queues/taskQueue.ts";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
-import type { TransferRepository } from "../../repositories/transfer.repository.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import { Task } from "../../models/task.ts";
+import type { TasksService } from "../tasks.service.ts";
 
 export async function confirmTransferQuote(
-  transferRepository: TransferRepository,
+  transferRepository: TransfersRepository,
+  tasksService: TasksService,
   id: string,
 ) {
   const transfer = await transferRepository.findById(id);
@@ -30,10 +32,12 @@ export async function confirmTransferQuote(
     if (!updatedTransfer)
       throw Error("Failed to update transfer status to CONFIRMED");
 
-    addToTaskQueue({
-      taskHandler: TaskHandlers.CHECK_COMPLIANCE,
-      payload: updatedTransfer.id,
-    });
+    tasksService.add(
+      new Task({
+        taskHandler: TaskHandlers.CHECK_COMPLIANCE,
+        payload: updatedTransfer.id,
+      }),
+    );
     return updatedTransfer;
   } else {
     throw Error("Quote has expired");

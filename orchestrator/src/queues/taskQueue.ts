@@ -1,36 +1,14 @@
-import {
-  taskHandlerFailFunctions,
-  taskHandlerFunctions,
-} from "../enums/taskHandlerFunctions.enum.ts";
-import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
+import type { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task } from "../models/task.ts";
+import { Task, type TaskType, type TaskTypeWithId } from "../models/task.ts";
 import { getBackoffTime } from "../utils/utilFunctions.ts";
 
 let isRunning = false;
 
-async function addToTaskQueue(task: {
-  taskHandler: TaskHandlers;
-  payload: any;
-  executeAt?: Date;
-}) {
-  const newTask = new Task({
-    taskHandler: task.taskHandler,
-    executeAt: task.executeAt,
-    payload: task.payload,
-    status: TaskStatus.PENDING,
-  });
-  const dbTask = await newTask.save();
-  if (!dbTask) {
-    throw new Error(
-      `Failed to save task to database with info "${JSON.stringify(task)}"`,
-    );
-  }
-
-  return dbTask;
-}
-
-async function runQueueWorker() {
+async function runQueueWorker(
+  taskHandlerFunctions: Record<TaskHandlers, ((task: TaskTypeWithId) => Promise<void>)>,
+  taskHandlerFailFunctions: Record<TaskHandlers, ((task: TaskTypeWithId) => Promise<void>)>,
+) {
   if (isRunning) return;
   isRunning = true;
   let tasks = await Task.find({
@@ -93,4 +71,4 @@ async function runQueueWorker() {
   } while (true);
 }
 
-export { addToTaskQueue, runQueueWorker };
+export { runQueueWorker };

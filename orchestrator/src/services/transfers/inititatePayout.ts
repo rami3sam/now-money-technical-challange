@@ -1,17 +1,17 @@
-import { v7 as uuidv7 } from "uuid";
 import {
   assertTransferStatusTransition,
   TransferStatus,
-} from "../../../enums/transferStatus.enum.ts";
-import { Transfer } from "../../../models/transfer.ts";
+} from "../../enums/transferStatus.enum.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import { v7 as uuidv7 } from "uuid";
+import { payoutStatusSchema } from "../../validations/payoutStatus.ts";
 import axios from "axios";
-import { payoutStatusSchema } from "../../../validations/payoutStatus.ts";
-import type { TaskType } from "../../../models/task.ts";
-
-export async function initaitePayoutWorker(task: TaskType & { id: string }) {
-  const transferId = task.payload;
-  const transfer = await Transfer.findById(transferId);
-  if (!transfer) throw Error(`Transfer with id ${transferId} not found`);
+export async function initiatePayout(
+  transfersRepository: TransfersRepository,
+  id: string,
+) {
+  const transfer = await transfersRepository.findById(id);
+  if (!transfer) throw Error(`Transfer with id ${id} not found`);
 
   const { recipient } = transfer;
   if (!recipient) throw Error("Transfer recipient not found");
@@ -22,13 +22,11 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
   );
 
   transfer.status = TransferStatus.PAYOUT_PENDING;
-  transfer.stateHistory.push({ state: TransferStatus.PAYOUT_PENDING });
   transfer.payoutId = uuidv7();
-  const updateTransfer = await Transfer.findOneAndUpdate(
-    { _id: transfer.id, status: TransferStatus.COMPLIANCE_APPROVED },
-    { $set: transfer },
-    { returnDocument: "after" }
-  ).exec();
+  const updateTransfer = await transfersRepository.updateTransfer(
+    transfer.id,
+    transfer,
+  );
 
   if (!updateTransfer)
     throw new Error("Failed to update transfer status to PAYOUT_PENDING");
@@ -56,11 +54,10 @@ export async function initaitePayoutWorker(task: TaskType & { id: string }) {
 
   const payoutFromPartner = payoutStatusSchema.parse(payoutResponse.data);
 
-  const updatedTransfer = await Transfer.findOneAndUpdate(
-    { _id: transfer.id, status: TransferStatus.PAYOUT_PENDING },
-    { $set: { partnerPayoutId: payoutFromPartner.partnerPayoutId } },
-    { returnDocument: "after" }
-  ).exec();
+  const updatedTransfer = await transfersRepository.updateTransfer(
+    transfer.id,
+    { partnerPayoutId: payoutFromPartner.partnerPayoutId },
+  );
 
   if (!updatedTransfer)
     throw new Error(

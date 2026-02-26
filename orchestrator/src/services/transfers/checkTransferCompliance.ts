@@ -1,26 +1,27 @@
 import currency from "currency.js";
-import { bannedCountries, bannedPeople } from "../../../constants/constants.ts";
-import { ComplianceDecisions } from "../../../enums/complianceDecisions.ts";
+import { bannedCountries, bannedPeople } from "../../constants/constants.ts";
+import { ComplianceDecisions } from "../../enums/complianceDecisions.ts";
+import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 import {
   assertTransferStatusTransition,
   TransferStatus,
-} from "../../../enums/transferStatus.enum.ts";
-import { Transfer } from "../../../models/transfer.ts";
+} from "../../enums/transferStatus.enum.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
 import {
   checkForNameInList,
   getComplianceMaximum,
-} from "../../../utils/utilFunctions.ts";
-import type { CurrencyCodes } from "../../../enums/currencyCodes.enum.ts";
-import { addToTaskQueue } from "../../taskQueue.ts";
-import { TaskHandlers } from "../../../enums/taskHandlers.enum.ts";
-import type { TaskType } from "../../../models/task.ts";
+} from "../../utils/utilFunctions.ts";
+import type { CurrencyCodes } from "../../enums/currencyCodes.enum.ts";
+import type { TasksService } from "../tasks.service.ts";
+import { Task } from "../../models/task.ts";
 
-export async function checkTransferComplianceWorker(
-  task: TaskType & { id: string },
+export async function checkTransferCompliance(
+  transferRepository: TransfersRepository,
+  tasksService: TasksService,
+  id: string,
 ) {
-  const transferId = task.payload;
-  const transfer = await Transfer.findById(transferId);
-  if (!transfer) throw Error(`Transfer with id ${transferId} not found`);
+  const transfer = await transferRepository.findById(id);
+  if (!transfer) throw Error(`Transfer with id ${id} not found`);
 
   const { recipient } = transfer;
   if (!recipient) throw Error("Transfer recipient not found");
@@ -38,21 +39,22 @@ export async function checkTransferComplianceWorker(
       triggeredRule: `Recipient country "${recipient.country}" is banned`,
     });
 
-    const updateTransfer = await Transfer.findOneAndUpdate(
-      { _id: transfer.id, status: TransferStatus.CONFIRMED },
-      { $set: transfer },
-      { returnDocument: "after" },
-    ).exec();
+    const updateTransfer = await transferRepository.updateTransfer(
+      id,
+      transfer,
+    );
 
-    if (updateTransfer)
-      addToTaskQueue({
-        taskHandler: TaskHandlers.REFUND_TRANSFER,
-        payload: updateTransfer.id,
-      });
-    else
+    if (!updateTransfer)
       throw new Error(
         "Failed to update transfer status to COMPLIANCE_REJECTED",
       );
+
+    tasksService.add(
+      new Task({
+        taskHandler: TaskHandlers.REFUND_TRANSFER,
+        payload: updateTransfer.id,
+      }),
+    );
   } else if (checkForNameInList(recipient.name, bannedPeople)) {
     assertTransferStatusTransition(
       transfer.status as TransferStatus,
@@ -65,11 +67,11 @@ export async function checkTransferComplianceWorker(
       decision: ComplianceDecisions.PENDING,
       triggeredRule: `Recipient name ${recipient.name} is banned`,
     });
-    const updateTransfer = await Transfer.findOneAndUpdate(
-      { _id: transfer.id, status: TransferStatus.CONFIRMED },
-      { $set: transfer },
-      { returnDocument: "after" },
-    ).exec();
+
+    const updateTransfer = await transferRepository.updateTransfer(
+      transfer.id,
+      transfer,
+    );
 
     if (!updateTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
@@ -83,26 +85,27 @@ export async function checkTransferComplianceWorker(
     );
 
     transfer.status = TransferStatus.COMPLIANCE_APPROVED;
-    transfer.stateHistory.push({ state: TransferStatus.COMPLIANCE_APPROVED });
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.APPROVED,
       triggeredRule: `amount ${transfer.sendAmount} is below compliance threshold`,
     });
-    const updateTransfer = await Transfer.findOneAndUpdate(
-      { _id: transfer.id, status: TransferStatus.CONFIRMED },
-      { $set: transfer },
-      { returnDocument: "after" },
-    ).exec();
+
+    const updateTransfer = await transferRepository.updateTransfer(
+      transfer.id,
+      transfer,
+    );
 
     if (!updateTransfer)
       throw new Error(
         "Failed to update transfer status to COMPLIANCE_APPROVED",
       );
 
-    addToTaskQueue({
-      taskHandler: TaskHandlers.INITIATE_PAYOUT,
-      payload: updateTransfer.id,
-    });
+    tasksService.add(
+      new Task({
+        taskHandler: TaskHandlers.INITIATE_PAYOUT,
+        payload: updateTransfer.id,
+      }),
+    );
   } else {
     assertTransferStatusTransition(
       transfer.status as TransferStatus,
@@ -110,16 +113,16 @@ export async function checkTransferComplianceWorker(
     );
 
     transfer.status = TransferStatus.COMPLIANCE_PENDING;
-    transfer.stateHistory.push({ state: TransferStatus.COMPLIANCE_PENDING });
+
     transfer.complianceDecisions.push({
       decision: ComplianceDecisions.PENDING,
       triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
     });
-    const updatedTransfer = await Transfer.findOneAndUpdate(
-      { _id: transfer.id, status: TransferStatus.CONFIRMED },
-      { $set: transfer },
-      { returnDocument: "after" }
-    ).exec();
+
+    const updatedTransfer = await transferRepository.updateTransfer(
+      transfer.id,
+      transfer,
+    );
 
     if (!updatedTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");

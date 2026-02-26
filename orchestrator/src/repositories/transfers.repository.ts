@@ -1,7 +1,7 @@
 import { TransferStatus } from "../enums/transferStatus.enum.ts";
 import { Transfer, type TransferType } from "../models/transfer.ts";
 
-export class TransferRepository {
+export class TransfersRepository {
   findById(id: string) {
     return Transfer.findById(id).exec();
   }
@@ -14,12 +14,12 @@ export class TransferRepository {
     return savedTransfer;
   }
 
-  async updateTransfer(id: string, updates: TransferType) {
+  async updateTransfer(id: string, updates: Partial<TransferType>) {
     const transfer = await Transfer.findById(id).exec();
     if (!transfer) throw Error(`Transfer with id ${id} not found`);
 
     if (updates.status) {
-      updates.stateHistory.push({ state: updates.status });
+      updates?.stateHistory?.push({ state: updates.status });
     }
 
     return Transfer.findOneAndUpdate(
@@ -31,5 +31,18 @@ export class TransferRepository {
 
   findBySenderId(senderId: string) {
     return Transfer.find({ "sender.senderId": senderId }).exec();
+  }
+
+  findByPartnerPayoutId(partnerPayoutId: string) {
+    return Transfer.findOne({ partnerPayoutId: partnerPayoutId }).exec();
+  }
+
+  findBetweenDates(startDate: Date, endDate: Date) {
+    return Transfer.find({
+      createdAt: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    }).exec();
   }
 }

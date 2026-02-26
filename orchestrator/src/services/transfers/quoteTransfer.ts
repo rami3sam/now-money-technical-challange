@@ -4,10 +4,10 @@ import {
 } from "../../enums/transferStatus.enum.ts";
 import axios from "axios";
 import { quoteResponseSchema } from "../../validations/quote.ts";
-import type { TransferRepository } from "../../repositories/transfer.repository.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
 
 export async function quoteTransfer(
-  transferRepository: TransferRepository,
+  transferRepository: TransfersRepository,
   id: string,
 ) {
   const transfer = await transferRepository.findById(id);

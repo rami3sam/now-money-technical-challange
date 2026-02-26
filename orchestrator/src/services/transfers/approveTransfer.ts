@@ -4,11 +4,13 @@ import {
   assertTransferStatusTransition,
   TransferStatus,
 } from "../../enums/transferStatus.enum.ts";
-import { addToTaskQueue } from "../../queues/taskQueue.ts";
-import type { TransferRepository } from "../../repositories/transfer.repository.ts";
+import { Task } from "../../models/task.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import { TasksService } from "../tasks.service.ts";
 
 export async function approveTransfer(
-  transferRepository: TransferRepository,
+  transferRepository: TransfersRepository,
+  taskSservice: TasksService,
   id: string,
   reviewerId: string,
 ) {
@@ -36,9 +38,11 @@ export async function approveTransfer(
   if (!updatedTransfer)
     throw new Error("Failed to update transfer status to COMPLIANCE_APPROVED");
 
-  addToTaskQueue({
-    taskHandler: TaskHandlers.INITIATE_PAYOUT,
-    payload: updatedTransfer.id,
-  });
+  taskSservice.add(
+    new Task({
+      taskHandler: TaskHandlers.INITIATE_PAYOUT,
+      payload: updatedTransfer.id,
+    }),
+  );
   return updatedTransfer;
 }

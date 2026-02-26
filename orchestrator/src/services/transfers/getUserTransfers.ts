@@ -1,7 +1,7 @@
-import type { TransferRepository } from "../../repositories/transfer.repository.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
 
 export async function getUserTransfers(
-  transferRepository: TransferRepository,
+  transferRepository: TransfersRepository,
   senderId: string,
 ) {
   if (!senderId) throw Error("You must provide a sender id");

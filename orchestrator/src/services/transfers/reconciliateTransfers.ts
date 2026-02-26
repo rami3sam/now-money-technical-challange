@@ -1,17 +1,18 @@
 import axios from "axios";
-import { Transfer, type TransferType } from "../../../models/transfer.ts";
-import type { TaskType } from "../../../models/task.ts";
-import { payoutSchema } from "../../../validations/payout.ts";
-import type { PayoutType } from "../../../models/payout.ts";
-import { Reconciliation } from "../../../models/reconciliation.ts";
-import { ReconciliationStatus } from "../../../enums/reconciliationStatus.enum.ts";
-import { calculateReconciliationDifference } from "../../../utils/reconciliationUtils.ts";
+import { ReconciliationStatus } from "../../enums/reconciliationStatus.enum.ts";
+import type { PayoutType } from "../../models/payout.ts";
+import type { TransferType } from "../../models/transfer.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import { payoutSchema } from "../../validations/payout.ts";
+import { calculateReconciliationDifference } from "../../utils/reconciliationUtils.ts";
+import { Reconciliation } from "../../models/reconciliation.ts";
+import { uuidv7 } from "zod";
 
-export async function transfersReconciliationWorker(
-  task: TaskType & { id: string },
+export async function reconciliateTransfers(
+  transfersRepository: TransfersRepository,
+  startDate: Date,
+  endDate: Date,
 ) {
-  const startDate: Date = task.payload.startDate;
-  const endDate: Date = task.payload.endDate;
   const reconciliationEntries: {
     transfer?: TransferType & { id: string };
     payout?: PayoutType;
@@ -31,12 +32,10 @@ export async function transfersReconciliationWorker(
   });
 
   let payouts = payoutSchema.parse(payoutsResponse.data);
-  const transfers = await Transfer.find({
-    createdAt: {
-      $gte: startDate,
-      $lte: endDate,
-    },
-  });
+  const transfers = await transfersRepository.findBetweenDates(
+    startDate,
+    endDate,
+  );
 
   while (transfers.length > 0) {
     const transfer = transfers.pop()!;
@@ -133,7 +132,7 @@ export async function transfersReconciliationWorker(
   );
 
   const reconciliationRecord = new Reconciliation({
-    runId: task.id,
+    runId: uuidv7(),
     runDate: new Date(),
 
     reconciliationEntries: reconciliationEntries,

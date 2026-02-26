@@ -4,22 +4,27 @@ import type { TaskType } from "../../../models/task.ts";
 import { payoutSchema } from "../../../validations/payout.ts";
 import type { PayoutType } from "../../../models/payout.ts";
 import { Reconciliation } from "../../../models/reconcilliation.ts";
+import currency from "currency.js";
+import { EnvVariables } from "../../../constants/config.ts";
+import { ReconciliationStatus } from "../../../enums/reconcilliationStatus.ts";
+import { only } from "node:test";
+import { calculateReconciliationDifference } from "../../../utils/reconcilliationUtils.ts";
 
 export async function transfersReconcilliationWorker(
   task: TaskType & { id: string },
 ) {
   const startDate: Date = task.payload.startDate;
   const endDate: Date = task.payload.endDate;
-  const matched: {
-    transfer: TransferType & { id: string };
-    payout: PayoutType;
+  const reconciliationEntries: {
+    transfer?: TransferType & { id: string };
+    payout?: PayoutType;
+    variance?: {
+      payoutAmountDifference: number;
+      sendAmountDifference: number;
+      currencyMismatch: boolean;
+    };
+    status: ReconciliationStatus;
   }[] = [];
-  const unmatched: {
-    transfer: TransferType & { id: string };
-    payout: PayoutType;
-  }[] = [];
-  const onlyInTransfers: (TransferType & { id: string })[] = [];
-  const onlyInPayouts: PayoutType[] = [];
 
   const payoutsResponse = await axios.get("http://localhost:8002/payouts", {
     params: {
@@ -43,61 +48,119 @@ export async function transfersReconcilliationWorker(
     )[0];
 
     if (matchingPayout) {
-      const matchingAmounts =
-        matchingPayout.sendAmount === transfer.sendAmount &&
-        matchingPayout.payoutAmount ===
-          transfer.immutableQuoteSnapshot?.payoutAmount;
-      const matchingCurrencies =
-        matchingPayout.sendCurrency === transfer.sendCurrency &&
-        matchingPayout.payoutCurrency === transfer.payoutCurrency;
+      const {
+        payoutAmountDifference,
+        sendAmountDifference,
+        matchingAmounts,
+        matchingCurrencies,
+        matchingStatus,
+        matchingAmountsWithTolerance,
+      } = calculateReconciliationDifference(
+        transfer,
+        matchingPayout as PayoutType,
+      );
+
+      const variance = {
+        payoutAmountDifference: payoutAmountDifference,
+        sendAmountDifference: sendAmountDifference,
+        currencyMismatch: !matchingCurrencies,
+      };
 
       payouts = payouts.filter(
         (p) => p.partnerPayoutId !== transfer.partnerPayoutId,
       );
 
-      if (matchingAmounts && matchingCurrencies) {
-        matched.push({
+      if (matchingAmounts && matchingCurrencies && matchingStatus) {
+        reconciliationEntries.push({
           transfer: transfer,
           payout: matchingPayout as PayoutType,
+          variance: {
+            payoutAmountDifference: payoutAmountDifference,
+            sendAmountDifference: sendAmountDifference,
+            currencyMismatch: !matchingCurrencies,
+          },
+          status: ReconciliationStatus.MATCHED_EXACT,
+        });
+      } else if (
+        matchingAmountsWithTolerance &&
+        matchingCurrencies &&
+        matchingStatus
+      ) {
+        reconciliationEntries.push({
+          transfer: transfer,
+          payout: matchingPayout as PayoutType,
+          variance: variance,
+          status: ReconciliationStatus.MATCHED_WITH_TOLERANCE,
+        });
+      } else if (!matchingStatus) {
+        reconciliationEntries.push({
+          transfer: transfer,
+          payout: matchingPayout as PayoutType,
+          variance: variance,
+          status: ReconciliationStatus.STATUS_MISMATCH,
+        });
+      } else if (!matchingAmounts) {
+        reconciliationEntries.push({
+          transfer: transfer,
+          payout: matchingPayout as PayoutType,
+          variance: variance,
+          status: ReconciliationStatus.AMOUNT_MISMATCH,
+        });
+      } else if (!matchingCurrencies) {
+        reconciliationEntries.push({
+          transfer: transfer,
+          payout: matchingPayout as PayoutType,
+          variance: variance,
+          status: ReconciliationStatus.CURRENCY_MISMATCH,
         });
       } else {
-        unmatched.push({
+        reconciliationEntries.push({
           transfer: transfer,
           payout: matchingPayout as PayoutType,
+          variance: variance,
+          status: ReconciliationStatus.UNKNOWN_MISMATCH,
         });
       }
     } else {
-      onlyInTransfers.push(transfer);
+      reconciliationEntries.push({
+        transfer: transfer,
+        status: ReconciliationStatus.MISSING_PAYOUT,
+      });
     }
   }
 
-  onlyInPayouts.push(...(payouts as PayoutType[]));
+  reconciliationEntries.push(
+    ...(payouts as (PayoutType & {
+      status: ReconciliationStatus.MISSING_TRANSFER;
+    })[]),
+  );
 
   const reconciliationRecord = new Reconciliation({
     runId: task.id,
     runDate: new Date(),
-    matched: matched.map((m) => ({
-      transfer: m.transfer,
-      payout: m.payout,
-    })),
-    unmatched: unmatched.map((m) => ({
-      transfer: m.transfer,
-      payout: m.payout,
-    })),
-    onlyInTransfers: onlyInTransfers.map((transfer) => ({
-      transfer: transfer,
-      reason: "no corresponding payout",
-    })),
-    onlyInPayouts: onlyInPayouts.map((payout) => ({
-      payout: payout,
-      reason: "no corresponding transfer",
-    })),
-    totalTransfers: matched.length + unmatched.length + onlyInTransfers.length,
-    totalPayouts: matched.length + unmatched.length + onlyInPayouts.length,
-    totalMatched: matched.length,
-    totalUnmatched: unmatched.length,
-    totalOnlyInTransfers: onlyInTransfers.length,
-    totalOnlyInPayouts: onlyInPayouts.length,
+
+    reconcilliationEntries: reconciliationEntries,
+
+    totalTransfers: reconciliationEntries.filter((entry) => entry.transfer)
+      .length,
+    totalPayouts: reconciliationEntries.filter((entry) => entry.payout).length,
+    totalExactMatch: reconciliationEntries.filter(
+      (entry) => entry.status === ReconciliationStatus.MATCHED_EXACT,
+    ).length,
+    totalToleranceMatch: reconciliationEntries.filter(
+      (entry) => entry.status === ReconciliationStatus.MATCHED_WITH_TOLERANCE,
+    ).length,
+    totalUnmatched: reconciliationEntries.filter(
+      (entry) =>
+        entry.status === ReconciliationStatus.MISSING_PAYOUT ||
+        entry.status === ReconciliationStatus.MISSING_TRANSFER,
+    ).length,
+    totalOnlyInTransfers: reconciliationEntries.filter(
+      (entry) => entry.status === ReconciliationStatus.MISSING_PAYOUT,
+    ).length,
+    totalOnlyInPayouts: reconciliationEntries.filter(
+      (entry) => entry.status === ReconciliationStatus.MISSING_TRANSFER,
+    ).length,
   });
 
   reconciliationRecord.save();

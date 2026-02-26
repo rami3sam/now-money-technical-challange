@@ -1,55 +1,41 @@
 import mongoose, { Schema, model } from "mongoose";
 import { payoutSchema } from "../validations/payout.ts";
 import { transferSchema } from "./transfer.ts";
+import { ReconciliationStatusValues } from "../enums/reconcilliationStatus.ts";
+import { required } from "zod/mini";
 
 const ReconciliationSchema = new Schema(
   {
     runId: { type: String, required: true, unique: true },
     runDate: { type: Date, required: true, default: () => new Date() },
 
-    matched: [
+    reconcilliationEntries: [
       {
         transfer: {
           type: transferSchema,
+          required: false,
+        },
+        payout: { type: payoutSchema, required: false },
+        variance: {
+          type: {
+            payoutAmountDifference: { type: Number, required: true },
+            sendAmountDifference: { type: Number, required: true },
+            currencyMismatch: { type: Boolean, required: true },
+          },
+          required: false,
+        },
+        status: {
+          type: String,
+          enum: ReconciliationStatusValues,
           required: true,
         },
-        payout: { type: payoutSchema, required: true },
-      },
-    ],
-
-    unmatched: [
-      {
-        transfer: {
-          type: transferSchema,
-          required: true,
-        },
-        payout: { type: payoutSchema, required: true },
-      },
-    ],
-
-    onlyInTransfers: [
-      {
-        transfer: {
-          type: transferSchema,
-        },
-        reason: { type: String, default: "no corresponding payout" },
-      },
-    ],
-
-    onlyInPayouts: [
-      {
-        payout: {
-          type: payoutSchema,
-          required: true,
-        },
-        reason: { type: String, default: "no corresponding transfer" },
       },
     ],
 
     totalTransfers: { type: Number, default: 0 },
     totalPayouts: { type: Number, default: 0 },
-    totalMatched: { type: Number, default: 0 },
-    totalUnmatched: { type: Number, default: 0 },
+    totalExactMatch: { type: Number, default: 0 },
+    totalToleranceMatch: { type: Number, default: 0 },
     totalOnlyInTransfers: { type: Number, default: 0 },
     totalOnlyInPayouts: { type: Number, default: 0 },
   },

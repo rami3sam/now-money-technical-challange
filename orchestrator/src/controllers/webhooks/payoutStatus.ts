@@ -36,6 +36,7 @@ const payoutStatus = async (req: Request, res: Response) => {
           status: TransferStatus.PAID,
           stateHistory: transfer.stateHistory,
           isPayoutProcessed: true,
+          payoutsStatus: payoutStatusRequest.status,
         },
       ).exec();
 
@@ -52,6 +53,7 @@ const payoutStatus = async (req: Request, res: Response) => {
           status: TransferStatus.FAILED,
           stateHistory: transfer.stateHistory,
           isPayoutProcessed: true,
+          payoutsStatus: payoutStatusRequest.status,
         },
       ).exec();
 

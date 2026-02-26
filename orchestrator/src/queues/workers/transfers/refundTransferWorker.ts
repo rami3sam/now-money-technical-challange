@@ -21,7 +21,7 @@ export async function refundTransferWorker(task: TaskType & { id: string }) {
     currency(transfer.final.paidAmount) > currency(0)
   ) {
     const feesCharged = currency(transfer.sendAmount).multiply(
-      EnvVariables.CANCELLATION_FEE_PERCENTAGE / 100,
+      EnvVariables.CANCELLATION_FEE_PERCENTAGE,
     );
 
     const refundedAmount = currency(transfer.sendAmount).subtract(feesCharged);

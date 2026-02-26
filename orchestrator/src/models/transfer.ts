@@ -11,6 +11,7 @@ import { quoteSchema } from "./quote.ts";
 import { immutableQuoteSchema } from "./immutableQuote.ts";
 import { complianceDecisionSchema } from "./complianceDecision.ts";
 import { transferStateHistorySchema } from "./transferStateHistory.ts";
+import { PayoutStatus } from "../enums/payoutStatus.enum.ts";
 
 export const transferSchema = new mongoose.Schema(
   {
@@ -126,10 +127,17 @@ export const transferSchema = new mongoose.Schema(
       minlength: 3,
       maxlength: 3,
     },
+
     status: {
       type: String,
       enum: TransferStatusValues,
       required: true,
+    },
+
+    payoutsStatus: {
+      type: String,
+      enum: PayoutStatus,
+      required: false,
     },
 
     complianceDecisions: {

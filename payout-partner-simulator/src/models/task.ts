@@ -34,3 +34,4 @@ export const taskSchema = new mongoose.Schema({
 
 export const Task = mongoose.model("Tasks", taskSchema);
 export type TaskType = InferSchemaType<typeof taskSchema>;
+export type TaskTypeWithId = TaskType & { id: string };

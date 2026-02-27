@@ -5,7 +5,7 @@ import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
 import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
 import { isValidMoney } from "../utils/validatorFunctions.ts";
 
-export const initatePayoutSchema = z.object({
+export const InitatePayoutType = z.object({
   sender: z.object({
     name: z.string().min(1, "sender name is required"),
   }),
@@ -58,4 +58,4 @@ export const initatePayoutSchema = z.object({
   payoutId: z.string().min(1, "payoutId is required"),
 });
 
-export type initatePayoutSchema = z.infer<typeof initatePayoutSchema>;
+export type InitatePayoutType = z.infer<typeof InitatePayoutType>;

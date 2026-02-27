@@ -14,32 +14,32 @@ export async function quoteTransfer(
   if (!transfer) throw Error(`Transfer with id ${id} not found`);
 
   const { recipient } = transfer;
-  const quoteResponse = await axios.post("http://localhost:8001/quote", {
+
+  const Response = await axios.post("http://localhost:8001/quote", {
     sendAmount: transfer.sendAmount,
     sendCurrency: transfer.sendCurrency,
     payoutCurrency: transfer.payoutCurrency,
-    destinationCountry: recipient!.country,
-    payoutMethod: recipient!.payoutMethod,
+    destinationCountry: recipient.country,
+    payoutMethod: recipient.payoutMethod,
   });
 
-  const quote = quoteResponseSchema.parse(quoteResponse.data);
+  const validatedQuote = quoteResponseSchema.parse(Response.data);
 
-  transfer.quote = {
-    rate: quote.fxRate,
-    fee: quote.feeAmount,
-    payoutAmount: quote.payoutAmount,
-    expiry: quote.quoteExpiry,
+  const quote = {
+    rate: validatedQuote.fxRate,
+    fee: validatedQuote.feeAmount,
+    payoutAmount: validatedQuote.payoutAmount,
+    expiry: validatedQuote.quoteExpiry,
   };
 
   assertTransferStatusTransition(
     transfer.status as TransferStatus,
     TransferStatus.QUOTED,
   );
-  transfer.status = TransferStatus.QUOTED;
 
-  const updatedTransfer = await transferRepository.updateTransfer(
+  const updatedTransfer = await transferRepository.updateTransferQuote(
     transfer.id,
-    transfer,
+    quote,
   );
 
   if (!updatedTransfer)

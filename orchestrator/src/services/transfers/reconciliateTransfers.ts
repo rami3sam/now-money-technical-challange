@@ -126,9 +126,10 @@ export async function reconciliateTransfers(
   }
 
   reconciliationEntries.push(
-    ...(payouts as (PayoutType & {
-      status: ReconciliationStatus.MISSING_TRANSFER;
-    })[]),
+    ...payouts.map((payout) => ({
+      payout: payout as PayoutType,
+      status: ReconciliationStatus.MISSING_TRANSFER,
+    })),
   );
 
   const reconciliationRecord = new Reconciliation({

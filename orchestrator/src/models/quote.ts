@@ -19,3 +19,5 @@ export const quoteSchema = new mongoose.Schema(
     _id: false,
   },
 );
+
+export type QuoteType = InferSchemaType<typeof quoteSchema>;

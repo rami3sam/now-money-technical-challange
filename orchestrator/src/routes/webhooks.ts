@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { verifyHmacMiddleware } from "../middlewares/verifyHmacMiddleware.ts";
 import { EnvVariables } from "../constants/config.ts";
-import { payoutStatus } from "../services/transfers/updatePayoutStatus.ts";
 import type { TasksService } from "../services/tasks.service.ts";
 import type { TransfersService } from "../services/transfers.service.ts";
 import { WebhookController } from "../controllers/webhook.controller.ts";

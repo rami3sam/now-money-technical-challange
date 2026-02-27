@@ -1,5 +1,5 @@
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task, type TaskType } from "../models/task.ts";
+import type { TaskType } from "../models/task.ts";
 import type { TasksRepository } from "../repositories/task.repository.ts";
 import { getBackoffTime } from "../utils/utilFunctions.ts";
 import { addTask } from "./tasks/add.ts";
@@ -14,16 +14,8 @@ export class TasksService {
     return await this.taskRepository.getPendingTasksToRun();
   }
 
-  async updateTaskStatusRunning(id: string) {
-    return await this.taskRepository.updateTaskStatusRunning(id);
-  }
-
-  async updateTaskStatusFinished(id: string) {
-    return await this.taskRepository.updateTaskStatusFinished(id);
-  }
-
-  async updateTaskStatusFailed(id: string) {
-    return await this.taskRepository.updateTaskStatusFailed(id);
+  async updateTaskStatus(id: string, status: TaskStatus) {
+    return await this.taskRepository.updateTaskStatus(id, status);
   }
 
   async scheduleTaskForRetry(id: string, retryDate?: Date) {

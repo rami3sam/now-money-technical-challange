@@ -1,78 +1,56 @@
-import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
+import type { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task } from "../models/task.ts";
-import { getBackoffTime } from "../utils/utilFunctions.ts";
-import {
-  taskHandlerFailFunctions,
-  taskHandlerFunctions,
-} from "../enums/taskHandlerFunctions.ts";
+import { Task, type TaskTypeWithId } from "../models/task.ts";
+import type { TasksService } from "../services/tasks.service.ts";
 
 let isRunning = false;
 
-async function addToTaskQueue(task: {
-  taskHandler: TaskHandlers;
-  payload: any;
-  executeAt?: Date;
-}) {
-  const newTask = new Task({
-    taskHandler: task.taskHandler,
-    executeAt: task.executeAt,
-    payload: task.payload,
-    status: TaskStatus.PENDING,
-  });
-  const dbTask = await newTask.save();
-  if (!dbTask) {
-    throw new Error(
-      `Failed to save task to database with info "${JSON.stringify(task)}"`,
-    );
-  }
-}
-
-async function runQueueWorker() {
+async function runQueueWorker(
+  tasksService: TasksService,
+  taskHandlerFunctions: Record<
+    TaskHandlers,
+    (task: TaskTypeWithId) => Promise<void>
+  >,
+  taskHandlerFailFunctions: Record<
+    TaskHandlers,
+    (task: TaskTypeWithId) => Promise<void>
+  >,
+) {
   if (isRunning) return;
   isRunning = true;
-  let tasks = await Task.find({
-    executeAt: { $lte: new Date() },
-    status: TaskStatus.PENDING,
-  })
-    .sort({ executeAt: 1 })
-    .exec();
+  let tasks = await tasksService.getPendingTasksToRun();
   do {
     const task = tasks.pop();
     if (task !== undefined) {
       try {
-        const updatedTask = await Task.findByIdAndUpdate(task._id, {
-          status: TaskStatus.RUNNING,
-        }).exec();
-
+        const updatedTask = await tasksService.updateTaskStatus(
+          task.id,
+          TaskStatus.RUNNING,
+        );
         if (taskHandlerFunctions[task.taskHandler])
           await taskHandlerFunctions[task.taskHandler]!(task);
 
-        await Task.findByIdAndUpdate(task._id, {
-          status: TaskStatus.FINISHED,
-        }).exec();
+        const finishedTask = await tasksService.updateTaskStatus(
+          task.id,
+          TaskStatus.FINISHED,
+        );
       } catch (err) {
         if (task.retryCount > task.maxRetries) {
-          const updateTask = await Task.findOneAndUpdate(
-            { _id: task._id, status: TaskStatus.RUNNING },
-            {
-              status: TaskStatus.FAILED,
-            },
-            { returnDocument: "after" },
-          ).exec();
-          if (updateTask && taskHandlerFunctions[task.taskHandler])
-            await taskHandlerFunctions[task.taskHandler]!(task);
+          const updatedTask = await tasksService.updateTaskStatus(
+            task.id,
+            TaskStatus.FAILED,
+          );
+          if (updatedTask && taskHandlerFailFunctions[task.taskHandler])
+            await taskHandlerFailFunctions[task.taskHandler]!(task);
         } else {
-          await Task.findOneAndUpdate(
-            { _id: task._id, status: TaskStatus.RUNNING },
-            {
-              status: TaskStatus.PENDING,
-              $inc: { retryCount: 1 },
-              executeAt: new Date(Date.now() + getBackoffTime(task.retryCount)),
-            },
-          ).exec();
+          const updatedTask = await tasksService.scheduleTaskForRetry(task.id);
+
+          if (!updatedTask)
+            console.error(
+              `Failed to update task with id ${task.id} for retrying.`,
+            );
         }
-        console.error(`Error processing task with id ${task}:`, err);
+        console.error(`Error processing task with id ${task.id}:`, err);
       }
     }
 
@@ -84,8 +62,6 @@ async function runQueueWorker() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   } while (true);
-
-  isRunning = false;
 }
 
-export { addToTaskQueue, runQueueWorker };
+export { runQueueWorker };

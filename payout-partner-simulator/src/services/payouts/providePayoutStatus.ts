@@ -1,14 +1,13 @@
 import axios from "axios";
-import { Payout } from "../../../models/payout.ts";
-import type { TaskType } from "../../../models/task.ts";
-import { signHmac as signHmac } from "../../../utils/utilFunctions.ts";
-import { EnvVariables } from "../../../constants/config.ts";
+import { PayoutsRepository } from "../../repositories/payouts.repository.ts";
+import { EnvVariables } from "../../constants/config.ts";
+import { signHmac } from "../../utils/utilFunctions.ts";
 
-export async function providePayoutStatusWorker(
-  task: TaskType & { id: string },
-) {
-  const payoutId = task.payload;
-  const payout = await Payout.findById(payoutId);
+export const providePayoutStatus = async (
+  payoutsRepository: PayoutsRepository,
+  payoutId: string,
+) => {
+  const payout = await payoutsRepository.findById(payoutId);
 
   if (!payout) throw Error(`Payout with id ${payoutId} not found`);
   const payload = {
@@ -22,4 +21,4 @@ export async function providePayoutStatusWorker(
     payload,
     { headers: { "X-Signature": signature } },
   );
-}
+};

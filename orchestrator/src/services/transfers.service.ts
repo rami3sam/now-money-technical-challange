@@ -1,6 +1,7 @@
 import type { PayoutType } from "../models/payout.ts";
 import type { TransferType } from "../models/transfer.ts";
 import type { TransfersRepository } from "../repositories/transfers.repository.ts";
+import type { PayoutStatusType } from "../validations/payoutStatus.ts";
 import type { TasksService } from "./tasks.service.ts";
 import { approveTransfer } from "./transfers/approveTransfer.ts";
 import { cancelTransfer } from "./transfers/cancelTransfer.ts";
@@ -14,7 +15,7 @@ import { quoteTransfer } from "./transfers/quoteTransfer.ts";
 import { reconciliateTransfers } from "./transfers/reconciliateTransfers.ts";
 import { refundTransfer } from "./transfers/refundTransfer.ts";
 import { rejectTransfer } from "./transfers/rejectTransfer.ts";
-import { payoutStatus } from "./transfers/updatePayoutStatus.ts";
+import { updatePayoutStatus } from "./transfers/updatePayoutStatus.ts";
 
 export class TransfersService {
   constructor(
@@ -22,10 +23,20 @@ export class TransfersService {
     private taskService: TasksService,
   ) {}
   async approveTransfer(id: string, reviewerId: string) {
-    return await approveTransfer(this.transfersRepository, this.taskService, id, reviewerId);
+    return await approveTransfer(
+      this.transfersRepository,
+      this.taskService,
+      id,
+      reviewerId,
+    );
   }
   async rejectTransfer(id: string, reviewerId: string) {
-    return await rejectTransfer(this.transfersRepository, this.taskService, id, reviewerId);
+    return await rejectTransfer(
+      this.transfersRepository,
+      this.taskService,
+      id,
+      reviewerId,
+    );
   }
   async cancelTransfer(id: string) {
     return await cancelTransfer(this.transfersRepository, this.taskService, id);
@@ -34,7 +45,11 @@ export class TransfersService {
     return await quoteTransfer(this.transfersRepository, id);
   }
   async confirmTransferQuote(id: string) {
-    return await confirmTransferQuote(this.transfersRepository, this.taskService, id);
+    return await confirmTransferQuote(
+      this.transfersRepository,
+      this.taskService,
+      id,
+    );
   }
   async getTransfer(id: string) {
     return await getTransfer(this.transfersRepository, id);
@@ -47,7 +62,11 @@ export class TransfersService {
   }
 
   async checkTransferCompliance(id: string) {
-    return await checkTransferCompliance(this.transfersRepository, this.taskService, id);
+    return await checkTransferCompliance(
+      this.transfersRepository,
+      this.taskService,
+      id,
+    );
   }
 
   async initiatePayout(id: string) {
@@ -66,11 +85,11 @@ export class TransfersService {
     );
   }
 
-  async payoutStatusWebhook(payout: PayoutType) {
-    return await payoutStatus(
+  async updatePayoutStatusWebhook(payoutStatus: PayoutStatusType) {
+    return await updatePayoutStatus(
       this.transfersRepository,
       this.taskService,
-      payout,
+      payoutStatus,
     );
   }
 }

@@ -1,63 +1,51 @@
 import type { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task, type TaskType, type TaskTypeWithId } from "../models/task.ts";
-import { getBackoffTime } from "../utils/utilFunctions.ts";
+import { Task, type TaskTypeWithId } from "../models/task.ts";
+import type { TasksService } from "../services/tasks.service.ts";
 
 let isRunning = false;
 
 async function runQueueWorker(
-  taskHandlerFunctions: Record<TaskHandlers, ((task: TaskTypeWithId) => Promise<void>)>,
-  taskHandlerFailFunctions: Record<TaskHandlers, ((task: TaskTypeWithId) => Promise<void>)>,
+  tasksService: TasksService,
+  taskHandlerFunctions: Record<
+    TaskHandlers,
+    (task: TaskTypeWithId) => Promise<void>
+  >,
+  taskHandlerFailFunctions: Record<
+    TaskHandlers,
+    (task: TaskTypeWithId) => Promise<void>
+  >,
 ) {
   if (isRunning) return;
   isRunning = true;
-  let tasks = await Task.find({
-    executeAt: { $lte: new Date() },
-    status: TaskStatus.PENDING,
-  })
-    .sort({ executeAt: 1 })
-    .exec();
+  let tasks = await tasksService.getPendingTasksToRun();
   do {
     const task = tasks.pop();
     if (task !== undefined) {
       try {
-        const updatedTask = await Task.findByIdAndUpdate(task._id, {
-          status: TaskStatus.RUNNING,
-        }).exec();
+        const updatedTask = await tasksService.updateTaskStatusRunning(task.id);
         if (taskHandlerFunctions[task.taskHandler])
           await taskHandlerFunctions[task.taskHandler]!(task);
 
-        await Task.findByIdAndUpdate(task._id, {
-          status: TaskStatus.FINISHED,
-        }).exec();
+        const finishedTask = await tasksService.updateTaskStatusFinished(
+          task.id,
+        );
       } catch (err) {
         if (task.retryCount > task.maxRetries) {
-          const updatedTask = await Task.findOneAndUpdate(
-            { _id: task._id, status: TaskStatus.RUNNING },
-            {
-              status: TaskStatus.FAILED,
-            },
-            { returnDocument: "after" },
-          ).exec();
+          const updatedTask = await tasksService.updateTaskStatusFailed(
+            task.id,
+          );
           if (updatedTask && taskHandlerFailFunctions[task.taskHandler])
             await taskHandlerFailFunctions[task.taskHandler]!(task);
         } else {
-          const updatedTask = await Task.findOneAndUpdate(
-            { _id: task._id, status: TaskStatus.RUNNING },
-            {
-              status: TaskStatus.PENDING,
-              $inc: { retryCount: 1 },
-              executeAt: new Date(Date.now() + getBackoffTime(task.retryCount)),
-            },
-            { returnDocument: "after" },
-          ).exec();
+          const updatedTask = await tasksService.scheduleTaskForRetry(task.id);
 
           if (!updatedTask)
             console.error(
-              `Failed to update task with id ${task._id} for retrying.`,
+              `Failed to update task with id ${task.id} for retrying.`,
             );
         }
-        console.error(`Error processing task with id ${task._id}:`, err);
+        console.error(`Error processing task with id ${task.id}:`, err);
       }
     }
 

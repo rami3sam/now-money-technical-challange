@@ -12,7 +12,7 @@ export const getBackoffTime = (
   return Math.min(exponential + jitter, maxDelay);
 };
 
-export function signHmacMiddleware(secret: string, body: any) {
+export function signHmac(secret: string, body: any) {
   const payload = JSON.stringify(body);
   const hmac = crypto.createHmac("sha256", secret);
   hmac.update(payload);

@@ -18,7 +18,6 @@ export async function createTransfer(
 
   if (!bankInfoOk && !cashInfoOk)
     throw Error("You must specify recipient details correctly");
-  console.log("Creating transfer with data:", transfer);
 
   transfer.status = TransferStatus.CREATED;
 

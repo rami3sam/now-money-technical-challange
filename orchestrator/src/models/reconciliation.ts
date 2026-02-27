@@ -6,7 +6,6 @@ import { required } from "zod/mini";
 
 const ReconciliationSchema = new Schema(
   {
-    runId: { type: String, required: true, unique: true },
     runDate: { type: Date, required: true, default: () => new Date() },
 
     reconciliationEntries: [

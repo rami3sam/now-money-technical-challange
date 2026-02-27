@@ -18,7 +18,6 @@ export async function refundTransfer(
     TransferStatus.REFUNDED,
   );
 
-  transfer.status = TransferStatus.REFUNDED;
   if (
     transfer.final?.paidAmount &&
     currency(transfer.final.paidAmount) > currency(0)
@@ -28,15 +27,14 @@ export async function refundTransfer(
     );
 
     const refundedAmount = currency(transfer.sendAmount).subtract(feesCharged);
-    transfer.final = {
-      ...transfer.final,
-      refundedAmount: refundedAmount.value.toFixed(2),
-      feesCharged: feesCharged.value.toFixed(2),
-    };
 
-    const updateTransfer = await transfersRepository.updateTransfer(
-      transfer.id,
-      transfer,
+    const refundedAmountFormatted = refundedAmount.value.toFixed(2);
+    const feesChargedFormatted = feesCharged.value.toFixed(2);
+
+    const updateTransfer = await transfersRepository.refundTransfer(
+      id,
+      refundedAmountFormatted,
+      feesChargedFormatted,
     );
 
     if (!updateTransfer)

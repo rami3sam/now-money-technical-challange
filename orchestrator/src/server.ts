@@ -8,7 +8,10 @@ import { TransfersRepository } from "./repositories/transfers.repository.ts";
 import { TransfersService } from "./services/transfers.service.ts";
 import { transfersRoutes } from "./routes/transfersRoutes.ts";
 import { webhookRoutes } from "./routes/webhooks.ts";
-import { getTaskErrorHandlers, getTaskHandlers } from "./utils/getTaskHandlers.ts";
+import {
+  getTaskErrorHandlers,
+  getTaskHandlers,
+} from "./utils/getTaskHandlers.ts";
 
 const PORT = EnvVariables.PORT;
 const app = express();
@@ -36,7 +39,11 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
-  runQueueWorker(getTaskHandlers(transfersService), getTaskErrorHandlers());
+  runQueueWorker(
+    tasksService,
+    getTaskHandlers(transfersService),
+    getTaskErrorHandlers(),
+  );
 }
 
 startServer();

@@ -6,7 +6,7 @@ import {
   assertTransferStatusTransition,
   TransferStatus,
 } from "../../enums/transferStatus.enum.ts";
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import { TransfersRepository } from "../../repositories/transfers.repository.ts";
 import {
   checkForNameInList,
   getComplianceMaximum,
@@ -16,11 +16,11 @@ import type { TasksService } from "../tasks.service.ts";
 import { Task } from "../../models/task.ts";
 
 export async function checkTransferCompliance(
-  transferRepository: TransfersRepository,
+  transfersRepository: TransfersRepository,
   tasksService: TasksService,
   id: string,
 ) {
-  const transfer = await transferRepository.findById(id);
+  const transfer = await transfersRepository.findById(id);
   if (!transfer) throw Error(`Transfer with id ${id} not found`);
 
   const { recipient } = transfer;
@@ -32,19 +32,12 @@ export async function checkTransferCompliance(
       TransferStatus.COMPLIANCE_REJECTED,
     );
 
-    transfer.status = TransferStatus.COMPLIANCE_REJECTED;
-    transfer.stateHistory.push({ state: TransferStatus.COMPLIANCE_REJECTED });
-    transfer.complianceDecisions.push({
-      decision: ComplianceDecisions.REJECTED,
-      triggeredRule: `Recipient country "${recipient.country}" is banned`,
-    });
-
-    const updateTransfer = await transferRepository.updateTransfer(
+    const updatedTransfer = await transfersRepository.markTransferAsRejected(
       id,
-      transfer,
+      `Recipient country "${recipient.country}" is banned`,
     );
 
-    if (!updateTransfer)
+    if (!updatedTransfer)
       throw new Error(
         "Failed to update transfer status to COMPLIANCE_REJECTED",
       );
@@ -52,7 +45,7 @@ export async function checkTransferCompliance(
     tasksService.add(
       new Task({
         taskHandler: TaskHandlers.REFUND_TRANSFER,
-        payload: updateTransfer.id,
+        payload: updatedTransfer.id,
       }),
     );
   } else if (checkForNameInList(recipient.name, bannedPeople)) {
@@ -61,19 +54,13 @@ export async function checkTransferCompliance(
       TransferStatus.COMPLIANCE_PENDING,
     );
 
-    transfer.status = TransferStatus.COMPLIANCE_PENDING;
-    transfer.stateHistory.push({ state: TransferStatus.COMPLIANCE_PENDING });
-    transfer.complianceDecisions.push({
-      decision: ComplianceDecisions.PENDING,
-      triggeredRule: `Recipient name ${recipient.name} is banned`,
-    });
+    const updatedTransfer =
+      await transfersRepository.markTransferAsCompliancePending(
+        transfer.id,
+        `Recipient name ${recipient.name} is banned`,
+      );
 
-    const updateTransfer = await transferRepository.updateTransfer(
-      transfer.id,
-      transfer,
-    );
-
-    if (!updateTransfer)
+    if (!updatedTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
   } else if (
     currency(transfer.sendAmount) <
@@ -90,12 +77,12 @@ export async function checkTransferCompliance(
       triggeredRule: `amount ${transfer.sendAmount} is below compliance threshold`,
     });
 
-    const updateTransfer = await transferRepository.updateTransfer(
+    const updatedTransfer = await transfersRepository.markTransferAsApproved(
       transfer.id,
-      transfer,
+      `amount ${transfer.sendAmount} is below compliance threshold`,
     );
 
-    if (!updateTransfer)
+    if (!updatedTransfer)
       throw new Error(
         "Failed to update transfer status to COMPLIANCE_APPROVED",
       );
@@ -103,7 +90,7 @@ export async function checkTransferCompliance(
     tasksService.add(
       new Task({
         taskHandler: TaskHandlers.INITIATE_PAYOUT,
-        payload: updateTransfer.id,
+        payload: updatedTransfer.id,
       }),
     );
   } else {
@@ -119,10 +106,11 @@ export async function checkTransferCompliance(
       triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
     });
 
-    const updatedTransfer = await transferRepository.updateTransfer(
-      transfer.id,
-      transfer,
-    );
+    const updatedTransfer =
+      await transfersRepository.markTransferAsCompliancePending(
+        transfer.id,
+        `amount ${transfer.sendAmount} is above compliance threshold`,
+      );
 
     if (!updatedTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");

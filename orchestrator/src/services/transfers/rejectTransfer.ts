@@ -23,13 +23,11 @@ export async function rejectTransfer(
     TransferStatus.COMPLIANCE_REJECTED,
   );
 
-  transfer.status = TransferStatus.COMPLIANCE_REJECTED;
-  transfer.complianceDecisions.push({
-    decision: ComplianceDecisions.REJECTED,
-    triggeredRule: `Transfer rejected by manual review`,
-    reviewerId: reviewerId,
-  });
-  const updateTransfer = await transferRepository.updateTransfer(id, transfer);
+  const updateTransfer = await transferRepository.markTransferAsRejected(
+    id,
+    `Transfer rejected by manual review`,
+    reviewerId,
+  );
 
   if (!updateTransfer)
     throw new Error("Failed to update transfer status to COMPLIANCE_REJECTED");
@@ -40,5 +38,6 @@ export async function rejectTransfer(
       payload: updateTransfer.id,
     }),
   );
+
   return updateTransfer;
 }

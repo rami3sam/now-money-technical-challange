@@ -3,7 +3,7 @@ import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
 import { Task, type TaskType } from "../models/task.ts";
 import type { TasksService } from "../services/tasks.service.ts";
 import type { TransfersService } from "../services/transfers.service.ts";
-import { payoutStatusSchema } from "../validations/payoutStatus.ts";
+import { PayoutStatusType } from "../validations/payoutStatus.ts";
 import { Payout, type PayoutType } from "../models/payout.ts";
 
 export class WebhookController {
@@ -30,13 +30,13 @@ export class WebhookController {
     res
       .status(200)
       .json({ message: "Reconciliation triggered", taskId: task._id });
-  }
+  };
 
   payoutStatus = async (req: Request, res: Response) => {
-    const payoutStatusRequest = payoutStatusSchema.parse(req.body);
+    const payoutStatusRequest = PayoutStatusType.parse(req.body);
 
-    return await this.transfersService.payoutStatusWebhook(
-      new Payout(payoutStatusRequest),
-    );
-  }
+    await this.transfersService.updatePayoutStatusWebhook(payoutStatusRequest);
+
+    res.status(200).json({ message: "Payout status updated successfully" });
+  };
 }

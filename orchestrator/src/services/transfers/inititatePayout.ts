@@ -4,7 +4,7 @@ import {
 } from "../../enums/transferStatus.enum.ts";
 import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
 import { v7 as uuidv7 } from "uuid";
-import { payoutStatusSchema } from "../../validations/payoutStatus.ts";
+import { PayoutStatusType } from "../../validations/payoutStatus.ts";
 import axios from "axios";
 export async function initiatePayout(
   transfersRepository: TransfersRepository,
@@ -23,9 +23,9 @@ export async function initiatePayout(
 
   transfer.status = TransferStatus.PAYOUT_PENDING;
   transfer.payoutId = uuidv7();
-  const updateTransfer = await transfersRepository.updateTransfer(
+  const updateTransfer = await transfersRepository.markPayoutPending(
     transfer.id,
-    transfer,
+    transfer.payoutId,
   );
 
   if (!updateTransfer)
@@ -52,11 +52,11 @@ export async function initiatePayout(
     payout,
   );
 
-  const payoutFromPartner = payoutStatusSchema.parse(payoutResponse.data);
+  const payoutFromPartner = PayoutStatusType.parse(payoutResponse.data);
 
-  const updatedTransfer = await transfersRepository.updateTransfer(
+  const updatedTransfer = await transfersRepository.updatePartnerPayoutId(
     transfer.id,
-    { partnerPayoutId: payoutFromPartner.partnerPayoutId },
+    payoutFromPartner.partnerPayoutId,
   );
 
   if (!updatedTransfer)

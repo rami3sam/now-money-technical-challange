@@ -13,26 +13,13 @@ export class TasksRepository {
     return savedTask;
   }
 
-  async updateTaskStatusRunning(id: string) {
-    return await Task.findOneAndUpdate(
-      { _id: id, status: TaskStatus.PENDING },
-      { status: TaskStatus.RUNNING },
-      { returnDocument: "after" },
-    ).exec();
-  }
+  async updateTask(id: string, updates: Partial<TaskType>) {
+    const task = await Task.findById(id).exec();
+    if (!task) throw Error(`Task with id ${id} not found`);
 
-  async updateTaskStatusFinished(id: string) {
-    return await Task.findOneAndUpdate(
-      { _id: id, status: TaskStatus.RUNNING },
-      { status: TaskStatus.FINISHED },
-      { returnDocument: "after" },
-    ).exec();
-  }
-
-  async updateTaskStatusFailed(id: string) {
-    return await Task.findOneAndUpdate(
-      { _id: id, status: TaskStatus.RUNNING },
-      { status: TaskStatus.FAILED },
+    return Task.findOneAndUpdate(
+      { _id: id },
+      { $set: updates },
       { returnDocument: "after" },
     ).exec();
   }
@@ -55,14 +42,26 @@ export class TasksRepository {
       .exec();
   }
 
-  scheduleFailedTaskForRetry(id: string, retryDate: Date) {
-    return Task.findOneAndUpdate(
-      { _id: id, status: TaskStatus.RUNNING },
+  updateTaskStatus(id: string, status: TaskStatus) {
+    return Task.findByIdAndUpdate(
+      id,
       {
-        $set: { status: TaskStatus.PENDING, executeAt: retryDate },
-        $inc: { retryCount: 1 },
+        status: status,
       },
       { returnDocument: "after" },
     ).exec();
   }
+
+    scheduleFailedTaskForRetry(id: string, retryDate: Date) {
+      return Task.findByIdAndUpdate(
+        id,
+        {
+          status: TaskStatus.PENDING,
+          $inc: { retryCount: 1 },
+          executeAt: retryDate,
+        },
+        { returnDocument: "after" },
+      ).exec();
+    }
+  
 }

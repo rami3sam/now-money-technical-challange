@@ -1,4 +1,4 @@
-import express, { json, response } from "express";
+import express, { json, response, type Request, type Response } from "express";
 import connectDB from "./utils/connectDB.ts";
 import { EnvVariables } from "./constants/config.ts";
 import { runQueueWorker } from "./queues/taskQueue.ts";
@@ -25,7 +25,7 @@ const transfersService = new TransfersService(
 
 app.use(
   express.json({
-    verify: (req, res, buf) => {
+    verify: (req: Request, res: Response, buf: any) => {
       (req as any).rawBody = buf;
     },
   }),
@@ -34,7 +34,7 @@ app.use("/transfers", transfersRoutes(transfersService));
 app.use("/webhooks", webhookRoutes(transfersService, tasksService));
 
 async function startServer() {
-  await connectDB();
+  await connectDB(EnvVariables.DB_URI);
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

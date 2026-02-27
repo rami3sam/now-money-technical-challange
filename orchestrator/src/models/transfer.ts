@@ -70,6 +70,7 @@ export const transferSchema = new mongoose.Schema(
         },
       },
       required: true,
+      _id: false,
     },
 
     sendAmount: {

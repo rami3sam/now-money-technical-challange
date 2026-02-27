@@ -48,6 +48,8 @@ export async function checkTransferCompliance(
         payload: updatedTransfer.id,
       }),
     );
+
+    return updatedTransfer;
   } else if (checkForNameInList(recipient.name, bannedPeople)) {
     assertTransferStatusTransition(
       transfer.status as TransferStatus,
@@ -62,20 +64,15 @@ export async function checkTransferCompliance(
 
     if (!updatedTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
+    return updatedTransfer;
   } else if (
-    currency(transfer.sendAmount) <
-    currency(getComplianceMaximum(transfer.sendCurrency as CurrencyCodes))
+    currency(transfer.sendAmount).value <
+    currency(getComplianceMaximum(transfer.sendCurrency as CurrencyCodes)).value
   ) {
     assertTransferStatusTransition(
       transfer.status as TransferStatus,
       TransferStatus.COMPLIANCE_APPROVED,
     );
-
-    transfer.status = TransferStatus.COMPLIANCE_APPROVED;
-    transfer.complianceDecisions.push({
-      decision: ComplianceDecisions.APPROVED,
-      triggeredRule: `amount ${transfer.sendAmount} is below compliance threshold`,
-    });
 
     const updatedTransfer = await transfersRepository.markTransferAsApproved(
       transfer.id,
@@ -93,18 +90,13 @@ export async function checkTransferCompliance(
         payload: updatedTransfer.id,
       }),
     );
+
+    return updatedTransfer;
   } else {
     assertTransferStatusTransition(
       transfer.status as TransferStatus,
       TransferStatus.COMPLIANCE_PENDING,
     );
-
-    transfer.status = TransferStatus.COMPLIANCE_PENDING;
-
-    transfer.complianceDecisions.push({
-      decision: ComplianceDecisions.PENDING,
-      triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
-    });
 
     const updatedTransfer =
       await transfersRepository.markTransferAsCompliancePending(
@@ -114,5 +106,6 @@ export async function checkTransferCompliance(
 
     if (!updatedTransfer)
       throw new Error("Failed to update transfer status to COMPLIANCE_PENDING");
+    return updatedTransfer;
   }
 }

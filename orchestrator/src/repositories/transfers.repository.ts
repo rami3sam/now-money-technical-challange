@@ -30,6 +30,7 @@ export class TransfersRepository {
         $set: { status: TransferStatus.PAYOUT_PENDING, payoutId: payoutId },
         $push: { stateHistory: { state: TransferStatus.PAYOUT_PENDING } },
       },
+      { returnDocument: "after" },
     ).exec();
   }
 
@@ -98,6 +99,7 @@ export class TransfersRepository {
           stateHistory: { state: TransferStatus.COMPLIANCE_PENDING },
         },
       },
+      { returnDocument: "after" },
     ).exec();
   }
 
@@ -106,6 +108,11 @@ export class TransfersRepository {
     triggeredRule: string,
     reviewerId?: string,
   ) {
+    const decision =
+      reviewerId !== undefined
+        ? ComplianceDecisions.APPROVED_MANUALLY
+        : ComplianceDecisions.APPROVED_AUTOMATICALLY;
+        
     return await Transfer.findOneAndUpdate(
       {
         _id: id,
@@ -117,13 +124,14 @@ export class TransfersRepository {
         $set: { status: TransferStatus.COMPLIANCE_APPROVED },
         $push: {
           complianceDecisions: {
-            decision: ComplianceDecisions.APPROVED,
+            decision: decision,
             triggeredRule: triggeredRule,
             reviewerId: reviewerId,
           },
           stateHistory: { state: TransferStatus.COMPLIANCE_APPROVED },
         },
       },
+      { returnDocument: "after" },
     ).exec();
   }
 
@@ -132,6 +140,10 @@ export class TransfersRepository {
     triggeredRule: string,
     reviewerId?: string,
   ) {
+    const decision =
+      reviewerId !== undefined
+        ? ComplianceDecisions.REJECTED_MANUALLY
+        : ComplianceDecisions.REJECTED_AUTOMATICALLY;
     return Transfer.findOneAndUpdate(
       {
         _id: id,
@@ -143,13 +155,14 @@ export class TransfersRepository {
         $set: { status: TransferStatus.COMPLIANCE_REJECTED },
         $push: {
           complianceDecisions: {
-            decision: ComplianceDecisions.REJECTED,
+            decision: decision,
             triggeredRule: triggeredRule,
             reviewerId: reviewerId,
           },
           stateHistory: { state: TransferStatus.COMPLIANCE_REJECTED },
         },
       },
+      { returnDocument: "after" },
     ).exec();
   }
 

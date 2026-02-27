@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll } from "vitest";
+import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
 import { TransfersService } from "./transfers.service.ts";
 import { TasksService } from "./tasks.service.ts";
 import { TasksRepository } from "../repositories/task.repository.ts";
@@ -8,6 +8,8 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import { TransferStatus } from "../enums/transferStatus.enum.ts";
 import axios from "axios";
+import { update } from "lodash";
+import { CountryCodes } from "../enums/countryCodes.enum.ts";
 let transfersService: TransfersService;
 
 vi.mock("axios");
@@ -35,7 +37,7 @@ const provideDummyTransfer = (updates: any): any =>
     ...updates,
   }) as TransferType;
 
-const provideQuotedTransfer = (updates: any): any => ({
+const provideDummyQuotedTransfer = (updates: any): any => ({
   sender: {
     senderId: "4",
     name: "Hassan Jalal",
@@ -74,6 +76,59 @@ const provideQuotedTransfer = (updates: any): any => ({
     payoutAmount: "35392.50",
     expiry: formatDate(new Date(Date.now() + 1000 * 60)),
   },
+  ...updates,
+});
+
+const provideDummyConfirmedTransfer = (updates: any): any => ({
+  final: {
+    paidAmount: "10000.00",
+  },
+  isPayoutProcessed: false,
+  complianceDecisions: [],
+  stateHistory: [
+    {
+      state: "CREATED",
+      timestamp: "2026-02-27T16:27:23.410Z",
+    },
+    {
+      state: "QUOTED",
+      timestamp: "2026-02-27T16:27:30.969Z",
+    },
+    {
+      state: "CONFIRMED",
+      timestamp: "2026-02-27T16:27:34.101Z",
+    },
+  ],
+  sender: {
+    senderId: "4",
+    name: "Hassan Jalal",
+  },
+  recipient: {
+    name: "Rami Essamedeen",
+    country: "ARE",
+    payoutMethod: "CASH",
+    payoutDetails: {
+      personalIDNumber: "12344556",
+      personalIDType: "PASSPORT",
+    },
+  },
+  sendAmount: "10000.00",
+  sendCurrency: "USD",
+  payoutCurrency: "AED",
+  status: "CONFIRMED",
+  quote: {
+    rate: "3.68",
+    fee: "250.00",
+    payoutAmount: "35880.00",
+    expiry: "2026-02-27T16:28:30.952Z",
+  },
+  immutableQuoteSnapshot: {
+    rate: "3.68",
+    fee: "250.00",
+    payoutAmount: "35880.00",
+    expiry: "2026-02-27T16:28:30.952Z",
+  },
+  ...updates,
 });
 
 const provideDummyQuote = (updates: any): any => ({
@@ -94,6 +149,11 @@ describe("TransfersService", () => {
     const transfersRepository = new TransfersRepository();
     transfersService = new TransfersService(transfersRepository, tasksService);
   });
+
+  afterEach(async () => {
+    await Transfer.deleteMany({});
+  });
+
   it("should create a transfer", async () => {
     const createdTransfer = await transfersService.createTransfer(
       provideDummyTransfer({}),
@@ -132,7 +192,7 @@ describe("TransfersService", () => {
     );
     axios.post = vi.fn().mockResolvedValue({ data: provideDummyQuote({}) });
 
-    expect(
+    await expect(
       transfersService.quoteTransfer(createdTransfer.id),
     ).rejects.toThrow();
   });
@@ -148,7 +208,9 @@ describe("TransfersService", () => {
   });
 
   it("should confirm a quoted transfer", async () => {
-    const createdTransfer = await Transfer.create(provideQuotedTransfer({}));
+    const createdTransfer = await Transfer.create(
+      provideDummyQuotedTransfer({}),
+    );
 
     const confirmedTransfer = await transfersService.confirmTransferQuote(
       createdTransfer._id.toString(),
@@ -157,6 +219,66 @@ describe("TransfersService", () => {
     expect(confirmedTransfer).toHaveProperty(
       "status",
       TransferStatus.CONFIRMED,
+    );
+  });
+
+  it("should change status to COMPLIANCE_PENDING if above threshold", async () => {
+    const createdTransfer = await Transfer.create(
+      provideDummyConfirmedTransfer({}),
+    );
+
+    const confirmedTransfer = await transfersService.checkTransferCompliance(
+      createdTransfer._id.toString(),
+    );
+
+    expect(confirmedTransfer).toHaveProperty(
+      "status",
+      TransferStatus.COMPLIANCE_PENDING,
+    );
+  });
+
+  it("should change status to COMPLIANCE_PENDING banned person", async () => {
+    const dummyTransfer = provideDummyConfirmedTransfer({});
+    dummyTransfer.recipient.name = "Osama Bin Laden";
+    const createdTransfer = await Transfer.create(dummyTransfer);
+
+    const confirmedTransfer = await transfersService.checkTransferCompliance(
+      createdTransfer._id.toString(),
+    );
+
+    expect(confirmedTransfer).toHaveProperty(
+      "status",
+      TransferStatus.COMPLIANCE_PENDING,
+    );
+  });
+
+  it("should reject transfer if recipient country is banned", async () => {
+    const dummyTransfer = provideDummyConfirmedTransfer({});
+    dummyTransfer.recipient.country = CountryCodes.IRN;
+    const createdTransfer = await Transfer.create(dummyTransfer);
+
+    const confirmedTransfer = await transfersService.checkTransferCompliance(
+      createdTransfer._id.toString(),
+    );
+
+    expect(confirmedTransfer).toHaveProperty(
+      "status",
+      TransferStatus.COMPLIANCE_REJECTED,
+    );
+  });
+
+  it("should approve if sendAmount is below threshold and recipient country not banned", async () => {
+    const dummyTransfer = provideDummyConfirmedTransfer({});
+    dummyTransfer.sendAmount = "100.00";
+    const createdTransfer = await Transfer.create(dummyTransfer);
+
+    const confirmedTransfer = await transfersService.checkTransferCompliance(
+      createdTransfer._id.toString(),
+    );
+
+    expect(confirmedTransfer).toHaveProperty(
+      "status",
+      TransferStatus.COMPLIANCE_APPROVED,
     );
   });
 });

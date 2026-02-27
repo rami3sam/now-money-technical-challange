@@ -1,9 +1,10 @@
+
 import mongoose from "mongoose";
 import { EnvVariables } from "../constants/config.ts";
 
-async function connectDB(url: string) {
+async function connectDB() {
   try {
-    await mongoose.connect(url);
+    await mongoose.connect(EnvVariables.DB_URI);
     console.log("MongoDB connected");
   } catch (error: any) {
     console.error("DB connection failed:", error.message);

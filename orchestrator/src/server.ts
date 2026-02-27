@@ -34,7 +34,7 @@ app.use("/transfers", transfersRoutes(transfersService));
 app.use("/webhooks", webhookRoutes(transfersService, tasksService));
 
 async function startServer() {
-  await connectDB(EnvVariables.DB_URI);
+  await connectDB();
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

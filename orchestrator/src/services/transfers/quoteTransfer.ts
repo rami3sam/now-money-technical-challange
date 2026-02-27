@@ -25,6 +25,10 @@ export async function quoteTransfer(
 
   const validatedQuote = quoteResponseSchema.parse(Response.data);
 
+  if (new Date(validatedQuote.quoteExpiry) < new Date()) {
+    throw Error(`Quote for transfer with id ${id} has expired`);
+  }
+
   const quote = {
     rate: validatedQuote.fxRate,
     fee: validatedQuote.feeAmount,

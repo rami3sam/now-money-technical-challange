@@ -1,6 +1,5 @@
-import type { PayoutType } from "../models/payout.ts";
-import type { TransferType } from "../models/transfer.ts";
 import type { TransfersRepository } from "../repositories/transfers.repository.ts";
+import type { createTransferSchema } from "../validations/createTransfer.ts";
 import type { PayoutStatusType } from "../validations/payoutStatus.ts";
 import type { TasksService } from "./tasks.service.ts";
 import { approveTransfer } from "./transfers/approveTransfer.ts";
@@ -57,7 +56,7 @@ export class TransfersService {
   async getUserTransfers(senderId: string) {
     return await getUserTransfers(this.transfersRepository, senderId);
   }
-  async createTransfer(transfer: TransferType) {
+  async createTransfer(transfer: createTransferSchema) {
     return await createTransfer(this.transfersRepository, transfer);
   }
 

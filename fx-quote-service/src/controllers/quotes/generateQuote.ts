@@ -34,7 +34,7 @@ const generateQuote = async (req: Request, res: Response) => {
     });
 
     await quote.save();
-    res.status(200).json({ returnQuote });
+    res.status(200).json({ ...returnQuote });
   } catch (err: any) {
     res.status(400).json(err.message);
   }

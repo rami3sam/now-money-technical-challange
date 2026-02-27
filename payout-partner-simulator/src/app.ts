@@ -8,12 +8,7 @@ import { PayoutsService } from "./services/payouts.service.ts";
 import { partnerPayoutsRoutes } from "./routes/partnerRoutes.ts";
 import { payoutsRoutes } from "./routes/payoutsRoutes.ts";
 import { PayoutsRepository } from "./repositories/payouts.repository.ts";
-import {
-  getTaskErrorHandlers,
-  getTaskHandlers,
-} from "./utils/getTaskHandlers.ts";
 
-const PORT = EnvVariables.PORT;
 const app = express();
 const tasksRepository = new TasksRepository();
 const tasksService = new TasksService(tasksRepository);

@@ -17,15 +17,19 @@ import { required } from "zod/mini";
 export const transferSchema = new mongoose.Schema(
   {
     sender: {
-      senderId: {
-        type: String,
-        required: true,
-        index: true,
+      type: {
+        senderId: {
+          type: String,
+          required: true,
+          index: true,
+        },
+        name: {
+          type: String,
+          required: true,
+        },
       },
-      name: {
-        type: String,
-        required: true,
-      },
+      required: true,
+      _id: false,
     },
 
     recipient: {
@@ -62,6 +66,7 @@ export const transferSchema = new mongoose.Schema(
             },
           },
           required: true,
+          _id: false,
         },
       },
       required: true,

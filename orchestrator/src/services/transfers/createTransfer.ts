@@ -2,23 +2,31 @@ import { PayoutMethods } from "../../enums/payoutMethods.enum.ts";
 import { TransferStatus } from "../../enums/transferStatus.enum.ts";
 import { Transfer, type TransferType } from "../../models/transfer.ts";
 import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import type { createTransferSchema } from "../../validations/createTransfer.ts";
 
 export async function createTransfer(
   transferRepository: TransfersRepository,
-  transfer: TransferType,
+  createTransferType: createTransferSchema,
 ) {
   const bankInfoOk =
-    transfer.recipient.payoutMethod == PayoutMethods.Bank &&
-    transfer.recipient.payoutDetails?.accountNumber;
+    createTransferType.recipient.payoutMethod == PayoutMethods.Bank &&
+    createTransferType.recipient.payoutDetails?.accountNumber;
 
   const cashInfoOk =
-    transfer.recipient.payoutMethod === PayoutMethods.Cash &&
-    transfer.recipient.payoutDetails.personalIDNumber &&
-    transfer.recipient.payoutDetails.personalIDType;
+    createTransferType.recipient.payoutMethod === PayoutMethods.Cash &&
+    createTransferType.recipient.payoutDetails.personalIDNumber &&
+    createTransferType.recipient.payoutDetails.personalIDType;
 
   if (!bankInfoOk && !cashInfoOk)
     throw Error("You must specify recipient details correctly");
 
+  const transfer = new Transfer()
+  transfer.sender = createTransferType.sender;
+  // @ts-ignore
+  transfer.recipient = createTransferType.recipient;
+  transfer.sendAmount = createTransferType.sendAmount;
+  transfer.sendCurrency = createTransferType.sendCurrency;
+  transfer.payoutCurrency = createTransferType.payoutCurrency;
   transfer.status = TransferStatus.CREATED;
 
   const newTransfer = await transferRepository.create(transfer);

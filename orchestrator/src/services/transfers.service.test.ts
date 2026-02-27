@@ -6,7 +6,9 @@ import { TransfersRepository } from "../repositories/transfers.repository.ts";
 import type { TransferType } from "../models/transfer.ts";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
+import { TransferStatus } from "../enums/transferStatus.enum.ts";
 let transfersService: TransfersService;
+
 const transfer = {
   sender: {
     senderId: "4",
@@ -41,6 +43,7 @@ describe("TransfersService", () => {
       transfer as TransferType,
     );
     expect(createdTransfer).toHaveProperty("id");
+    expect(createdTransfer).toHaveProperty("status", TransferStatus.CREATED);
   });
   it("should get a transfer by id", async () => {
     const createdTransfer = await transfersService.createTransfer(
@@ -50,5 +53,23 @@ describe("TransfersService", () => {
       createdTransfer.id,
     );
     expect(fetchedTransfer).toHaveProperty("id", createdTransfer.id);
-  })
+  });
+  it("shouldn't get a transfer that doesn't exist", async () => {
+    const createdTransfer = await transfersService.createTransfer(
+      transfer as TransferType,
+    );
+
+    await expect(
+      transfersService.getTransfer("0000000000000000"),
+    ).rejects.toThrow();
+  });
+  it("shouldn't confirm an unqouted transfer", async () => {
+    const createdTransfer = await transfersService.createTransfer(
+      transfer as TransferType,
+    );
+
+    await expect(
+      transfersService.confirmTransferQuote(createdTransfer.id),
+    ).rejects.toThrow();
+  });
 });

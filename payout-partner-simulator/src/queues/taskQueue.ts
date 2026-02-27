@@ -23,22 +23,17 @@ async function runQueueWorker(
     const task = tasks.pop();
     if (task !== undefined) {
       try {
-        const updatedTask = await tasksService.updateTaskStatus(
-          task.id,
-          TaskStatus.RUNNING,
-        );
+        const updatedTask = await tasksService.updateTaskStatusRunning(task.id);
         if (taskHandlerFunctions[task.taskHandler])
           await taskHandlerFunctions[task.taskHandler]!(task);
 
-        const finishedTask = await tasksService.updateTaskStatus(
+        const finishedTask = await tasksService.updateTaskStatusFinished(
           task.id,
-          TaskStatus.FINISHED,
         );
       } catch (err) {
         if (task.retryCount > task.maxRetries) {
-          const updatedTask = await tasksService.updateTaskStatus(
+          const updatedTask = await tasksService.updateTaskStatusFailed(
             task.id,
-            TaskStatus.FAILED,
           );
           if (updatedTask && taskHandlerFailFunctions[task.taskHandler])
             await taskHandlerFailFunctions[task.taskHandler]!(task);

@@ -22,17 +22,19 @@ const generateQuote = async (req: Request, res: Response) => {
       .multiply(fxRate);
 
     const quoteExpiry = new Date(Date.now() + quoteExpiryTimeInSeconds);
-
-    const quote = new Quote({
-      ...fxInfo,
+    const returnQuote = {
       fxRate: fxRate.toString(),
       feeAmount: feeAmount.toString(),
       payoutAmount: payoutAmount.toString(),
       quoteExpiry,
+    };
+    const quote = new Quote({
+      ...fxInfo,
+      ...returnQuote,
     });
 
     await quote.save();
-    res.status(200).json(quote);
+    res.status(200).json({ returnQuote });
   } catch (err: any) {
     res.status(400).json(err.message);
   }

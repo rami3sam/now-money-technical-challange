@@ -25,17 +25,4 @@ app.use(json());
 app.use("/partner", partnerPayoutsRoutes(payoutsService, tasksService));
 app.use("/payouts", payoutsRoutes(payoutsService, tasksService));
 
-async function startServer() {
-  await connectDB();
-  runQueueWorker(
-    tasksService,
-    getTaskHandlers(payoutsService),
-    getTaskErrorHandlers(),
-  );
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-}
-
-startServer();
+export { app, tasksService, payoutsService };

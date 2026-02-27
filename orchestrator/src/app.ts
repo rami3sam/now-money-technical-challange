@@ -8,12 +8,7 @@ import { TransfersRepository } from "./repositories/transfers.repository.ts";
 import { TransfersService } from "./services/transfers.service.ts";
 import { transfersRoutes } from "./routes/transfersRoutes.ts";
 import { webhookRoutes } from "./routes/webhooks.ts";
-import {
-  getTaskErrorHandlers,
-  getTaskHandlers,
-} from "./utils/getTaskHandlers.ts";
 
-const PORT = EnvVariables.PORT;
 const app = express();
 const taskRepository = new TasksRepository();
 const tasksService = new TasksService(taskRepository);
@@ -33,17 +28,4 @@ app.use(
 app.use("/transfers", transfersRoutes(transfersService));
 app.use("/webhooks", webhookRoutes(transfersService, tasksService));
 
-async function startServer() {
-  await connectDB();
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-  runQueueWorker(
-    tasksService,
-    getTaskHandlers(transfersService),
-    getTaskErrorHandlers(),
-  );
-}
-
-startServer();
+export { app, tasksService, transfersService };

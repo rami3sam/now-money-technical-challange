@@ -17,7 +17,7 @@ export const providePayoutStatus = async (
   const signature = signHmac(EnvVariables.WEBHOOK_SECRET, payload);
 
   const quoteResponse = await axios.post(
-    "http://localhost:8000/webhooks/payout-status",
+    `${EnvVariables.ORCHESTRATOR_SERVICE_URL}/webhooks/payout-status`,
     payload,
     { headers: { "X-Signature": signature } },
   );

@@ -24,12 +24,15 @@ export async function reconciliateTransfers(
     status: ReconciliationStatus;
   }[] = [];
 
-  const payoutsResponse = await axios.get("http://localhost:8002/payouts", {
-    params: {
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+  const payoutsResponse = await axios.get(
+    `${process.env.PAYOUT_PARTNER_SIMULATOR_SERVICE_URL}/payouts`,
+    {
+      params: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      },
     },
-  });
+  );
 
   let payouts = payoutSchema.parse(payoutsResponse.data);
   const transfers = await transfersRepository.findBetweenDates(

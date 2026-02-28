@@ -48,7 +48,7 @@ export async function initiatePayout(
   };
 
   const payoutResponse = await axios.post(
-    "http://localhost:8002/partner/payouts",
+    `${process.env.PAYOUT_PARTNER_SIMULATOR_SERVICE_URL}/partner/payouts`,
     payout,
   );
 

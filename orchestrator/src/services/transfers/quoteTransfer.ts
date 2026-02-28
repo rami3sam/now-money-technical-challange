@@ -15,13 +15,16 @@ export async function quoteTransfer(
 
   const { recipient } = transfer;
 
-  const Response = await axios.post("http://localhost:8001/quote", {
-    sendAmount: transfer.sendAmount,
-    sendCurrency: transfer.sendCurrency,
-    payoutCurrency: transfer.payoutCurrency,
-    destinationCountry: recipient.country,
-    payoutMethod: recipient.payoutMethod,
-  });
+  const Response = await axios.post(
+    `${process.env.FX_QUOTE_SERVICE_URL}/quote`,
+    {
+      sendAmount: transfer.sendAmount,
+      sendCurrency: transfer.sendCurrency,
+      payoutCurrency: transfer.payoutCurrency,
+      destinationCountry: recipient.country,
+      payoutMethod: recipient.payoutMethod,
+    },
+  );
 
   const validatedQuote = quoteResponseSchema.parse(Response.data);
 

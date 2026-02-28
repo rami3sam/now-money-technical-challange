@@ -12,8 +12,16 @@ export const processPayout = async (
   const payout = await payoutsRepository.findById(payoutId);
   if (!payout) throw Error(`Payout with id ${payoutId} not found`);
 
-  const payoutStatus =
-    Math.random() > 0.2 ? PayoutStatus.PAID : PayoutStatus.FAILED;
+  let payoutStatus: PayoutStatus;
+  if (payout.sender!.name.includes("---")) {
+    payoutStatus = PayoutStatus.FAILED;
+  } else if (payout.sender!.name.includes("+++")) {
+    payoutStatus = PayoutStatus.PAID;
+  } else {
+    payoutStatus =
+      Math.random() > 0.2 ? PayoutStatus.PAID : PayoutStatus.FAILED;
+  }
+
   const newPayout = await payoutsRepository.updatePayout(payoutId, {
     payoutStatus: payoutStatus,
   });

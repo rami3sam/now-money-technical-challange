@@ -6,6 +6,13 @@ export class TasksRepository {
     return Task.findById(id).exec();
   }
 
+  async recoverTasksAfterCrash() {
+    return await Task.updateMany(
+      { status: TaskStatus.RUNNING },
+      { status: TaskStatus.PENDING },
+    ).exec();
+  }
+
   async create(data: TaskType) {
     const newTask = await Task.create(data);
     const savedTask = await newTask.save();

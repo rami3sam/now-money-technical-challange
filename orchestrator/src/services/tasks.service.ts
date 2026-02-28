@@ -5,9 +5,15 @@ import { getBackoffTime } from "../utils/utilFunctions.js";
 import { addTask } from "./tasks/add.js";
 
 export class TasksService {
-  constructor(private taskRepository: TasksRepository) {}
+  constructor(private taskRepository: TasksRepository) {
+    this.recoverTasksAfterCrash();
+  }
   async add(task: TaskType) {
     return await addTask(this.taskRepository, task);
+  }
+
+  async recoverTasksAfterCrash() {
+    return await this.taskRepository.recoverTasksAfterCrash();
   }
 
   async getPendingTasksToRun() {

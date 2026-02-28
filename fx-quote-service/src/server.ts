@@ -2,11 +2,13 @@ import { EnvVariables } from "./constants/config.js";
 import express, { json } from "express";
 import quotesRoutes from "./routes/quotesRoutes.js";
 import connectDB from "./utils/connectDB.js";
+import healthRoutes from "./routes/healthRoutes.js";
 const PORT = EnvVariables.PORT;
 const app = express();
 
 app.use(json());
 app.use("/quote", quotesRoutes);
+app.use("/health", healthRoutes);
 async function startServer() {
   await connectDB();
 

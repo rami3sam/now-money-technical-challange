@@ -8,6 +8,7 @@ import { TransfersRepository } from "./repositories/transfers.repository.js";
 import { TransfersService } from "./services/transfers.service.js";
 import { transfersRoutes } from "./routes/transfersRoutes.js";
 import { webhookRoutes } from "./routes/webhooks.js";
+import healthRoutes from "./routes/healthRoutes.js";
 
 const app = express();
 const taskRepository = new TasksRepository();
@@ -25,6 +26,7 @@ app.use(
     },
   }),
 );
+app.use("/health", healthRoutes);
 app.use("/transfers", transfersRoutes(transfersService));
 app.use("/webhooks", webhookRoutes(transfersService, tasksService));
 

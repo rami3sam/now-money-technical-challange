@@ -8,11 +8,12 @@ services:
       - "8000"
     environment:
       - NODE_ENV=development
-      - DB_URI=mongodb://mongo:27017/orchestrator
+      # - DB_URI=mongodb://mongo:27017/orchestrator
       - FX_QUOTE_SERVICE_URL=http://fx-quote-service:8001
       - PAYOUT_PARTNER_SIMULATOR_SERVICE_URL=http://payout-partner-simulator:8002
       - PORT=8000
       - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - DB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/orchestrator?authSource=admin
     depends_on:
       - mongo
       - fx-quote-service
@@ -28,7 +29,7 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=8001
-      - DB_URI=mongodb://mongo:27017/fx-quote-service
+      - DB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/fx-quote-service?authSource=admin
     depends_on:
       - mongo
 
@@ -42,7 +43,7 @@ services:
     environment:
       - PORT=8002
       - NODE_ENV=development
-      - DB_URI=mongodb://mongo:27017/payout-partner-simulator
+      - DB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/payout-partner-simulator?authSource=admin
       - ORCHESTRATOR_SERVICE_URL=http://orchestrator:8000
       - WEBHOOK_SECRET=${WEBHOOK_SECRET}
     depends_on:
@@ -63,12 +64,16 @@ services:
       - payout-partner-simulator
 
   mongo:
-    image: mongo:8
+    image: mongo:7
     container_name: mongo
+    environment:
+      # provide your credentials here
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
     expose:
       - "27017"
     volumes:
       - mongo_data:/data/db
-    command: ["mongod", "--quiet"]
+    command: ["mongod", "--quiet", "--logpath", "/dev/null"]
 volumes:
   mongo_data:

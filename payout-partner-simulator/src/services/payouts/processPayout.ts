@@ -32,7 +32,7 @@ export const processPayout = async (
     new Task({
       taskHandler: TaskHandlers.PROVIDE_PAYOUT_STATUS,
       payload: payoutId,
-      executeAt: new Date(Date.now() + 5000),
+      executeAt: new Date(Date.now() + 500),
     }),
   );
 };

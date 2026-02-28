@@ -50,7 +50,7 @@ export const receivePartnerPayoutRequest = async (
     new Task({
       taskHandler: TaskHandlers.PROCESS_PAYOUT,
       payload: payout._id,
-      executeAt: new Date(Date.now() + 5000),
+      executeAt: new Date(Date.now() + 500),
     }),
   );
 

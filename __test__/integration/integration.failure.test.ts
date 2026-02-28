@@ -13,11 +13,11 @@ import axios from "axios";
 import { waitForCondition } from "./utils";
 
 describe("App integration tests", () => {
-  let transferIdThatWillBePaid: string;
+  let transferIdThatWillNotBePaid: string;
   const transferThatWillNotBePaid = {
     sender: {
       senderId: "4",
-      name: "Hassan Jalal",
+      name: "Hassan Jalal---",
     },
     recipient: {
       name: "Rami Essamedeen---",
@@ -40,13 +40,13 @@ describe("App integration tests", () => {
     );
 
     //@ts-ignore
-    transferIdThatWillBePaid = res.data._id;
+    transferIdThatWillNotBePaid = res.data._id;
     expect(res.data).toHaveProperty("status", "CREATED");
   });
 
   it("POST /transfers/:id/quote should quote the transfer", async () => {
     const res = await axios.post(
-      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}/quote`,
+      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}/quote`,
     );
 
     expect(res.data).toHaveProperty("data.status", "QUOTED");
@@ -54,7 +54,7 @@ describe("App integration tests", () => {
 
   it("POST /transfers/:id/confirm should confirm the transfer", async () => {
     const res = await axios.post(
-      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}/confirm`,
+      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}/confirm`,
     );
 
     expect(res.data).toHaveProperty("data.status", "CONFIRMED");
@@ -64,7 +64,7 @@ describe("App integration tests", () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
       );
       //@ts-ignore
       return res.data.status === "COMPLIANCE_PENDING";
@@ -75,7 +75,7 @@ describe("App integration tests", () => {
 
   it("POST /transfers/:id/approve should confirm the transfer", async () => {
     const res = await axios.post(
-      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}/compliance/approve?reviewerId=100`,
+      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}/compliance/approve?reviewerId=100`,
     );
 
     expect(res.status).toBe(200);
@@ -85,7 +85,7 @@ describe("App integration tests", () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
       );
       //@ts-ignore
       return res.data.status === "COMPLIANCE_APPROVED";
@@ -98,7 +98,7 @@ describe("App integration tests", () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
       );
       //@ts-ignore
       return res.data.status === "PAYOUT_PENDING";
@@ -107,16 +107,29 @@ describe("App integration tests", () => {
     expect(res).toHaveProperty("data.status", "PAYOUT_PENDING");
   });
 
-  it("the transfer should be be change to FAILED", async () => {
+  it("should be changed to FAILED when payout fails", async () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
       );
       //@ts-ignore
       return res.data.status === "FAILED";
     });
 
     expect(res).toHaveProperty("data.status", "FAILED");
+  }, 30000);
+
+  it("should be changed to REFUNDED when transfer is refunded", async () => {
+    let res;
+    await waitForCondition(async () => {
+      res = await axios.get(
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
+      );
+      //@ts-ignore
+      return res.data.status === "REFUNDED";
+    });
+
+    expect(res).toHaveProperty("data.status", "REFUNDED");
   }, 30000);
 });

@@ -8,6 +8,7 @@ import { PayoutsService } from "./services/payouts.service.js";
 import { partnerPayoutsRoutes } from "./routes/partnerRoutes.js";
 import { payoutsRoutes } from "./routes/payoutsRoutes.js";
 import { PayoutsRepository } from "./repositories/payouts.repository.js";
+import healthRoutes from "./routes/healthRoutes.js";
 
 const app = express();
 const tasksRepository = new TasksRepository();
@@ -17,7 +18,9 @@ const payoutsService = new PayoutsService(payoutsRepository, tasksService);
 
 app.use(json());
 
+app.use("/health", healthRoutes);
 app.use("/partner", partnerPayoutsRoutes(payoutsService, tasksService));
 app.use("/payouts", payoutsRoutes(payoutsService, tasksService));
+
 
 export { app, tasksService, payoutsService };

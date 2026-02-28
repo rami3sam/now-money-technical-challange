@@ -46,6 +46,7 @@ export const updatePayoutStatus = async (
       new Task({
         taskHandler: TaskHandlers.REFUND_TRANSFER,
         payload: updatedTransfer.id,
+        executeAt: new Date(Date.now() + 2000),
       }),
     );
 

@@ -17,10 +17,10 @@ describe("App integration tests", () => {
   const transferThatWillBePaid = {
     sender: {
       senderId: "4",
-      name: "Hassan Jalal",
+      name: "Hassan Jalal+++",
     },
     recipient: {
-      name: "Rami Essamedeen+++",
+      name: "Rami Essamedeen",
       country: "ARE",
       payoutMethod: "CASH",
       payoutDetails: {

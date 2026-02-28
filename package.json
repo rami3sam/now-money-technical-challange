@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run --run --reporter=verbose"
+    "test": "wait-on $ORCHESTRATOR_SERVICE_URL/health $FX_QUOTE_SERVICE_URL/health $PAYOUT_PARTNER_SIMULATOR_SERVICE_URL/health && vitest run --reporter=verbose"
   },
   "repository": {
     "type": "git",
@@ -21,12 +21,12 @@
   "dependencies": {
     "axios": "^1.13.6",
     "dotenv": "^17.3.1",
-    "supertest": "^7.2.2",
     "vitest": "^4.0.18"
   },
   "devDependencies": {
     "@types/axios": "^0.9.36",
     "@types/node": "^25.3.2",
-    "@types/supertest": "^7.2.0"
+    "@types/supertest": "^7.2.0",
+    "wait-on": "^9.0.4"
   }
 }

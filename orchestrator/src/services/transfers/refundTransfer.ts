@@ -5,6 +5,7 @@ import {
   TransferStatus,
 } from "../../enums/transferStatus.enum.ts";
 import { EnvVariables } from "../../constants/config.ts";
+import { Transfer } from "../../models/transfer.ts";
 
 export async function refundTransfer(
   transfersRepository: TransfersRepository,
@@ -22,9 +23,14 @@ export async function refundTransfer(
     transfer.final?.paidAmount &&
     currency(transfer.final.paidAmount) > currency(0)
   ) {
-    const feesCharged = currency(transfer.sendAmount).multiply(
-      EnvVariables.CANCELLATION_FEE_PERCENTAGE,
-    );
+    const feesCharged = [
+      TransferStatus.FAILED,
+      TransferStatus.COMPLIANCE_REJECTED,
+    ].includes(transfer.status as TransferStatus)
+      ? currency(0)
+      : currency(transfer.sendAmount).multiply(
+          EnvVariables.CANCELLATION_FEE_PERCENTAGE,
+        );
 
     const refundedAmount = currency(transfer.sendAmount).subtract(feesCharged);
 
@@ -39,5 +45,7 @@ export async function refundTransfer(
 
     if (!updateTransfer)
       throw new Error("Failed to update transfer after refund");
+
+    return updateTransfer;
   }
 }

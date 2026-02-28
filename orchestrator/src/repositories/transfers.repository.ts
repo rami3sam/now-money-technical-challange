@@ -78,6 +78,7 @@ export class TransfersRepository {
         $set: { status: TransferStatus.CANCELLED },
         $push: { stateHistory: { state: TransferStatus.CANCELLED } },
       },
+      { returnDocument: "after" },
     ).exec();
   }
 

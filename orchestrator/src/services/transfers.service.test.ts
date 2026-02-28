@@ -687,18 +687,22 @@ describe("TransfersService", () => {
   });
 
   it.each([TransferStatus.CREATED, TransferStatus.QUOTED])(
-    "should be able to cancel a %s status transfer",
+    "should be able to cancel a %s status transfer and no need for refund",
     async (status) => {
       const dummyTransfer = provideDummyTransfer(status);
       const createdTransfer = await Transfer.create(dummyTransfer);
       const cancelledTransfer = await transfersService.cancelTransfer(
         createdTransfer._id.toString(),
       );
+
       expect(cancelledTransfer).toHaveProperty(
         "status",
         TransferStatus.CANCELLED,
       );
       expect(cancelledTransfer).toHaveProperty("final.paidAmount", undefined);
+      expect(
+        transfersService.refundTransfer(cancelledTransfer._id.toString()),
+      ).rejects.toThrowError();
     },
   );
 
@@ -707,12 +711,15 @@ describe("TransfersService", () => {
     TransferStatus.COMPLIANCE_APPROVED,
     TransferStatus.COMPLIANCE_PENDING,
   ])(
-    "should be able to cancel a %s status transfer but paidAmount should be equal to sendAmount and refuned later",
+    "should be able to cancel a %s status transfer but paidAmount should be equal to sendAmount and refunded later minus fees",
     async (status) => {
       const dummyTransfer = provideDummyTransfer(status);
       const createdTransfer = await Transfer.create(dummyTransfer);
       const cancelledTransfer = await transfersService.cancelTransfer(
         createdTransfer._id.toString(),
+      );
+      const refundedTransfer = await transfersService.refundTransfer(
+        cancelledTransfer._id.toString(),
       );
       expect(cancelledTransfer).toHaveProperty(
         "status",

@@ -19,6 +19,8 @@ export async function refundTransfer(
     TransferStatus.REFUNDED,
   );
 
+  if (!transfer.final?.paidAmount) throw new Error("No paid amount to refund");
+
   if (
     transfer.final?.paidAmount &&
     currency(transfer.final.paidAmount) > currency(0)

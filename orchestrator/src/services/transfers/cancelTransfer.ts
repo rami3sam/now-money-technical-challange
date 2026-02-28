@@ -1,3 +1,4 @@
+import currency from "currency.js";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
 import {
   assertTransferStatusTransition,
@@ -20,11 +21,16 @@ export async function cancelTransfer(
   if (!updatedTransfer)
     throw new Error("Failed to update transfer status to CANCELLED");
 
-  tasksService.add(
-    new Task({
-      taskHandler: TaskHandlers.REFUND_TRANSFER,
-      payload: updatedTransfer.id,
-    }),
-  );
+  if (
+    updatedTransfer.final?.paidAmount &&
+    currency(updatedTransfer.final?.paidAmount).value > 0
+  ) {
+    tasksService.add(
+      new Task({
+        taskHandler: TaskHandlers.REFUND_TRANSFER,
+        payload: updatedTransfer.id,
+      }),
+    );
+  }
   return updatedTransfer;
 }

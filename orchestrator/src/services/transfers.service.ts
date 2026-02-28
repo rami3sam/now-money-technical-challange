@@ -84,7 +84,7 @@ export class TransfersService {
     );
   }
 
-  async updatePayoutStatusWebhook(payoutStatus: PayoutStatusType) {
+  async updatePayoutStatus(payoutStatus: PayoutStatusType) {
     return await updatePayoutStatus(
       this.transfersRepository,
       this.taskService,

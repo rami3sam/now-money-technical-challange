@@ -32,6 +32,7 @@ export const updatePayoutStatus = async (
 
     if (!updatedTransfer)
       throw new Error("Failed to update transfer status to PAID");
+    return updatedTransfer;
   } else if (payoutStatus.status === PayoutStatus.FAILED) {
     const updatedTransfer = await transfersRepository.updatePayoutStatus(
       transfer.id,
@@ -51,5 +52,7 @@ export const updatePayoutStatus = async (
     if (!task)
       throw new Error("Failed to create refund task for failed payout");
     return updatedTransfer;
+  } else {
+    throw new Error(`Unhandled payout status: ${payoutStatus.status}`);
   }
 };

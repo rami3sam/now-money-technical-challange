@@ -63,4 +63,6 @@ export async function initiatePayout(
     throw new Error(
       "Failed to update transfer with partner payout id after initiating payout",
     );
+
+  return updatedTransfer;
 }

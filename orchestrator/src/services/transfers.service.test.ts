@@ -11,7 +11,10 @@ import axios from "axios";
 import { update } from "lodash";
 import { CountryCodes } from "../enums/countryCodes.enum.ts";
 import { runQueueWorker } from "../queues/taskQueue.ts";
-import { getTaskErrorHandlers, getTaskHandlers } from "../utils/getTaskHandlers.ts";
+import {
+  getTaskErrorHandlers,
+  getTaskHandlers,
+} from "../utils/getTaskHandlers.ts";
 import { getEnabledCategories } from "node:trace_events";
 let transfersService: TransfersService;
 
@@ -19,33 +22,11 @@ vi.mock("axios");
 
 const formatDate = (date: Date) => date.toISOString();
 
-const provideDummyTransfer = (updates: any): any =>
-  ({
-    sender: {
-      senderId: "4",
-      name: "Hassan Jalal",
-    },
-    recipient: {
-      name: "Rami Essamedeen",
-      country: "ARE",
-      payoutMethod: "CASH",
-      payoutDetails: {
-        personalIDNumber: "12344556",
-        personalIDType: "PASSPORT",
-      },
-    },
-    sendAmount: "10000.00",
-    sendCurrency: "USD",
-    payoutCurrency: "AED",
-    ...updates,
-  }) as TransferType;
-
-const provideDummyQuotedTransfer = (updates: any): any => ({
+const provideDummyTransfer = (updates: any): any => ({
   sender: {
     senderId: "4",
     name: "Hassan Jalal",
   },
-  _id: "69a1baac61e10217d6f74e1f",
   recipient: {
     name: "Rami Essamedeen",
     country: "ARE",
@@ -53,9 +34,30 @@ const provideDummyQuotedTransfer = (updates: any): any => ({
     payoutDetails: {
       personalIDNumber: "12344556",
       personalIDType: "PASSPORT",
-      _id: "69a1baac61e10217d6f74e21",
     },
-    _id: "69a1baac61e10217d6f74e20",
+  },
+  sendAmount: "10000.00",
+  sendCurrency: "USD",
+  payoutCurrency: "AED",
+  ...updates,
+});
+
+const provideDummyQuotedTransfer = (
+  updates: any,
+  date: Date = new Date(),
+): any => ({
+  sender: {
+    senderId: "4",
+    name: "Hassan Jalal",
+  },
+  recipient: {
+    name: "Rami Essamedeen",
+    country: "ARE",
+    payoutMethod: "CASH",
+    payoutDetails: {
+      personalIDNumber: "12344556",
+      personalIDType: "PASSPORT",
+    },
   },
   sendAmount: "10000.00",
   sendCurrency: "USD",
@@ -65,11 +67,11 @@ const provideDummyQuotedTransfer = (updates: any): any => ({
   stateHistory: [
     {
       state: "CREATED",
-      timestamp: formatDate(new Date(Date.now() - 5000)),
+      timestamp: formatDate(new Date(date.getTime() - 5000)),
     },
     {
       state: "QUOTED",
-      timestamp: formatDate(new Date(Date.now() - 3000)),
+      timestamp: formatDate(new Date(date.getTime() - 3000)),
     },
   ],
   status: "QUOTED",
@@ -77,12 +79,15 @@ const provideDummyQuotedTransfer = (updates: any): any => ({
     rate: "3.63",
     fee: "250.00",
     payoutAmount: "35392.50",
-    expiry: formatDate(new Date(Date.now() + 1000 * 60)),
+    expiry: formatDate(new Date(date.getTime() + 1000 * 60)),
   },
   ...updates,
 });
 
-const provideDummyConfirmedTransfer = (updates: any): any => ({
+const provideDummyConfirmedTransfer = (
+  updates: any,
+  date: Date = new Date(),
+): any => ({
   final: {
     paidAmount: "10000.00",
   },
@@ -91,15 +96,15 @@ const provideDummyConfirmedTransfer = (updates: any): any => ({
   stateHistory: [
     {
       state: "CREATED",
-      timestamp: "2026-02-27T16:27:23.410Z",
+      timestamp: formatDate(new Date(date.getTime() - 5000)),
     },
     {
       state: "QUOTED",
-      timestamp: "2026-02-27T16:27:30.969Z",
+      timestamp: formatDate(new Date(date.getTime() - 3000)),
     },
     {
       state: "CONFIRMED",
-      timestamp: "2026-02-27T16:27:34.101Z",
+      timestamp: formatDate(new Date(date.getTime() - 1000)),
     },
   ],
   sender: {
@@ -123,15 +128,181 @@ const provideDummyConfirmedTransfer = (updates: any): any => ({
     rate: "3.68",
     fee: "250.00",
     payoutAmount: "35880.00",
-    expiry: "2026-02-27T16:28:30.952Z",
+    expiry: formatDate(new Date(date.getTime() + 1000 * 60)),
   },
   immutableQuoteSnapshot: {
     rate: "3.68",
     fee: "250.00",
     payoutAmount: "35880.00",
-    expiry: "2026-02-27T16:28:30.952Z",
+    expiry: formatDate(new Date(date.getTime() - 2000)),
   },
   ...updates,
+});
+
+const provideDummmyComplianceApprovedTransfer = (
+  updates: any,
+  date: Date = new Date(),
+): any => ({
+  final: {
+    paidAmount: "10000.00",
+  },
+  isPayoutProcessed: false,
+  complianceDecisions: [
+    {
+      decision: "PENDING",
+      triggeredRule: "amount 10000.00 is above compliance threshold",
+      timestamp: formatDate(new Date(date.getTime() - 2000)),
+    },
+    {
+      decision: "APPROVED_MANUALLY",
+      triggeredRule: "Transfer approved by manual review",
+      reviewerId: "100",
+      timestamp: formatDate(new Date(date.getTime() - 1000)),
+    },
+  ],
+  stateHistory: [
+    {
+      state: "CREATED",
+      timestamp: formatDate(new Date(date.getTime() - 5000)),
+    },
+    {
+      state: "QUOTED",
+      timestamp: formatDate(new Date(date.getTime() - 4000)),
+    },
+    {
+      state: "CONFIRMED",
+      timestamp: formatDate(new Date(date.getTime() - 3000)),
+    },
+    {
+      state: "COMPLIANCE_PENDING",
+      timestamp: formatDate(new Date(date.getTime() - 2000)),
+    },
+    {
+      state: "COMPLIANCE_APPROVED",
+      timestamp: formatDate(new Date(date.getTime() - 1000)),
+    },
+  ],
+  sender: {
+    senderId: "4",
+    name: "Hassan Jalal",
+  },
+  recipient: {
+    name: "Rami Essamedeen",
+    country: "ARE",
+    payoutMethod: "CASH",
+    payoutDetails: {
+      personalIDNumber: "12344556",
+      personalIDType: "PASSPORT",
+    },
+  },
+  sendAmount: "10000.00",
+  sendCurrency: "USD",
+  payoutCurrency: "AED",
+  status: "COMPLIANCE_APPROVED",
+  quote: {
+    rate: "3.72",
+    fee: "250.00",
+    payoutAmount: "36270.00",
+    expiry: formatDate(new Date(date.getTime())),
+  },
+  immutableQuoteSnapshot: {
+    rate: "3.72",
+    fee: "250.00",
+    payoutAmount: "36270.00",
+    expiry: "2026-02-28T07:00:36.530Z",
+  },
+  payoutId: "019ca30b-d1e4-746a-aefd-c5cb4cd395ff",
+  partnerPayoutId: "019ca30b-d1e4-746a-aefd-c5cb4cd395ff",
+  ...updates,
+});
+
+const provideDummmyPayoutPendingTransfer = (
+  updates: any,
+  date: Date = new Date(),
+): any => ({
+  final: {
+    paidAmount: "10000.00",
+  },
+  isPayoutProcessed: false,
+  complianceDecisions: [
+    {
+      decision: "PENDING",
+      triggeredRule: "amount 10000.00 is above compliance threshold",
+      timestamp: formatDate(new Date(date.getTime() - 2000)),
+    },
+    {
+      decision: "APPROVED_MANUALLY",
+      triggeredRule: "Transfer approved by manual review",
+      reviewerId: "100",
+      timestamp: formatDate(new Date(date.getTime() - 1000)),
+    },
+  ],
+  stateHistory: [
+    {
+      state: "CREATED",
+      timestamp: formatDate(new Date(date.getTime() - 5000)),
+    },
+    {
+      state: "QUOTED",
+      timestamp: formatDate(new Date(date.getTime() - 4000)),
+    },
+    {
+      state: "CONFIRMED",
+      timestamp: formatDate(new Date(date.getTime() - 3000)),
+    },
+    {
+      state: "COMPLIANCE_PENDING",
+      timestamp: formatDate(new Date(date.getTime() - 2000)),
+    },
+    {
+      state: "COMPLIANCE_APPROVED",
+      timestamp: formatDate(new Date(date.getTime() - 1000)),
+    },
+    {
+      state: "PAYOUT_PENDING",
+      timestamp: formatDate(new Date(date.getTime() - 500)),
+    },
+  ],
+  sender: {
+    senderId: "4",
+    name: "Hassan Jalal",
+  },
+  recipient: {
+    name: "Rami Essamedeen",
+    country: "ARE",
+    payoutMethod: "CASH",
+    payoutDetails: {
+      personalIDNumber: "12344556",
+      personalIDType: "PASSPORT",
+    },
+  },
+  sendAmount: "10000.00",
+  sendCurrency: "USD",
+  payoutCurrency: "AED",
+  status: "PAYOUT_PENDING",
+  quote: {
+    rate: "3.72",
+    fee: "250.00",
+    payoutAmount: "36270.00",
+    expiry: formatDate(new Date(date.getTime())),
+  },
+  immutableQuoteSnapshot: {
+    rate: "3.72",
+    fee: "250.00",
+    payoutAmount: "36270.00",
+    expiry: "2026-02-28T07:00:36.530Z",
+  },
+  payoutId: "019ca30b-d1e4-746a-aefd-c5cb4cd395ff",
+  partnerPayoutId: "019ca30b-d1e4-746a-aefd-c5cb4cd395ff",
+  ...updates,
+});
+
+const provideDummyPayoutStatusUpdate = (
+  partnerPayoutId: string,
+  status: string,
+): any => ({
+  partnerPayoutId,
+  status,
 });
 
 const provideDummyQuote = (updates: any): any => ({
@@ -142,6 +313,14 @@ const provideDummyQuote = (updates: any): any => ({
   ...updates,
 });
 
+const provideDummyInitiatePayoutResponse = (updates: any): any => ({
+  partnerPayoutId: "019c9b5b-7ca8-750d-b749-0c3bd5280fd1",
+  status: "PENDING",
+  ...updates,
+});
+
+//----------------------------------------------------------------------------------------------
+
 describe("TransfersService", () => {
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create();
@@ -151,7 +330,11 @@ describe("TransfersService", () => {
     const tasksService = new TasksService(tasksRepository);
     const transfersRepository = new TransfersRepository();
     transfersService = new TransfersService(transfersRepository, tasksService);
-    runQueueWorker(tasksService, getTaskHandlers(transfersService), getTaskErrorHandlers());
+    runQueueWorker(
+      tasksService,
+      getTaskHandlers(transfersService),
+      getTaskErrorHandlers(),
+    );
   });
 
   afterEach(async () => {
@@ -274,6 +457,7 @@ describe("TransfersService", () => {
   it("should approve if sendAmount is below threshold and recipient country not banned", async () => {
     const dummyTransfer = provideDummyConfirmedTransfer({});
     dummyTransfer.sendAmount = "100.00";
+    dummyTransfer.recipient.country = CountryCodes.ARE;
     const createdTransfer = await Transfer.create(dummyTransfer);
 
     const confirmedTransfer = await transfersService.checkTransferCompliance(
@@ -284,5 +468,61 @@ describe("TransfersService", () => {
       "status",
       TransferStatus.COMPLIANCE_APPROVED,
     );
+  });
+
+  it("should initiate payout of an approved transfer", async () => {
+    const dummyTransfer = provideDummmyComplianceApprovedTransfer({});
+    const createdTransfer = await Transfer.create(dummyTransfer);
+
+    axios.post = vi
+      .fn()
+      .mockResolvedValue({ data: provideDummyInitiatePayoutResponse({}) });
+
+    const confirmedTransfer = await transfersService.initiatePayout(
+      createdTransfer._id.toString(),
+    );
+
+    expect(confirmedTransfer).toHaveProperty(
+      "status",
+      TransferStatus.PAYOUT_PENDING,
+    );
+  });
+
+  it("should change status to failed after receiving payout failure status", async () => {
+    const dummyTransfer = provideDummmyPayoutPendingTransfer({});
+    const createdTransfer = await Transfer.create(dummyTransfer);
+
+    const confirmedTransfer = await transfersService.updatePayoutStatus(
+      provideDummyPayoutStatusUpdate(dummyTransfer.partnerPayoutId, "FAILED"),
+    );
+
+    expect(confirmedTransfer).toHaveProperty("status", TransferStatus.FAILED);
+  });
+
+  it("should change status to paid after receiving payout success status", async () => {
+    const dummyTransfer = provideDummmyPayoutPendingTransfer({});
+    const createdTransfer = await Transfer.create(dummyTransfer);
+
+    const confirmedTransfer = await transfersService.updatePayoutStatus(
+      provideDummyPayoutStatusUpdate(dummyTransfer.partnerPayoutId, "PAID"),
+    );
+
+    console.log(confirmedTransfer);
+
+    expect(confirmedTransfer).toHaveProperty("status", TransferStatus.PAID);
+  });
+
+  it("should throw an error if payout status is an value outside of PAID or FAILED", async () => {
+    const dummyTransfer = provideDummmyPayoutPendingTransfer({});
+    const createdTransfer = await Transfer.create(dummyTransfer);
+
+    expect(
+      transfersService.updatePayoutStatus(
+        provideDummyPayoutStatusUpdate(
+          dummyTransfer.partnerPayoutId,
+          "UNKNOWN",
+        ),
+      ),
+    ).rejects.toThrowError();
   });
 });

@@ -35,7 +35,7 @@ export class WebhookController {
   payoutStatus = async (req: Request, res: Response) => {
     const payoutStatusRequest = PayoutStatusType.parse(req.body);
 
-    await this.transfersService.updatePayoutStatusWebhook(payoutStatusRequest);
+    await this.transfersService.updatePayoutStatus(payoutStatusRequest);
 
     res.status(200).json({ message: "Payout status updated successfully" });
   };

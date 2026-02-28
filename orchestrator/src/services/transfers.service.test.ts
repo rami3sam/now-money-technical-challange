@@ -10,6 +10,9 @@ import { TransferStatus } from "../enums/transferStatus.enum.ts";
 import axios from "axios";
 import { update } from "lodash";
 import { CountryCodes } from "../enums/countryCodes.enum.ts";
+import { runQueueWorker } from "../queues/taskQueue.ts";
+import { getTaskErrorHandlers, getTaskHandlers } from "../utils/getTaskHandlers.ts";
+import { getEnabledCategories } from "node:trace_events";
 let transfersService: TransfersService;
 
 vi.mock("axios");
@@ -148,6 +151,7 @@ describe("TransfersService", () => {
     const tasksService = new TasksService(tasksRepository);
     const transfersRepository = new TransfersRepository();
     transfersService = new TransfersService(transfersRepository, tasksService);
+    runQueueWorker(tasksService, getTaskHandlers(transfersService), getTaskErrorHandlers());
   });
 
   afterEach(async () => {

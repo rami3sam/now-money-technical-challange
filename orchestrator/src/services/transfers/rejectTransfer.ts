@@ -23,10 +23,19 @@ export async function rejectTransfer(
     TransferStatus.COMPLIANCE_REJECTED,
   );
 
+  const decision = reviewerId
+    ? ComplianceDecisions.REJECTED_MANUALLY
+    : ComplianceDecisions.REJECTED_AUTOMATICALLY;
+
+  const complianceDecision = {
+    decision: decision,
+    triggeredRule: `Transfer rejected by manual review`,
+    reviewerId: reviewerId,
+  };
+
   const updateTransfer = await transferRepository.markTransferAsRejected(
     id,
-    `Transfer rejected by manual review`,
-    reviewerId,
+    complianceDecision,
   );
 
   if (!updateTransfer)

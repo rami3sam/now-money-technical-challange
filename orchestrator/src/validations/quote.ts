@@ -1,8 +1,4 @@
 import { z } from "zod";
-import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
-import { PersonalIDTypesValues } from "../enums/personalIDTypes.enum.ts";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
-import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
 import { isValidMoney, validateDate } from "../utils/validatorFunctions.ts";
 
 export const quoteResponseSchema = z.object({

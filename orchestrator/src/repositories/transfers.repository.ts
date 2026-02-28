@@ -81,7 +81,13 @@ export class TransfersRepository {
     ).exec();
   }
 
-  async markTransferAsCompliancePending(id: string, triggeredRule: string) {
+  async markTransferAsCompliancePending(
+    id: string,
+    complianceDecision: {
+      decision: ComplianceDecisions;
+      triggeredRule: string;
+    },
+  ) {
     return await Transfer.findOneAndUpdate(
       {
         _id: id,
@@ -92,10 +98,7 @@ export class TransfersRepository {
       {
         $set: { status: TransferStatus.COMPLIANCE_PENDING },
         $push: {
-          complianceDecisions: {
-            decision: ComplianceDecisions.PENDING,
-            triggeredRule: triggeredRule,
-          },
+          complianceDecisions: complianceDecision,
           stateHistory: { state: TransferStatus.COMPLIANCE_PENDING },
         },
       },
@@ -105,14 +108,12 @@ export class TransfersRepository {
 
   async markTransferAsApproved(
     id: string,
-    triggeredRule: string,
-    reviewerId?: string,
+    complianceDecision: {
+      decision: ComplianceDecisions;
+      triggeredRule: string;
+      reviewerId?: string;
+    },
   ) {
-    const decision =
-      reviewerId !== undefined
-        ? ComplianceDecisions.APPROVED_MANUALLY
-        : ComplianceDecisions.APPROVED_AUTOMATICALLY;
-        
     return await Transfer.findOneAndUpdate(
       {
         _id: id,
@@ -123,11 +124,7 @@ export class TransfersRepository {
       {
         $set: { status: TransferStatus.COMPLIANCE_APPROVED },
         $push: {
-          complianceDecisions: {
-            decision: decision,
-            triggeredRule: triggeredRule,
-            reviewerId: reviewerId,
-          },
+          complianceDecisions: complianceDecision,
           stateHistory: { state: TransferStatus.COMPLIANCE_APPROVED },
         },
       },
@@ -137,13 +134,12 @@ export class TransfersRepository {
 
   markTransferAsRejected(
     id: string,
-    triggeredRule: string,
-    reviewerId?: string,
+    complianceDecision: {
+      decision: ComplianceDecisions;
+      triggeredRule: string;
+      reviewerId?: string;
+    },
   ) {
-    const decision =
-      reviewerId !== undefined
-        ? ComplianceDecisions.REJECTED_MANUALLY
-        : ComplianceDecisions.REJECTED_AUTOMATICALLY;
     return Transfer.findOneAndUpdate(
       {
         _id: id,
@@ -154,11 +150,7 @@ export class TransfersRepository {
       {
         $set: { status: TransferStatus.COMPLIANCE_REJECTED },
         $push: {
-          complianceDecisions: {
-            decision: decision,
-            triggeredRule: triggeredRule,
-            reviewerId: reviewerId,
-          },
+          complianceDecisions: complianceDecision,
           stateHistory: { state: TransferStatus.COMPLIANCE_REJECTED },
         },
       },

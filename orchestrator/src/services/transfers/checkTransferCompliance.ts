@@ -32,9 +32,16 @@ export async function checkTransferCompliance(
       TransferStatus.COMPLIANCE_REJECTED,
     );
 
+    const decision = ComplianceDecisions.REJECTED_AUTOMATICALLY;
+
+    const complianceDecision = {
+      decision: decision,
+      triggeredRule: `Recipient country "${recipient.country}" is banned`,
+    };
+
     const updatedTransfer = await transfersRepository.markTransferAsRejected(
       id,
-      `Recipient country "${recipient.country}" is banned`,
+      complianceDecision,
     );
 
     if (!updatedTransfer)
@@ -56,10 +63,15 @@ export async function checkTransferCompliance(
       TransferStatus.COMPLIANCE_PENDING,
     );
 
+    const complianceDecision = {
+      decision: ComplianceDecisions.PENDING,
+      triggeredRule: `Recipient name ${recipient.name} is banned`,
+    };
+
     const updatedTransfer =
       await transfersRepository.markTransferAsCompliancePending(
         transfer.id,
-        `Recipient name ${recipient.name} is banned`,
+        complianceDecision,
       );
 
     if (!updatedTransfer)
@@ -74,9 +86,14 @@ export async function checkTransferCompliance(
       TransferStatus.COMPLIANCE_APPROVED,
     );
 
+    const complianceDecision = {
+      decision: ComplianceDecisions.APPROVED_AUTOMATICALLY,
+      triggeredRule: `amount ${transfer.sendAmount} is below compliance threshold`,
+    };
+
     const updatedTransfer = await transfersRepository.markTransferAsApproved(
       transfer.id,
-      `amount ${transfer.sendAmount} is below compliance threshold`,
+      complianceDecision,
     );
 
     if (!updatedTransfer)
@@ -98,10 +115,15 @@ export async function checkTransferCompliance(
       TransferStatus.COMPLIANCE_PENDING,
     );
 
+    const complianceDecision = {
+      decision: ComplianceDecisions.PENDING,
+      triggeredRule: `amount ${transfer.sendAmount} is above compliance threshold`,
+    };
+
     const updatedTransfer =
       await transfersRepository.markTransferAsCompliancePending(
         transfer.id,
-        `amount ${transfer.sendAmount} is above compliance threshold`,
+        complianceDecision,
       );
 
     if (!updatedTransfer)

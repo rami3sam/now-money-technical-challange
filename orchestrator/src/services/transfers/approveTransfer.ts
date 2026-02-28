@@ -8,7 +8,6 @@ import { Task } from "../../models/task.ts";
 import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
 import { TasksService } from "../tasks.service.ts";
 
-
 export async function approveTransfer(
   transfersRepository: TransfersRepository,
   taskSservice: TasksService,
@@ -26,13 +25,20 @@ export async function approveTransfer(
   );
 
   transfer.status = TransferStatus.COMPLIANCE_APPROVED;
-  transfer.complianceDecisions.push({
-    decision: ComplianceDecisions.APPROVED,
+  const decision = reviewerId
+    ? ComplianceDecisions.APPROVED_MANUALLY
+    : ComplianceDecisions.APPROVED_AUTOMATICALLY;
+
+  const complianceDecision = {
+    decision: decision,
     triggeredRule: `Transfer approved by manual review`,
     reviewerId: reviewerId,
-  });
+  };
 
-  const updatedTransfer = await transfersRepository.markTransferAsApproved(id, reviewerId);
+  const updatedTransfer = await transfersRepository.markTransferAsApproved(
+    id,
+    complianceDecision,
+  );
 
   if (!updatedTransfer)
     throw new Error("Failed to update transfer status to COMPLIANCE_APPROVED");

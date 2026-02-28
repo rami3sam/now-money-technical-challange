@@ -1,5 +1,5 @@
-import { Payout, type PayoutType } from "../../models/payout.ts";
-import type { PayoutsRepository } from "../../repositories/payouts.repository.ts";
+import { Payout, type PayoutType } from "../../models/payout.js";
+import type { PayoutsRepository } from "../../repositories/payouts.repository.js";
 
 export const getPayouts = async (
   payoutsRepository: PayoutsRepository,

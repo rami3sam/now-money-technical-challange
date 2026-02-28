@@ -1,17 +1,17 @@
 import mongoose, { Mongoose, Schema, type InferSchemaType } from "mongoose";
-import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
-import { TransferStatusValues } from "../enums/transferStatus.enum.ts";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
-import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
+import { PayoutMethodsValues } from "../enums/payoutMethods.enum.js";
+import { TransferStatusValues } from "../enums/transferStatus.enum.js";
+import { CountryCodesValues } from "../enums/countryCodes.enum.js";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.js";
 import {
   allValuesProvidedValidator,
   isValidMoney,
-} from "../utils/validatorFunctions.ts";
-import { quoteSchema } from "./quote.ts";
-import { immutableQuoteSchema } from "./immutableQuote.ts";
-import { complianceDecisionSchema } from "./complianceDecision.ts";
-import { transferStateHistorySchema } from "./transferStateHistory.ts";
-import { PayoutStatus } from "../enums/payoutStatus.enum.ts";
+} from "../utils/validatorFunctions.js";
+import { quoteSchema } from "./quote.js";
+import { immutableQuoteSchema } from "./immutableQuote.js";
+import { complianceDecisionSchema } from "./complianceDecision.js";
+import { transferStateHistorySchema } from "./transferStateHistory.js";
+import { PayoutStatus } from "../enums/payoutStatus.enum.js";
 import { required } from "zod/mini";
 
 export const transferSchema = new mongoose.Schema(

@@ -1,20 +1,20 @@
-import type { TransfersRepository } from "../repositories/transfers.repository.ts";
-import type { createTransferSchema } from "../validations/createTransfer.ts";
-import type { PayoutStatusType } from "../validations/payoutStatus.ts";
-import type { TasksService } from "./tasks.service.ts";
-import { approveTransfer } from "./transfers/approveTransfer.ts";
-import { cancelTransfer } from "./transfers/cancelTransfer.ts";
-import { checkTransferCompliance } from "./transfers/checkTransferCompliance.ts";
-import { confirmTransferQuote } from "./transfers/confirmTransferQuote.ts";
-import { createTransfer } from "./transfers/createTransfer.ts";
-import { getTransfer } from "./transfers/getTransfer.ts";
-import { getUserTransfers } from "./transfers/getUserTransfers.ts";
-import { initiatePayout } from "./transfers/inititatePayout.ts";
-import { quoteTransfer } from "./transfers/quoteTransfer.ts";
-import { reconciliateTransfers } from "./transfers/reconciliateTransfers.ts";
-import { refundTransfer } from "./transfers/refundTransfer.ts";
-import { rejectTransfer } from "./transfers/rejectTransfer.ts";
-import { updatePayoutStatus } from "./transfers/updatePayoutStatus.ts";
+import type { TransfersRepository } from "../repositories/transfers.repository.js";
+import type { createTransferSchema } from "../validations/createTransfer.js";
+import type { PayoutStatusType } from "../validations/payoutStatus.js";
+import type { TasksService } from "./tasks.service.js";
+import { approveTransfer } from "./transfers/approveTransfer.js";
+import { cancelTransfer } from "./transfers/cancelTransfer.js";
+import { checkTransferCompliance } from "./transfers/checkTransferCompliance.js";
+import { confirmTransferQuote } from "./transfers/confirmTransferQuote.js";
+import { createTransfer } from "./transfers/createTransfer.js";
+import { getTransfer } from "./transfers/getTransfer.js";
+import { getUserTransfers } from "./transfers/getUserTransfers.js";
+import { initiatePayout } from "./transfers/inititatePayout.js";
+import { quoteTransfer } from "./transfers/quoteTransfer.js";
+import { reconciliateTransfers } from "./transfers/reconciliateTransfers.js";
+import { refundTransfer } from "./transfers/refundTransfer.js";
+import { rejectTransfer } from "./transfers/rejectTransfer.js";
+import { updatePayoutStatus } from "./transfers/updatePayoutStatus.js";
 
 export class TransfersService {
   constructor(

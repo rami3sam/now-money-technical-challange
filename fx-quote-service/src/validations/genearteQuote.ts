@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
-import { isValidCurrency, isValidMoney } from "../utils/validatorFunctions.ts";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
-import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.js";
+import { isValidCurrency, isValidMoney } from "../utils/validatorFunctions.js";
+import { CountryCodesValues } from "../enums/countryCodes.enum.js";
+import { PayoutMethodsValues } from "../enums/payoutMethods.enum.js";
 
 export const generateQuoteSchema = z.object({
   destinationCountry: z

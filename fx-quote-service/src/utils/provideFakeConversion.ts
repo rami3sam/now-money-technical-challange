@@ -1,4 +1,5 @@
-import { CurrencyCodes } from "../../../orchestrator/src/enums/currencyCodes.enum.ts";
+import { CurrencyCodes } from "../enums/currencyCodes.enum.js";
+
 
 // Mock data: Rates relative to 1 USD
 const ratesToUSD: Record<string, number> = {

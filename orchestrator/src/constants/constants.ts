@@ -1,4 +1,4 @@
-import { CountryCodes } from "../enums/countryCodes.enum.ts";
+import { CountryCodes } from "../enums/countryCodes.enum.js";
 
 const bannedCountries: string[] = [
   CountryCodes.IRN,

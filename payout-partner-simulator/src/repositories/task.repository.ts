@@ -1,5 +1,5 @@
-import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task, type TaskType } from "../models/task.ts";
+import { TaskStatus } from "../enums/taskStatus.enum.js";
+import { Task, type TaskType } from "../models/task.js";
 
 export class TasksRepository {
   findById(id: string) {

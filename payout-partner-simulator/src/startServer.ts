@@ -1,11 +1,11 @@
-import { app, payoutsService, tasksService } from "./app.ts";
-import { EnvVariables } from "./constants/config.ts";
-import { runQueueWorker } from "./queues/taskQueue.ts";
-import connectDB from "./utils/connectDB.ts";
+import { app, payoutsService, tasksService } from "./app.js";
+import { EnvVariables } from "./constants/config.js";
+import { runQueueWorker } from "./queues/taskQueue.js";
+import connectDB from "./utils/connectDB.js";
 import {
   getTaskErrorHandlers,
   getTaskHandlers,
-} from "./utils/getTaskHandlers.ts";
+} from "./utils/getTaskHandlers.js";
 
 const PORT = EnvVariables.PORT;
 

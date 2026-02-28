@@ -1,8 +1,8 @@
-import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task, type TaskType } from "../models/task.ts";
-import type { TasksRepository } from "../repositories/task.repository.ts";
-import { getBackoffTime } from "../utils/utilFunctions.ts";
-import { addTask } from "./tasks/add.ts";
+import { TaskStatus } from "../enums/taskStatus.enum.js";
+import { Task, type TaskType } from "../models/task.js";
+import type { TasksRepository } from "../repositories/task.repository.js";
+import { getBackoffTime } from "../utils/utilFunctions.js";
+import { addTask } from "./tasks/add.js";
 
 export class TasksService {
   constructor(private taskRepository: TasksRepository) {}

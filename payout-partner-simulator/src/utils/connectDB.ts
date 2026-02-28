@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { EnvVariables } from "../constants/config.ts";
+import { EnvVariables } from "../constants/config.js";
 
 
 async function connectDB() {

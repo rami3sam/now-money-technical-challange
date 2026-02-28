@@ -1,7 +1,7 @@
 import { Router } from "express"
-import { PayoutController } from "../controllers/payouts.controller.ts.ts";
-import type { TasksService } from "../services/tasks.service.ts";
-import type { PayoutsService } from "../services/payouts.service.ts";
+import { PayoutController } from "../controllers/payouts.controller.ts.js";
+import type { TasksService } from "../services/tasks.service.js";
+import type { PayoutsService } from "../services/payouts.service.js";
 
 export function payoutsRoutes(
   payoutsService: PayoutsService,

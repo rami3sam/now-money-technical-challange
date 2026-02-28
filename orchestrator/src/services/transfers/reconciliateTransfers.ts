@@ -1,11 +1,11 @@
 import axios from "axios";
-import { ReconciliationStatus } from "../../enums/reconciliationStatus.enum.ts";
-import type { PayoutType } from "../../models/payout.ts";
-import type { TransferType } from "../../models/transfer.ts";
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
-import { payoutSchema } from "../../validations/payout.ts";
-import { calculateReconciliationDifference } from "../../utils/reconciliationUtils.ts";
-import { Reconciliation } from "../../models/reconciliation.ts";
+import { ReconciliationStatus } from "../../enums/reconciliationStatus.enum.js";
+import type { PayoutType } from "../../models/payout.js";
+import type { TransferType } from "../../models/transfer.js";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
+import { payoutSchema } from "../../validations/payout.js";
+import { calculateReconciliationDifference } from "../../utils/reconciliationUtils.js";
+import { Reconciliation } from "../../models/reconciliation.js";
 import { uuidv7 } from "zod";
 
 export async function reconciliateTransfers(

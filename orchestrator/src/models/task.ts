@@ -1,6 +1,6 @@
 import mongoose, { Schema, type InferSchemaType } from "mongoose";
-import { TaskStatus, TaskStatusValues } from "../enums/taskStatus.enum.ts";
-import { TaskHandlerValues } from "../enums/taskHandlers.enum.ts";
+import { TaskStatus, TaskStatusValues } from "../enums/taskStatus.enum.js";
+import { TaskHandlerValues } from "../enums/taskHandlers.enum.js";
 
 export const taskSchema = new mongoose.Schema({
   status: {

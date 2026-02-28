@@ -1,10 +1,10 @@
 import { v7 as uuidv7 } from "uuid";
-import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
-import { Payout } from "../../models/payout.ts";
-import { Task } from "../../models/task.ts";
-import type { PayoutsRepository } from "../../repositories/payouts.repository.ts";
-import { InitatePayoutType } from "../../validations/initiatePayout.ts";
-import type { TasksService } from "../tasks.service.ts";
+import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
+import { Payout } from "../../models/payout.js";
+import { Task } from "../../models/task.js";
+import type { PayoutsRepository } from "../../repositories/payouts.repository.js";
+import { InitatePayoutType } from "../../validations/initiatePayout.js";
+import type { TasksService } from "../tasks.service.js";
 
 export const receivePartnerPayoutRequest = async (
   payoutsRepository: PayoutsRepository,

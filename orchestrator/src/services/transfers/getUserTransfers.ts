@@ -1,4 +1,4 @@
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 
 export async function getUserTransfers(
   transferRepository: TransfersRepository,

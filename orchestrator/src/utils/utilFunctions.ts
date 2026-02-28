@@ -1,4 +1,4 @@
-import { CurrencyCodes } from "../enums/currencyCodes.enum.ts";
+import { CurrencyCodes } from "../enums/currencyCodes.enum.js";
 
 function getComplianceMaximum(currency: CurrencyCodes): number {
   switch (currency) {

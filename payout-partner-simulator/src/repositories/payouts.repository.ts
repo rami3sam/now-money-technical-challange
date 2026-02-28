@@ -1,4 +1,4 @@
-import { Payout, type PayoutType } from "../models/payout.ts";
+import { Payout, type PayoutType } from "../models/payout.js";
 
 export class PayoutsRepository {
   findById(id: string) {

@@ -1,12 +1,12 @@
 import {
   assertTransferStatusTransition,
   TransferStatus,
-} from "../../enums/transferStatus.enum.ts";
-import { ComplianceDecisions } from "../../enums/complianceDecisions.ts";
-import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
-import { Task } from "../../models/task.ts";
-import type { TasksService } from "../tasks.service.ts";
+} from "../../enums/transferStatus.enum.js";
+import { ComplianceDecisions } from "../../enums/complianceDecisions.js";
+import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
+import { Task } from "../../models/task.js";
+import type { TasksService } from "../tasks.service.js";
 
 export async function rejectTransfer(
   transferRepository: TransfersRepository,

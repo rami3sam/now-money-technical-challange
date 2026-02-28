@@ -1,7 +1,7 @@
 import mongoose, { Schema, model } from "mongoose";
-import { payoutSchema } from "../validations/payout.ts";
-import { transferSchema } from "./transfer.ts";
-import { ReconciliationStatusValues } from "../enums/reconciliationStatus.enum.ts";
+import { payoutSchema } from "../validations/payout.js";
+import { transferSchema } from "./transfer.js";
+import { ReconciliationStatusValues } from "../enums/reconciliationStatus.enum.js";
 import { required } from "zod/mini";
 
 const ReconciliationSchema = new Schema(

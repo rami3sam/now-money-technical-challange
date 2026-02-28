@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
-import { generateQuoteSchema } from "../../validations/genearteQuote.ts";
+import { generateQuoteSchema } from "../../validations/genearteQuote.js";
 import currency from "currency.js";
-import { getFXRate } from "../../utils/provideFakeConversion.ts";
-import type { CurrencyCodes } from "../../enums/currencyCodes.enum.ts";
-import { Quote } from "../../models/quotes.ts";
-import { quoteExpiryTimeInSeconds } from "../../constants/constants.ts";
+import { getFXRate } from "../../utils/provideFakeConversion.js";
+import type { CurrencyCodes } from "../../enums/currencyCodes.enum.js";
+import { Quote } from "../../models/quotes.js";
+import { quoteExpiryTimeInSeconds } from "../../constants/constants.js";
 
 const generateQuote = async (req: Request, res: Response) => {
   try {

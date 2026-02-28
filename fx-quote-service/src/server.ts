@@ -1,7 +1,7 @@
-import { EnvVariables } from "./constants/config.ts";
+import { EnvVariables } from "./constants/config.js";
 import express, { json } from "express";
-import quotesRoutes from "./routes/quotesRoutes.ts";
-import connectDB from "./utils/connectDB.ts";
+import quotesRoutes from "./routes/quotesRoutes.js";
+import connectDB from "./utils/connectDB.js";
 const PORT = EnvVariables.PORT;
 const app = express();
 

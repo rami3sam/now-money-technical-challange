@@ -1,10 +1,10 @@
-import type { PayoutsRepository } from "../repositories/payouts.repository.ts";
-import type { InitatePayoutType } from "../validations/initiatePayout.ts";
-import { getPayouts } from "./payouts/getPayoutsBetweenDates.ts";
-import { processPayout } from "./payouts/processPayout.ts";
-import { providePayoutStatus } from "./payouts/providePayoutStatus.ts";
-import { receivePartnerPayoutRequest } from "./payouts/receivePartnerPayoutRequest.ts";
-import type { TasksService } from "./tasks.service.ts";
+import type { PayoutsRepository } from "../repositories/payouts.repository.js";
+import type { InitatePayoutType } from "../validations/initiatePayout.js";
+import { getPayouts } from "./payouts/getPayoutsBetweenDates.js";
+import { processPayout } from "./payouts/processPayout.js";
+import { providePayoutStatus } from "./payouts/providePayoutStatus.js";
+import { receivePartnerPayoutRequest } from "./payouts/receivePartnerPayoutRequest.js";
+import type { TasksService } from "./tasks.service.js";
 
 export class PayoutsService {
   constructor(

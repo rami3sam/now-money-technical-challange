@@ -1,5 +1,5 @@
 import mongoose, { type InferSchemaType } from "mongoose";
-import { complianceDecisionValues } from "../enums/complianceDecisions.ts";
+import { complianceDecisionValues } from "../enums/complianceDecisions.js";
 
 export const complianceDecisionSchema = new mongoose.Schema(
   {

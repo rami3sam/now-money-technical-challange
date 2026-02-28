@@ -1,6 +1,6 @@
-import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
-import type { TaskType, TaskTypeWithId } from "../models/task.ts";
-import type { TransfersService } from "../services/transfers.service.ts";
+import { TaskHandlers } from "../enums/taskHandlers.enum.js";
+import type { TaskType, TaskTypeWithId } from "../models/task.js";
+import type { TransfersService } from "../services/transfers.service.js";
 
 export function getTaskHandlers(transferService: TransfersService) {
   return {

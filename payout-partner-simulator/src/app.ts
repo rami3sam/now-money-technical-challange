@@ -1,13 +1,13 @@
 import express, { json } from "express";
-import { EnvVariables } from "./constants/config.ts";
-import connectDB from "./utils/connectDB.ts";
-import { runQueueWorker } from "./queues/taskQueue.ts";
-import { TasksRepository } from "./repositories/task.repository.ts";
-import { TasksService } from "./services/tasks.service.ts";
-import { PayoutsService } from "./services/payouts.service.ts";
-import { partnerPayoutsRoutes } from "./routes/partnerRoutes.ts";
-import { payoutsRoutes } from "./routes/payoutsRoutes.ts";
-import { PayoutsRepository } from "./repositories/payouts.repository.ts";
+import { EnvVariables } from "./constants/config.js";
+import connectDB from "./utils/connectDB.js";
+import { runQueueWorker } from "./queues/taskQueue.js";
+import { TasksRepository } from "./repositories/task.repository.js";
+import { TasksService } from "./services/tasks.service.js";
+import { PayoutsService } from "./services/payouts.service.js";
+import { partnerPayoutsRoutes } from "./routes/partnerRoutes.js";
+import { payoutsRoutes } from "./routes/payoutsRoutes.js";
+import { PayoutsRepository } from "./repositories/payouts.repository.js";
 
 const app = express();
 const tasksRepository = new TasksRepository();

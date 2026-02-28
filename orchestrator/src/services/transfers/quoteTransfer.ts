@@ -1,10 +1,10 @@
 import {
   assertTransferStatusTransition,
   TransferStatus,
-} from "../../enums/transferStatus.enum.ts";
+} from "../../enums/transferStatus.enum.js";
 import axios from "axios";
-import { quoteResponseSchema } from "../../validations/quote.ts";
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import { quoteResponseSchema } from "../../validations/quote.js";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 
 export async function quoteTransfer(
   transferRepository: TransfersRepository,

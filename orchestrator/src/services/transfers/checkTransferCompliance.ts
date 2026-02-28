@@ -1,19 +1,19 @@
 import currency from "currency.js";
-import { bannedCountries, bannedPeople } from "../../constants/constants.ts";
-import { ComplianceDecisions } from "../../enums/complianceDecisions.ts";
-import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
+import { bannedCountries, bannedPeople } from "../../constants/constants.js";
+import { ComplianceDecisions } from "../../enums/complianceDecisions.js";
+import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
 import {
   assertTransferStatusTransition,
   TransferStatus,
-} from "../../enums/transferStatus.enum.ts";
-import { TransfersRepository } from "../../repositories/transfers.repository.ts";
+} from "../../enums/transferStatus.enum.js";
+import { TransfersRepository } from "../../repositories/transfers.repository.js";
 import {
   checkForNameInList,
   getComplianceMaximum,
-} from "../../utils/utilFunctions.ts";
-import type { CurrencyCodes } from "../../enums/currencyCodes.enum.ts";
-import type { TasksService } from "../tasks.service.ts";
-import { Task } from "../../models/task.ts";
+} from "../../utils/utilFunctions.js";
+import type { CurrencyCodes } from "../../enums/currencyCodes.enum.js";
+import type { TasksService } from "../tasks.service.js";
+import { Task } from "../../models/task.js";
 
 export async function checkTransferCompliance(
   transfersRepository: TransfersRepository,

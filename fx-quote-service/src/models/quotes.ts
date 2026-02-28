@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
-import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
-import { isValidMoney } from "../utils/validatorFunctions.ts";
+import { PayoutMethodsValues } from "../enums/payoutMethods.enum.js";
+import { CountryCodesValues } from "../enums/countryCodes.enum.js";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.js";
+import { isValidMoney } from "../utils/validatorFunctions.js";
 
 const quoteSchema = new mongoose.Schema(
   {

@@ -1,5 +1,5 @@
 import mongoose, { type InferSchemaType } from "mongoose";
-import { TransferStatusValues } from "../enums/transferStatus.enum.ts";
+import { TransferStatusValues } from "../enums/transferStatus.enum.js";
 
 export const transferStateHistorySchema = new mongoose.Schema(
   {

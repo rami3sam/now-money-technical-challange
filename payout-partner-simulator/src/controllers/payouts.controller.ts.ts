@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
-import type { TasksService } from "../services/tasks.service.ts";
-import { Payout, type PayoutType } from "../models/payout.ts";
-import type { PayoutsRepository } from "../repositories/payouts.repository.ts";
-import type { PayoutsService } from "../services/payouts.service.ts";
-import { InitatePayoutType } from "../validations/initiatePayout.ts";
+import type { TasksService } from "../services/tasks.service.js";
+import { Payout, type PayoutType } from "../models/payout.js";
+import type { PayoutsRepository } from "../repositories/payouts.repository.js";
+import type { PayoutsService } from "../services/payouts.service.js";
+import { InitatePayoutType } from "../validations/initiatePayout.js";
 
 export class PayoutController {
   constructor(

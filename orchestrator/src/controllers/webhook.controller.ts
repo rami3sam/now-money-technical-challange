@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
-import { TaskHandlers } from "../enums/taskHandlers.enum.ts";
-import { Task, type TaskType } from "../models/task.ts";
-import type { TasksService } from "../services/tasks.service.ts";
-import type { TransfersService } from "../services/transfers.service.ts";
-import { PayoutStatusType } from "../validations/payoutStatus.ts";
-import { Payout, type PayoutType } from "../models/payout.ts";
+import { TaskHandlers } from "../enums/taskHandlers.enum.js";
+import { Task, type TaskType } from "../models/task.js";
+import type { TasksService } from "../services/tasks.service.js";
+import type { TransfersService } from "../services/transfers.service.js";
+import { PayoutStatusType } from "../validations/payoutStatus.js";
+import { Payout, type PayoutType } from "../models/payout.js";
 
 export class WebhookController {
   constructor(

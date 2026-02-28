@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { TransfersService } from "../services/transfers.service.ts";
-import { TransferController } from "../controllers/transfers.controller.ts";
+import { TransfersService } from "../services/transfers.service.js";
+import { TransferController } from "../controllers/transfers.controller.js";
 
 export function transfersRoutes(transfersService: TransfersService) {
   const transfersRouter = Router();

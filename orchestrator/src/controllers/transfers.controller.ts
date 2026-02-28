@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
-import type { TransfersService } from "../services/transfers.service.ts";
-import { isString } from "../utils/utilFunctions.ts";
-import { createTransferSchema } from "../validations/createTransfer.ts";
-import { Transfer } from "../models/transfer.ts";
+import type { TransfersService } from "../services/transfers.service.js";
+import { isString } from "../utils/utilFunctions.js";
+import { createTransferSchema } from "../validations/createTransfer.js";
+import { Transfer } from "../models/transfer.js";
 
 export class TransferController {
   constructor(private transfersService: TransfersService) {}

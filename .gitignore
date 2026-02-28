@@ -10,3 +10,7 @@ payout-partner-simulator/package-lock.json
 .env.*
 **/.env
 **/.env.*
+orchestrator/dist
+fx-quote-service/dist
+payout-partner-simulator/dist
+dist

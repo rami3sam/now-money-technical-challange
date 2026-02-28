@@ -1,20 +1,20 @@
 import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
-import { TransfersService } from "./transfers.service.ts";
-import { TasksService } from "./tasks.service.ts";
-import { TasksRepository } from "../repositories/task.repository.ts";
-import { TransfersRepository } from "../repositories/transfers.repository.ts";
-import { Transfer, type TransferType } from "../models/transfer.ts";
+import { TransfersService } from "./transfers.service.js";
+import { TasksService } from "./tasks.service.js";
+import { TasksRepository } from "../repositories/task.repository.js";
+import { TransfersRepository } from "../repositories/transfers.repository.js";
+import { Transfer, type TransferType } from "../models/transfer.js";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import { TransferStatus } from "../enums/transferStatus.enum.ts";
+import { TransferStatus } from "../enums/transferStatus.enum.js";
 import axios from "axios";
 import { each, update } from "lodash";
-import { CountryCodes } from "../enums/countryCodes.enum.ts";
-import { runQueueWorker } from "../queues/taskQueue.ts";
+import { CountryCodes } from "../enums/countryCodes.enum.js";
+import { runQueueWorker } from "../queues/taskQueue.js";
 import {
   getTaskErrorHandlers,
   getTaskHandlers,
-} from "../utils/getTaskHandlers.ts";
+} from "../utils/getTaskHandlers.js";
 import { getEnabledCategories } from "node:trace_events";
 import currency from "currency.js";
 import test from "node:test";

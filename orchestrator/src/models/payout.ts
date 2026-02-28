@@ -1,15 +1,15 @@
 import mongoose, { Mongoose, Schema, type InferSchemaType } from "mongoose";
-import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
-import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
+import { PayoutMethodsValues } from "../enums/payoutMethods.enum.js";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.js";
 import {
   allValuesProvidedValidator,
   isValidMoney,
-} from "../utils/validatorFunctions.ts";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
+} from "../utils/validatorFunctions.js";
+import { CountryCodesValues } from "../enums/countryCodes.enum.js";
 import {
   PayoutStatus,
   PayoutStatusValues,
-} from "../enums/payoutStatus.enum.ts";
+} from "../enums/payoutStatus.enum.js";
 
 const payoutSchema = new mongoose.Schema(
   {

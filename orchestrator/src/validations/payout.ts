@@ -1,9 +1,9 @@
 import z from "zod";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
-import { PayoutMethodsValues } from "../enums/payoutMethods.enum.ts";
-import { isValidMoney } from "../utils/validatorFunctions.ts";
-import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
-import { PayoutStatusValues } from "../enums/payoutStatus.enum.ts";
+import { CountryCodesValues } from "../enums/countryCodes.enum.js";
+import { PayoutMethodsValues } from "../enums/payoutMethods.enum.js";
+import { isValidMoney } from "../utils/validatorFunctions.js";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.js";
+import { PayoutStatusValues } from "../enums/payoutStatus.enum.js";
 
 export const payoutSchema = z.array(
   z.object({

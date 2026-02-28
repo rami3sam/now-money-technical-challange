@@ -1,7 +1,7 @@
 import axios from "axios";
-import { PayoutsRepository } from "../../repositories/payouts.repository.ts";
-import { EnvVariables } from "../../constants/config.ts";
-import { signHmac } from "../../utils/utilFunctions.ts";
+import { PayoutsRepository } from "../../repositories/payouts.repository.js";
+import { EnvVariables } from "../../constants/config.js";
+import { signHmac } from "../../utils/utilFunctions.js";
 
 export const providePayoutStatus = async (
   payoutsRepository: PayoutsRepository,

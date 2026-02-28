@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { PayoutMethods } from "../enums/payoutMethods.enum.ts";
-import { PersonalIDTypesValues } from "../enums/personalIDTypes.enum.ts";
-import { CountryCodesValues } from "../enums/countryCodes.enum.ts";
-import { CurrencyCodesValues } from "../enums/currencyCodes.enum.ts";
-import { isValidMoney } from "../utils/validatorFunctions.ts";
+import { PayoutMethods } from "../enums/payoutMethods.enum.js";
+import { PersonalIDTypesValues } from "../enums/personalIDTypes.enum.js";
+import { CountryCodesValues } from "../enums/countryCodes.enum.js";
+import { CurrencyCodesValues } from "../enums/currencyCodes.enum.js";
+import { isValidMoney } from "../utils/validatorFunctions.js";
 
 export const createTransferSchema = z.object({
   sender: z.object({

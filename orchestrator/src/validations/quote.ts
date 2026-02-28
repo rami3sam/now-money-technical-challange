@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isValidMoney, validateDate } from "../utils/validatorFunctions.ts";
+import { isValidMoney, validateDate } from "../utils/validatorFunctions.js";
 
 export const quoteResponseSchema = z.object({
   fxRate: z

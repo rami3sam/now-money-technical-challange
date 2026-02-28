@@ -1,11 +1,11 @@
 import currency from "currency.js";
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 import {
   assertTransferStatusTransition,
   TransferStatus,
-} from "../../enums/transferStatus.enum.ts";
-import { EnvVariables } from "../../constants/config.ts";
-import { Transfer } from "../../models/transfer.ts";
+} from "../../enums/transferStatus.enum.js";
+import { EnvVariables } from "../../constants/config.js";
+import { Transfer } from "../../models/transfer.js";
 
 export async function refundTransfer(
   transfersRepository: TransfersRepository,

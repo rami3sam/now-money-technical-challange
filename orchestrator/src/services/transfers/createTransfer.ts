@@ -1,8 +1,8 @@
-import { PayoutMethods } from "../../enums/payoutMethods.enum.ts";
-import { TransferStatus } from "../../enums/transferStatus.enum.ts";
-import { Transfer, type TransferType } from "../../models/transfer.ts";
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
-import type { createTransferSchema } from "../../validations/createTransfer.ts";
+import { PayoutMethods } from "../../enums/payoutMethods.enum.js";
+import { TransferStatus } from "../../enums/transferStatus.enum.js";
+import { Transfer, type TransferType } from "../../models/transfer.js";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
+import type { createTransferSchema } from "../../validations/createTransfer.js";
 
 export async function createTransfer(
   transferRepository: TransfersRepository,

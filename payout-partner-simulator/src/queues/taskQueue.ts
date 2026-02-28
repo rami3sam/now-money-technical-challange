@@ -1,7 +1,7 @@
-import type { TaskHandlers } from "../enums/taskHandlers.enum.ts";
-import { TaskStatus } from "../enums/taskStatus.enum.ts";
-import { Task, type TaskTypeWithId } from "../models/task.ts";
-import type { TasksService } from "../services/tasks.service.ts";
+import type { TaskHandlers } from "../enums/taskHandlers.enum.js";
+import { TaskStatus } from "../enums/taskStatus.enum.js";
+import { Task, type TaskTypeWithId } from "../models/task.js";
+import type { TasksService } from "../services/tasks.service.js";
 
 let isRunning = false;
 

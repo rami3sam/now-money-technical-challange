@@ -1,7 +1,7 @@
-import type { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
-import { TaskStatus } from "../../enums/taskStatus.enum.ts";
-import { Task, type TaskType } from "../../models/task.ts";
-import type { TasksRepository } from "../../repositories/task.repository.ts";
+import type { TaskHandlers } from "../../enums/taskHandlers.enum.js";
+import { TaskStatus } from "../../enums/taskStatus.enum.js";
+import { Task, type TaskType } from "../../models/task.js";
+import type { TasksRepository } from "../../repositories/task.repository.js";
 
 export async function addTask(
   taskRepository: TasksRepository,

@@ -1,8 +1,8 @@
-import { PayoutStatus } from "../../enums/payoutStatus.enum.ts";
-import { TaskHandlers } from "../../enums/taskHandlers.enum.ts";
-import { Task, type TaskTypeWithId } from "../../models/task.ts";
-import type { PayoutsRepository } from "../../repositories/payouts.repository.ts";
-import type { TasksService } from "../tasks.service.ts";
+import { PayoutStatus } from "../../enums/payoutStatus.enum.js";
+import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
+import { Task, type TaskTypeWithId } from "../../models/task.js";
+import type { PayoutsRepository } from "../../repositories/payouts.repository.js";
+import type { TasksService } from "../tasks.service.js";
 
 export const processPayout = async (
   tasksService: TasksService,

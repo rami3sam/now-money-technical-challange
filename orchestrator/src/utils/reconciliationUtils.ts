@@ -1,7 +1,7 @@
 import currency from "currency.js";
-import type { TransferType } from "../models/transfer.ts";
-import type { PayoutType } from "../models/payout.ts";
-import { EnvVariables } from "../constants/config.ts";
+import type { TransferType } from "../models/transfer.js";
+import type { PayoutType } from "../models/payout.js";
+import { EnvVariables } from "../constants/config.js";
 
 export function calculateReconciliationDifference(
   transfer: TransferType,

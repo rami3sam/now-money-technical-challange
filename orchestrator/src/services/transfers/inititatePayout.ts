@@ -1,10 +1,10 @@
 import {
   assertTransferStatusTransition,
   TransferStatus,
-} from "../../enums/transferStatus.enum.ts";
-import type { TransfersRepository } from "../../repositories/transfers.repository.ts";
+} from "../../enums/transferStatus.enum.js";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 import { v7 as uuidv7 } from "uuid";
-import { PayoutStatusType } from "../../validations/payoutStatus.ts";
+import { PayoutStatusType } from "../../validations/payoutStatus.js";
 import axios from "axios";
 export async function initiatePayout(
   transfersRepository: TransfersRepository,

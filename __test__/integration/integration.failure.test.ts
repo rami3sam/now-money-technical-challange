@@ -14,13 +14,13 @@ import { waitForCondition } from "./utils";
 
 describe("App integration tests", () => {
   let transferIdThatWillBePaid: string;
-  const transferThatWillBePaid = {
+  const transferThatWillNotBePaid = {
     sender: {
       senderId: "4",
       name: "Hassan Jalal",
     },
     recipient: {
-      name: "Rami Essamedeen+++",
+      name: "Rami Essamedeen---",
       country: "ARE",
       payoutMethod: "CASH",
       payoutDetails: {
@@ -36,7 +36,7 @@ describe("App integration tests", () => {
   it("POST /transfers should create a transfer", async () => {
     const res = await axios.post(
       `${config.orchestratorServiceUrl}/transfers`,
-      transferThatWillBePaid,
+      transferThatWillNotBePaid,
     );
 
     //@ts-ignore
@@ -107,16 +107,16 @@ describe("App integration tests", () => {
     expect(res).toHaveProperty("data.status", "PAYOUT_PENDING");
   });
 
-  it("the transfer should be be change to PAID", async () => {
+  it("the transfer should be be change to FAILED", async () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
         `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
       );
       //@ts-ignore
-      return res.data.status === "PAID";
+      return res.data.status === "FAILED";
     });
 
-    expect(res).toHaveProperty("data.status", "PAID");
-  });
+    expect(res).toHaveProperty("data.status", "FAILED");
+  }, 30000);
 });

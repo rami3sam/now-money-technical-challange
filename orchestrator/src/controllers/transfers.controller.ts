@@ -9,6 +9,7 @@ export class TransferController {
 
   getTransfer = async (req: Request, res: Response) => {
     const { id } = req.params;
+    (req as any).locals = { ...(req as any).locals, transferId: id };
     if (!id) throw Error("Transfer id is required");
     if (!isString(id)) throw Error("Transfer id must be a string");
     const result = await this.transfersService.getTransfer(id);
@@ -27,11 +28,13 @@ export class TransferController {
     const transferData = createTransferSchema.parse(req.body);
     if (!transferData) throw Error("Transfer data is required");
     const result = await this.transfersService.createTransfer(transferData);
+    (req as any).locals = { ...(req as any).locals, transferId: result.id };
     res.status(200).json(result);
   };
 
   quote = async (req: Request, res: Response) => {
     const { id } = req.params;
+    (req as any).locals = { ...(req as any).locals, transferId: id };
     if (!id) throw Error("Transfer id is required");
     if (!isString(id)) throw Error("Transfer id must be a string");
     const result = await this.transfersService.quoteTransfer(id);
@@ -43,7 +46,7 @@ export class TransferController {
 
   confirm = async (req: Request, res: Response) => {
     const { id } = req.params;
-
+    (req as any).locals = { ...(req as any).locals, transferId: id };
     if (!id) throw Error("Transfer id is required");
     if (!isString(id)) throw Error("Transfer id must be a string");
     const result = await this.transfersService.confirmTransferQuote(id);
@@ -56,7 +59,7 @@ export class TransferController {
   approve = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { reviewerId } = req.query;
-
+    (req as any).locals = { ...(req as any).locals, transferId: id };
     if (!id) throw Error("Transfer id is required");
     if (!isString(id)) throw Error("Transfer id must be a string");
     if (!reviewerId) throw Error("Reviewer id is required");
@@ -69,6 +72,7 @@ export class TransferController {
   reject = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { reviewerId } = req.query;
+    (req as any).locals = { ...(req as any).locals, transferId: id };
 
     if (!id) throw Error("Transfer id is required");
     if (!isString(id)) throw Error("Transfer id must be a string");
@@ -81,6 +85,7 @@ export class TransferController {
 
   cancel = async (req: Request, res: Response) => {
     const { id } = req.params;
+    (req as any).locals = { ...(req as any).locals, transferId: id };
 
     if (!id) throw Error("Transfer id is required");
     if (!isString(id)) throw Error("Transfer id must be a string");

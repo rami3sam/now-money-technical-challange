@@ -10,6 +10,7 @@ import { transfersRoutes } from "./routes/transfersRoutes.js";
 import { webhookRoutes } from "./routes/webhooks.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
+import { requestContext } from "./middlewares/requestContextMiddleware.js";
 
 const app = express();
 const taskRepository = new TasksRepository();
@@ -27,9 +28,10 @@ app.use(
     },
   }),
 );
+app.use(requestContext);
 app.use("/health", healthRoutes);
 app.use("/transfers", transfersRoutes(transfersService));
 app.use("/webhooks", webhookRoutes(transfersService, tasksService));
-app.use(errorMiddleware)
+app.use(errorMiddleware);
 
 export { app, tasksService, transfersService };

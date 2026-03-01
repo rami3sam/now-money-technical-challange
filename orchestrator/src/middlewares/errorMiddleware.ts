@@ -12,7 +12,8 @@ export function errorMiddleware(err: any, req: Request, res: Response, next: Nex
     statusCode,
     method: req.method,
     url: req.originalUrl,
-    stack: err.stack
+    stack: err.stack,
+    transferId: (req as any).locals?.transferId || "N/A"
   });
 
   // Send response to client

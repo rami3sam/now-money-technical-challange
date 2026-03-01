@@ -5,7 +5,7 @@ import { runQueueWorker } from "./queues/taskQueue.js";
 import connectDB from "./utils/connectDB.js";
 import {
   getTaskErrorHandlers,
-  executeTask as getTaskHandlers,
+  getTaskHandlers as getTaskHandlers,
 } from "./utils/getTaskHandlers.js";
 
 const PORT = EnvVariables.PORT;

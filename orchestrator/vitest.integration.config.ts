@@ -5,12 +5,13 @@ export default defineConfig({
     environment: "node",
     globals: true,
 
-    include: ["**/*.test.ts"],
+    include: ["src/__test__/*.test.ts"],
 
     testTimeout: 30000, // useful for DB / docker startup
 
     coverage: {
       reporter: ["text", "html"],
     },
+
   },
 });

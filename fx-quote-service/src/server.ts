@@ -4,6 +4,7 @@ import quotesRoutes from "./routes/quotesRoutes.js";
 import connectDB from "./utils/connectDB.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
+import { logger } from "./config/logger.js";
 const PORT = EnvVariables.PORT;
 const app = express();
 
@@ -15,7 +16,7 @@ async function startServer() {
   await connectDB();
 
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server running on port ${PORT}`);
   });
 }
 

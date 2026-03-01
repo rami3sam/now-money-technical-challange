@@ -1,24 +1,20 @@
-import { describe, it, expect, vi, beforeAll, afterEach } from "vitest";
-import { TransfersService } from "./transfers.service.js";
-import { TasksService } from "./tasks.service.js";
-import { TasksRepository } from "../repositories/task.repository.js";
-import { TransfersRepository } from "../repositories/transfers.repository.js";
-import { Transfer, type TransferType } from "../models/transfer.js";
+import axios from "axios";
+import currency from "currency.js";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import { TransferStatus } from "../enums/transferStatus.enum.js";
-import axios from "axios";
-import { each, update } from "lodash";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CountryCodes } from "../enums/countryCodes.enum.js";
+import { TransferStatus } from "../enums/transferStatus.enum.js";
+import { Transfer } from "../models/transfer.js";
 import { runQueueWorker } from "../queues/taskQueue.js";
+import { TasksRepository } from "../repositories/task.repository.js";
+import { TransfersRepository } from "../repositories/transfers.repository.js";
 import {
   getTaskErrorHandlers,
   getTaskHandlers,
 } from "../utils/getTaskHandlers.js";
-import { getEnabledCategories } from "node:trace_events";
-import currency from "currency.js";
-import test from "node:test";
-import { stat } from "node:fs";
+import { TasksService } from "./tasks.service.js";
+import { TransfersService } from "./transfers.service.js";
 let transfersService: TransfersService;
 
 vi.mock("axios");

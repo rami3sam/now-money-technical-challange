@@ -10,6 +10,7 @@ import { payoutsRoutes } from "./routes/payoutsRoutes.js";
 import { PayoutsRepository } from "./repositories/payouts.repository.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
+import { logger } from "./config/logger.js";
 
 const app = express();
 const tasksRepository = new TasksRepository();
@@ -17,10 +18,12 @@ const tasksService = new TasksService(tasksRepository);
 const payoutsRepository = new PayoutsRepository();
 const payoutsService = new PayoutsService(payoutsRepository, tasksService);
 
+
 app.use(json())
 app.use("/health", healthRoutes);
 app.use("/partner", partnerPayoutsRoutes(payoutsService, tasksService));
 app.use("/payouts", payoutsRoutes(payoutsService, tasksService));
 app.use(errorMiddleware)
+
 
 export { app, tasksService, payoutsService };

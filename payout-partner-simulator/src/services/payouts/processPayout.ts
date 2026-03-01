@@ -9,6 +9,8 @@ export const processPayout = async (
   payoutsRepository: PayoutsRepository,
   payoutId: string,
 ) => {
+  
+
   const payout = await payoutsRepository.findById(payoutId);
   if (!payout) throw Error(`Payout with id ${payoutId} not found`);
 

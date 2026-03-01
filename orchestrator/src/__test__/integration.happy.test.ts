@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const config = {
-  orchestratorServiceUrl: process.env.ORCHESTRATOR_SERVICE_URL!,
+  orchestratorServiceUrl: "http://localhost:8000",
   fxQuoteServiceUrl: process.env.FX_QUOTE_SERVICE_URL!,
   payoutPartnerSimulatorServiceUrl:
     process.env.PAYOUT_PARTNER_SIMULATOR_SERVICE_URL!,
@@ -10,17 +10,17 @@ const config = {
 };
 import { describe, it, expect } from "vitest";
 import axios from "axios";
-import { waitForCondition } from "./utils";
+import { waitForCondition } from "../utils/waitForCondition.js";
 
 describe("App integration tests", () => {
-  let transferIdThatWillNotBePaid: string;
-  const transferThatWillNotBePaid = {
+  let transferIdThatWillBePaid: string;
+  const transferThatWillBePaid = {
     sender: {
       senderId: "4",
-      name: "Hassan Jalal---",
+      name: "Hassan Jalal+++",
     },
     recipient: {
-      name: "Rami Essamedeen---",
+      name: "Rami Essamedeen",
       country: "ARE",
       payoutMethod: "CASH",
       payoutDetails: {
@@ -36,17 +36,17 @@ describe("App integration tests", () => {
   it("POST /transfers should create a transfer", async () => {
     const res = await axios.post(
       `${config.orchestratorServiceUrl}/transfers`,
-      transferThatWillNotBePaid,
+      transferThatWillBePaid,
     );
 
     //@ts-ignore
-    transferIdThatWillNotBePaid = res.data._id;
+    transferIdThatWillBePaid = res.data._id;
     expect(res.data).toHaveProperty("status", "CREATED");
   });
 
   it("POST /transfers/:id/quote should quote the transfer", async () => {
     const res = await axios.post(
-      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}/quote`,
+      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}/quote`,
     );
 
     expect(res.data).toHaveProperty("data.status", "QUOTED");
@@ -54,7 +54,7 @@ describe("App integration tests", () => {
 
   it("POST /transfers/:id/confirm should confirm the transfer", async () => {
     const res = await axios.post(
-      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}/confirm`,
+      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}/confirm`,
     );
 
     expect(res.data).toHaveProperty("data.status", "CONFIRMED");
@@ -64,7 +64,7 @@ describe("App integration tests", () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
       );
       //@ts-ignore
       return res.data.status === "COMPLIANCE_PENDING";
@@ -75,7 +75,7 @@ describe("App integration tests", () => {
 
   it("POST /transfers/:id/approve should confirm the transfer", async () => {
     const res = await axios.post(
-      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}/compliance/approve?reviewerId=100`,
+      `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}/compliance/approve?reviewerId=100`,
     );
 
     expect(res.status).toBe(200);
@@ -85,7 +85,7 @@ describe("App integration tests", () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
       );
       //@ts-ignore
       return res.data.status === "COMPLIANCE_APPROVED";
@@ -98,7 +98,7 @@ describe("App integration tests", () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
       );
       //@ts-ignore
       return res.data.status === "PAYOUT_PENDING";
@@ -107,29 +107,16 @@ describe("App integration tests", () => {
     expect(res).toHaveProperty("data.status", "PAYOUT_PENDING");
   });
 
-  it("should be changed to FAILED when payout fails", async () => {
+  it("the transfer should be be change to PAID", async () => {
     let res;
     await waitForCondition(async () => {
       res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
+        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillBePaid}`,
       );
       //@ts-ignore
-      return res.data.status === "FAILED";
+      return res.data.status === "PAID";
     });
 
-    expect(res).toHaveProperty("data.status", "FAILED");
-  }, 30000);
-
-  it("should be changed to REFUNDED when transfer is refunded", async () => {
-    let res;
-    await waitForCondition(async () => {
-      res = await axios.get(
-        `${config.orchestratorServiceUrl}/transfers/${transferIdThatWillNotBePaid}`,
-      );
-      //@ts-ignore
-      return res.data.status === "REFUNDED";
-    });
-
-    expect(res).toHaveProperty("data.status", "REFUNDED");
+    expect(res).toHaveProperty("data.status", "PAID");
   }, 30000);
 });

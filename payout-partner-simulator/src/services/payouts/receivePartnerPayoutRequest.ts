@@ -5,12 +5,14 @@ import { Task } from "../../models/task.js";
 import type { PayoutsRepository } from "../../repositories/payouts.repository.js";
 import { InitatePayoutType } from "../../validations/initiatePayout.js";
 import type { TasksService } from "../tasks.service.js";
+import { logger } from "../../config/logger.js";
 
 export const receivePartnerPayoutRequest = async (
   payoutsRepository: PayoutsRepository,
   tasksService: TasksService,
   initiatePayout: InitatePayoutType,
 ) => {
+   
   const databasePayout = await payoutsRepository.findByPartnerPayoutId(
     initiatePayout.payoutId,
   );
@@ -45,6 +47,7 @@ export const receivePartnerPayoutRequest = async (
 
   await payout.save();
   if (!payout) throw new Error("Failed to save payout to database");
+
 
   await tasksService.add(
     new Task({

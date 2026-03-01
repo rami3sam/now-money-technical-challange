@@ -1,5 +1,7 @@
 # Use official Node image
-FROM node:20-alpine
+FROM node:20-bullseye
+
+ENV MONGOMS_DOWNLOAD_URL='https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.2.8.tgz'
 
 # Set working directory
 WORKDIR /app

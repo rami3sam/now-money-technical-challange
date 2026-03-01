@@ -4,6 +4,7 @@ import { Payout, type PayoutType } from "../models/payout.js";
 import type { PayoutsRepository } from "../repositories/payouts.repository.js";
 import type { PayoutsService } from "../services/payouts.service.js";
 import { InitatePayoutType } from "../validations/initiatePayout.js";
+import { logger } from "../config/logger.js";
 
 export class PayoutController {
   constructor(
@@ -12,6 +13,7 @@ export class PayoutController {
   ) {}
 
   receivePartnerPayoutRequest = async (req: Request, res: Response) => {
+    
     const initiatePayout = InitatePayoutType.parse(req.body);
     const response =
       await this.payoutsService.receivePartnerPayoutRequest(initiatePayout);

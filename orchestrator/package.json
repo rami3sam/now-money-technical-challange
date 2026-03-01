@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node dist/startServer.js",
-    "test": "vitest --reporter verbose --dir src",
+    "test:unit": "vitest -c vitest.unit.config.ts",
+    "test:integration": "wait-on http://localhost:8000/health $FX_QUOTE_SERVICE_URL/health $PAYOUT_PARTNER_SIMULATOR_SERVICE_URL/health && vitest -c vitest.integration.config.ts",
     "dev": "nodemon --exec node  --loader ts-node/esm  src/startServer.ts",
     "build": "tsc",
     "clean": "rm -rf dist"
@@ -27,12 +28,15 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/lodash": "^4.17.24",
+    "@types/mongodb-memory-server": "^1.8.0",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^25.3.0",
+    "mongod": "^2.0.0",
     "mongodb-memory-server": "^11.0.1",
     "nodemon": "^3.1.13",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "wait-on": "^9.0.4"
   }
 }

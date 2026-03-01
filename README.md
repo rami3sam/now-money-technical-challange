@@ -30,8 +30,8 @@ This project implements a distributed payment orchestration system composed of m
 1. Clone the repository:
 
 ```bash
-git clone <your-repository-url>
-cd <repository-folder>
+git clone https://github.com/rami3sam/now-money-technical-challange.git
+cd now-money-technical-challange
 ```
 
 2. Create a `.env` file in the **top-level root** of the repository with the following values:
@@ -62,6 +62,11 @@ This will start:
 - database
 
 ---
+## How to Run Locally
+
+```bash
+docker compose up
+```
 
 ## How to Run Tests
 
@@ -85,17 +90,8 @@ docker compose exec orchestrator npm run test:integration
 You can import the Postman collection from the repository:
 
 ```
-/postman/now-money.postman_collection.json
+postman/now-money.postman_collection.json
 ```
-
-Steps:
-
-1. Open Postman
-2. Click **Import**
-3. Select the collection JSON file
-4. Run requests
-
----
 
 ## Environment Variables
 
@@ -123,7 +119,6 @@ Steps:
 
 ## Notes
 
-- Docker is required to run the system locally.
 - All services communicate via internal Docker networking.
 - Integration tests run against real containers.
 

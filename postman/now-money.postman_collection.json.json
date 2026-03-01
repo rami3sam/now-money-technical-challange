@@ -1,0 +1,463 @@
+{
+  "info": {
+    "_postman_id": "951c7a9d-c788-407a-bfa5-051847ceae93",
+    "name": "NowMoneyChallange",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21593591"
+  },
+  "item": [
+    {
+      "name": "Create a Transfer",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"sender\": {\r\n        \"senderId\": \"4\",\r\n        \"name\": \"Hassan Jalal\"\r\n    },\r\n    \"recipient\": {\r\n        \"name\": \"Rami Essamedeen\",\r\n        \"country\": \"ARE\",\r\n        \"payoutMethod\": \"CASH\",\r\n        \"payoutDetails\": {\r\n            \"personalIDNumber\": \"12344556\",\r\n            \"personalIDType\": \"PASSPORT\"\r\n        }\r\n    },\r\n    \"sendAmount\": \"10000.00\",\r\n    \"sendCurrency\": \"USD\",\r\n    \"payoutCurrency\": \"AED\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8000/transfers/",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get a Transfer",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "localhost:8000/transfers/{{TransferID}}",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers",
+            "{{TransferID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get User Transfers",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "localhost:8000/transfers?senderId={{SenderID}}",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers"
+          ],
+          "query": [
+            {
+              "key": "senderId",
+              "value": "{{SenderID}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Quote a transfer",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "localhost:8000/transfers/{{TransferID}}/quote",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers",
+            "{{TransferID}}",
+            "quote"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Confirm a Transfer",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "localhost:8000/transfers/{{TransferID}}/confirm",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers",
+            "{{TransferID}}",
+            "confirm"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Cancel a Transaction",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "localhost:8000/transfers/{{TransferID}}/cancel",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers",
+            "{{TransferID}}",
+            "cancel"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Approve a Transfer",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "localhost:8000/transfers/{{TransferID}}/compliance/approve?reviewerId={{ReviewerID}}",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers",
+            "{{TransferID}}",
+            "compliance",
+            "approve"
+          ],
+          "query": [
+            {
+              "key": "reviewerId",
+              "value": "{{ReviewerID}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Reject a Transfer",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "localhost:8000/transfers/{{TransferID}}/compliance/reject?reviewerId={{ReviewerID}}",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "transfers",
+            "{{TransferID}}",
+            "compliance",
+            "reject"
+          ],
+          "query": [
+            {
+              "key": "reviewerId",
+              "value": "{{ReviewerID}}"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get a Quote",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"destinationCountry\": \"SDN\",\r\n    \"sendAmount\": \"10000.00\",\r\n    \"sendCurrency\": \"USD\",\r\n    \"payoutCurrency\": \"AED\",\r\n    \"payoutMethod\": \"CASH\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8001/quote",
+          "host": [
+            "localhost"
+          ],
+          "port": "8001",
+          "path": [
+            "quote"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Issue payout request",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"sender\": {\r\n        \"name\": \"Hassan Jalal\"\r\n    },\r\n    \"recipient\": {\r\n        \"name\": \"Rami Essamedeen\",\r\n        \"country\": \"ARE\",\r\n        \"payoutMethod\": \"CASH\",\r\n        \"payoutDetails\": {\r\n            \"personalIDNumber\": \"12344556\",\r\n            \"personalIDType\": \"PASSPORT\"\r\n        }\r\n    },\r\n    \"sendAmount\": \"10000.00\",\r\n    \"payoutAmount\": \"35490.00\",\r\n    \"sendCurrency\": \"USD\",\r\n    \"payoutCurrency\": \"AED\",\r\n    \"payoutId\" : \"019c9b5b-722332-352d-b249-099823228989352331200\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8002/partner/payouts",
+          "host": [
+            "localhost"
+          ],
+          "port": "8002",
+          "path": [
+            "partner",
+            "payouts"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Partner Payouts",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8002/payouts?startDate=2026-02-23&endDate=2026-02-28",
+          "host": [
+            "localhost"
+          ],
+          "port": "8002",
+          "path": [
+            "payouts"
+          ],
+          "query": [
+            {
+              "key": "startDate",
+              "value": "2026-02-23"
+            },
+            {
+              "key": "endDate",
+              "value": "2026-02-28"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Trigger Reconcilliation",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8000/webhooks/reconciliation?startDate=2026-02-23&endDate=2026-02-28",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "webhooks",
+            "reconciliation"
+          ],
+          "query": [
+            {
+              "key": "startDate",
+              "value": "2026-02-23"
+            },
+            {
+              "key": "endDate",
+              "value": "2026-02-28"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Provide Transaction Status(Webhook)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const secret = 'RAMI'; // Your shared secret key\r",
+              "// Access the request body. Note: this might need adjustment depending on body type (raw, form-data, etc.)\r",
+              "let payload = pm.request.body.raw; \r",
+              "\r",
+              "// If the body is empty, you might need special handling based on API spec.\r",
+              "if (!payload) {\r",
+              "    payload = \"\"; \r",
+              "}\r",
+              "\r",
+              "// Calculate the HMAC SHA256 hash using the built-in CryptoJS library.\r",
+              "const hmacHash = CryptoJS.HmacSHA256(payload, secret);\r",
+              "\r",
+              "// Encode the hash (Base64 is common, but check API requirements).\r",
+              "const signature = CryptoJS.enc.Base64.stringify(hmacHash); \r",
+              "\r",
+              "// Add the signature to the request headers.\r",
+              "pm.request.headers.add({\r",
+              "    key: 'X-Signature',\r",
+              "    value: signature\r",
+              "});\r",
+              "\r",
+              "console.log(\"Signature :: \" + signature);\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"partnerPayoutId\":\"019c90d3-69c7-76fe-b339-650e9dda41db\",\"status\":\"FAILED\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:8000/webhooks/payout-status",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "webhooks",
+            "payout-status"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "TransferID",
+      "value": ""
+    },
+    {
+      "key": "SenderID",
+      "value": ""
+    },
+    {
+      "key": "ReviewerID",
+      "value": ""
+    }
+  ]
+}

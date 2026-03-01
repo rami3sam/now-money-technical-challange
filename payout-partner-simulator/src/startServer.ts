@@ -1,10 +1,11 @@
 import { app, payoutsService, tasksService } from "./app.js";
+import { logger } from "./config/logger.js";
 import { EnvVariables } from "./constants/config.js";
 import { runQueueWorker } from "./queues/taskQueue.js";
 import connectDB from "./utils/connectDB.js";
 import {
   getTaskErrorHandlers,
-  getTaskHandlers,
+  executeTask as getTaskHandlers,
 } from "./utils/getTaskHandlers.js";
 
 const PORT = EnvVariables.PORT;
@@ -18,7 +19,7 @@ async function startServer() {
   );
 
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server running on port ${PORT}`);
   });
 }
 

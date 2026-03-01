@@ -1,3 +1,4 @@
+import { logger } from "../config/logger.js";
 import { TaskStatus } from "../enums/taskStatus.enum.js";
 import { Task, type TaskType } from "../models/task.js";
 import type { TasksRepository } from "../repositories/task.repository.js";
@@ -6,14 +7,12 @@ import { addTask } from "./tasks/add.js";
 
 export class TasksService {
   constructor(private taskRepository: TasksRepository) {
-    this.recoverTasksAfterCrash();
+    this.recoverTasksAfterCrash().catch((err) => {
+      logger.error("Failed to recover tasks after crash:", err);
+    });
   }
   async add(task: TaskType) {
     return await addTask(this.taskRepository, task);
-  }
-
-  async recoverTasksAfterCrash() {
-    return await this.taskRepository.recoverTasksAfterCrash();
   }
 
   async getPendingTasksToRun() {
@@ -30,6 +29,9 @@ export class TasksService {
 
   async updateTaskStatusFailed(id: string) {
     return await this.taskRepository.updateTaskStatusFailed(id);
+  }
+  async recoverTasksAfterCrash() {
+    return await this.taskRepository.recoverTasksAfterCrash();
   }
 
   async scheduleTaskForRetry(id: string, retryDate?: Date) {

@@ -1,3 +1,4 @@
+import { logger } from "../config/logger.js";
 import type { TaskHandlers } from "../enums/taskHandlers.enum.js";
 import { TaskStatus } from "../enums/taskStatus.enum.js";
 import { Task, type TaskTypeWithId } from "../models/task.js";
@@ -25,12 +26,12 @@ async function runQueueWorker(
       try {
         const updatedTask = await tasksService.updateTaskStatusRunning(task.id);
         if (taskHandlerFunctions[task.taskHandler])
-          await taskHandlerFunctions[task.taskHandler]!(task);
+           await taskHandlerFunctions[task.taskHandler](task)
 
         const finishedTask = await tasksService.updateTaskStatusFinished(
           task.id,
         );
-      } catch (err) {
+      } catch (err: any) {
         if (task.retryCount > task.maxRetries) {
           const updatedTask = await tasksService.updateTaskStatusFailed(
             task.id,
@@ -41,11 +42,11 @@ async function runQueueWorker(
           const updatedTask = await tasksService.scheduleTaskForRetry(task.id);
 
           if (!updatedTask)
-            console.error(
+            logger.error(
               `Failed to update task with id ${task.id} for retrying.`,
             );
         }
-        console.error(`Error processing task with id ${task.id}:`, err);
+        logger.error(`Error processing task with id ${task.id}:`, err);
       }
     }
 

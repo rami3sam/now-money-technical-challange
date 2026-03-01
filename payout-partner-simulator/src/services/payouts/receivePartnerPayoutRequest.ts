@@ -46,7 +46,7 @@ export const receivePartnerPayoutRequest = async (
   await payout.save();
   if (!payout) throw new Error("Failed to save payout to database");
 
-  tasksService.add(
+  await tasksService.add(
     new Task({
       taskHandler: TaskHandlers.PROCESS_PAYOUT,
       payload: payout._id,

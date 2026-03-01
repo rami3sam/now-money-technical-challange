@@ -4,6 +4,7 @@ import { EnvVariables } from "../constants/config.js";
 import type { TasksService } from "../services/tasks.service.js";
 import type { TransfersService } from "../services/transfers.service.js";
 import { WebhookController } from "../controllers/webhook.controller.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 
@@ -16,8 +17,8 @@ export function webhookRoutes(
   webhooksRouter.post(
     "/payout-status",
     verifyHmacMiddleware(EnvVariables.WEBHOOK_SECRET),
-    webhookController.payoutStatus,
+    asyncHandler(webhookController.payoutStatus),
   );
-  webhooksRouter.post("/reconciliation", webhookController.triggerReconciliation);
+  webhooksRouter.post("/reconciliation", asyncHandler(webhookController.triggerReconciliation));
   return webhooksRouter;
 }

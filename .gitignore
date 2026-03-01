@@ -14,3 +14,7 @@ orchestrator/dist
 fx-quote-service/dist
 payout-partner-simulator/dist
 dist
+orchestrator/logs
+fx-quote-service/logs
+payout-partner-simulator/logs
+logs

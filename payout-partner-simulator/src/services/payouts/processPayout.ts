@@ -28,7 +28,7 @@ export const processPayout = async (
 
   if (!newPayout) throw Error(`Failed to update payout with id ${payoutId}`);
 
-  tasksService.add(
+  await tasksService.add(
     new Task({
       taskHandler: TaskHandlers.PROVIDE_PAYOUT_STATUS,
       payload: payoutId,

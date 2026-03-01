@@ -9,6 +9,7 @@ import { TransfersService } from "./services/transfers.service.js";
 import { transfersRoutes } from "./routes/transfersRoutes.js";
 import { webhookRoutes } from "./routes/webhooks.js";
 import healthRoutes from "./routes/healthRoutes.js";
+import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 const app = express();
 const taskRepository = new TasksRepository();
@@ -29,5 +30,6 @@ app.use(
 app.use("/health", healthRoutes);
 app.use("/transfers", transfersRoutes(transfersService));
 app.use("/webhooks", webhookRoutes(transfersService, tasksService));
+app.use(errorMiddleware)
 
 export { app, tasksService, transfersService };

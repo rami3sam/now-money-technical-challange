@@ -2,15 +2,15 @@ import { TaskHandlers } from "../enums/taskHandlers.enum.js";
 import type { TaskType, TaskTypeWithId } from "../models/task.js";
 import type { PayoutsService } from "../services/payouts.service.js";
 
-export function getTaskHandlers(payoutsService: PayoutsService) {
+export function executeTask(payoutsService: PayoutsService) {
   return {
-    [TaskHandlers.PROCESS_PAYOUT]: (task: TaskTypeWithId) => {
-      payoutsService.processPayout(task.payload as string);
-    },
-    [TaskHandlers.PROVIDE_PAYOUT_STATUS]: (task: TaskTypeWithId) => {
-      payoutsService.providePayoutStatus(task.payload as string);
-    },
-  } as Record<TaskHandlers, (task: TaskTypeWithId) => Promise<void>>;
+    [TaskHandlers.PROCESS_PAYOUT]: (task: TaskTypeWithId) => 
+      payoutsService.processPayout(task.payload as string)
+    ,
+    [TaskHandlers.PROVIDE_PAYOUT_STATUS]: (task: TaskTypeWithId) => 
+      payoutsService.providePayoutStatus(task.payload as string)
+    ,
+  } as any;
 }
 
 export function getTaskErrorHandlers(): Record<

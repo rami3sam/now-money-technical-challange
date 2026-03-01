@@ -1,4 +1,5 @@
 import { app, tasksService, transfersService } from "./app.js";
+import { logger } from "./config/logger.js";
 import { EnvVariables } from "./constants/config.js";
 import { runQueueWorker } from "./queues/taskQueue.js";
 import connectDB from "./utils/connectDB.js";
@@ -11,7 +12,7 @@ async function startServer() {
   await connectDB();
 
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    logger.info(`Server is running on port ${PORT}`)
   });
   runQueueWorker(
     tasksService,

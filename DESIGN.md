@@ -62,6 +62,26 @@ A simple task queue is implemented to support:
 
 ---
 
+## State Machine Diagram
+
+![State Transition Diagram](https://github.com/rami3sam/now-money-technical-challange/blob/master/images/state%20transition%20diagram.png?raw=true)
+
+The diagram above illustrates the transfer state transitions.
+
+### Terminal States
+- **PAID**
+- **CANCELLED**
+- **REFUNDED**
+
+### Cancellation Logic
+- **CANCELLED** is a terminal state **only if the send amount has not been deducted**.
+- If the send amount **has been deducted**, the flow must end in **REFUNDED** instead.
+
+### Quote Refresh Behavior
+- The **QUOTED** state can transition to itself.
+- This occurs when the sender refreshes the quote.
+- Keeping this self-transition helps track that the transfer has been quoted multiple times in the state history.
+
 ## Timeouts and Handling Unknown Outcomes
 
 ### Timeout Handling

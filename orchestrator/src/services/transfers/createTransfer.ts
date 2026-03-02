@@ -9,7 +9,8 @@ export async function createTransfer(
   createTransferType: createTransferSchema,
 ) {
   const bankInfoOk =
-    createTransferType.recipient.payoutMethod == PayoutMethods.Bank &&
+    createTransferType.recipient.payoutMethod.toUpperCase() ==
+      PayoutMethods.Bank &&
     createTransferType.recipient.payoutDetails?.accountNumber;
 
   const cashInfoOk =
@@ -18,9 +19,12 @@ export async function createTransfer(
     createTransferType.recipient.payoutDetails.personalIDType;
 
   if (!bankInfoOk && !cashInfoOk)
-    throw Error("You must specify recipient details correctly");
+    throw Error(
+      `if Payout method is BANK, account number(accountNumber) must be provided in the recipient.\
+       If payout method is CASH, personal ID number(personalIDNumber) and type(personalIDType) must be provided in the recipient`,
+    );
 
-  const transfer = new Transfer()
+  const transfer = new Transfer();
   transfer.sender = createTransferType.sender;
   // @ts-ignore
   transfer.recipient = createTransferType.recipient;

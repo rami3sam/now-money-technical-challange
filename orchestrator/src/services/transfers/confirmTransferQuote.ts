@@ -1,10 +1,9 @@
-import {
-  assertTransferStatusTransition,
-  TransferStatus,
-} from "../../enums/transferStatus.enum.js";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
-import type { TransfersRepository } from "../../repositories/transfers.repository.js";
+import {
+  TransferStatus
+} from "../../enums/transferStatus.enum.js";
 import { Task } from "../../models/task.js";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 import type { TasksService } from "../tasks.service.js";
 
 export async function confirmTransferQuote(
@@ -19,7 +18,6 @@ export async function confirmTransferQuote(
     throw Error(`Transfer status is ${transfer.status} not QUOTED`);
 
   if (transfer.quote?.expiry && new Date(transfer.quote.expiry) > new Date()) {
-    assertTransferStatusTransition(transfer.status, TransferStatus.CONFIRMED);
 
     const updatedTransfer =
       await transfersRepository.markTransferAsConfirmed(id);

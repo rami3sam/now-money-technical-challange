@@ -1,10 +1,7 @@
-import {
-  assertTransferStatusTransition,
-  TransferStatus,
-} from "../../enums/transferStatus.enum.js";
 import axios from "axios";
-import { quoteResponseSchema } from "../../validations/quote.js";
+import { EnvVariables } from "../../constants/config.js";
 import type { TransfersRepository } from "../../repositories/transfers.repository.js";
+import { quoteResponseSchema } from "../../validations/quote.js";
 
 export async function quoteTransfer(
   transferRepository: TransfersRepository,
@@ -16,7 +13,7 @@ export async function quoteTransfer(
   const { recipient } = transfer;
 
   const Response = await axios.post(
-    `${process.env.FX_QUOTE_SERVICE_URL}/quote`,
+    `${EnvVariables.FX_QUOTE_SERVICE_URL}/quote`,
     {
       sendAmount: transfer.sendAmount,
       sendCurrency: transfer.sendCurrency,
@@ -38,11 +35,6 @@ export async function quoteTransfer(
     payoutAmount: validatedQuote.payoutAmount,
     expiry: validatedQuote.quoteExpiry,
   };
-
-  assertTransferStatusTransition(
-    transfer.status as TransferStatus,
-    TransferStatus.QUOTED,
-  );
 
   const updatedTransfer = await transferRepository.updateTransferQuote(
     transfer.id,

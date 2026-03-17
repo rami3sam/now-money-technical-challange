@@ -1,19 +1,15 @@
 import currency from "currency.js";
 import { bannedCountries, bannedPeople } from "../../constants/constants.js";
 import { ComplianceDecisions } from "../../enums/complianceDecisions.js";
+import type { CurrencyCodes } from "../../enums/currencyCodes.enum.js";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
-import {
-  assertTransferStatusTransition,
-  TransferStatus,
-} from "../../enums/transferStatus.enum.js";
+import { Task } from "../../models/task.js";
 import { TransfersRepository } from "../../repositories/transfers.repository.js";
 import {
   checkForNameInList,
   getComplianceMaximum,
 } from "../../utils/utilFunctions.js";
-import type { CurrencyCodes } from "../../enums/currencyCodes.enum.js";
 import type { TasksService } from "../tasks.service.js";
-import { Task } from "../../models/task.js";
 
 export async function checkTransferCompliance(
   transfersRepository: TransfersRepository,
@@ -27,10 +23,6 @@ export async function checkTransferCompliance(
   if (!recipient) throw Error("Transfer recipient not found");
 
   if (bannedCountries.includes(recipient.country)) {
-    assertTransferStatusTransition(
-      transfer.status as TransferStatus,
-      TransferStatus.COMPLIANCE_REJECTED,
-    );
 
     const decision = ComplianceDecisions.REJECTED_AUTOMATICALLY;
 
@@ -58,10 +50,6 @@ export async function checkTransferCompliance(
 
     return updatedTransfer;
   } else if (checkForNameInList(recipient.name, bannedPeople)) {
-    assertTransferStatusTransition(
-      transfer.status as TransferStatus,
-      TransferStatus.COMPLIANCE_PENDING,
-    );
 
     const complianceDecision = {
       decision: ComplianceDecisions.PENDING,
@@ -81,10 +69,6 @@ export async function checkTransferCompliance(
     currency(transfer.sendAmount).value <
     currency(getComplianceMaximum(transfer.sendCurrency as CurrencyCodes)).value
   ) {
-    assertTransferStatusTransition(
-      transfer.status as TransferStatus,
-      TransferStatus.COMPLIANCE_APPROVED,
-    );
 
     const complianceDecision = {
       decision: ComplianceDecisions.APPROVED_AUTOMATICALLY,
@@ -110,10 +94,6 @@ export async function checkTransferCompliance(
 
     return updatedTransfer;
   } else {
-    assertTransferStatusTransition(
-      transfer.status as TransferStatus,
-      TransferStatus.COMPLIANCE_PENDING,
-    );
 
     const complianceDecision = {
       decision: ComplianceDecisions.PENDING,

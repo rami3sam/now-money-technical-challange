@@ -20,11 +20,12 @@ export const createTransferSchema = z.object({
       ),
     payoutMethod: z.enum([PayoutMethods.Bank, PayoutMethods.Cash]),
     payoutDetails: z.object({
-      accountNumber: z.string().optional(),
-      personalIDNumber: z.string().optional(),
-      personalIDType: z.enum(PersonalIDTypesValues).optional(),
+      accountNumber: z.string().nullable().default(null),
+      personalIDNumber: z.string().nullable().default(null),
+      personalIDType: z.enum(PersonalIDTypesValues).nullable().default(null),
     }),
   }),
+  
   sendAmount: z
     .string()
     .refine(

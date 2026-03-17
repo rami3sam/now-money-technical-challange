@@ -6,4 +6,4 @@ export const EnvVariables = {
   DB_URI: process.env.DB_URI!,
   WEBHOOK_SECRET: process.env.WEBHOOK_SECRET!,
   ORCHESTRATOR_SERVICE_URL: process.env.ORCHESTRATOR_SERVICE_URL!,
-};
+} as const;

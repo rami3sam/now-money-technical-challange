@@ -1,11 +1,10 @@
+import axios from "axios";
+import { v7 as uuidv7 } from "uuid";
 import {
-  assertTransferStatusTransition,
-  TransferStatus,
+  TransferStatus
 } from "../../enums/transferStatus.enum.js";
 import type { TransfersRepository } from "../../repositories/transfers.repository.js";
-import { v7 as uuidv7 } from "uuid";
 import { PayoutStatusType } from "../../validations/payoutStatus.js";
-import axios from "axios";
 export async function initiatePayout(
   transfersRepository: TransfersRepository,
   id: string,
@@ -15,11 +14,6 @@ export async function initiatePayout(
 
   const { recipient } = transfer;
   if (!recipient) throw Error("Transfer recipient not found");
-
-  assertTransferStatusTransition(
-    transfer.status as TransferStatus,
-    TransferStatus.PAYOUT_PENDING,
-  );
 
   transfer.status = TransferStatus.PAYOUT_PENDING;
   transfer.payoutId = uuidv7();

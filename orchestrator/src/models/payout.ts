@@ -29,7 +29,6 @@ const payoutSchema = new mongoose.Schema(
         type: String,
         enum: CountryCodesValues,
         required: true,
-        minlength: 2,
       },
       payoutMethod: {
         type: String,
@@ -53,7 +52,6 @@ const payoutSchema = new mongoose.Schema(
     sendAmount: {
       type: String,
       required: true,
-      minLength: 1,
       valdate: {
         validator: isValidMoney,
         message: "sendAmount must be a valid money string eg 100.00",
@@ -63,7 +61,6 @@ const payoutSchema = new mongoose.Schema(
     payoutAmount: {
       type: String,
       required: true,
-      minLength: 1,
       valdate: {
         validator: isValidMoney,
         message: "payoutAmount must be a valid money string eg 100.00",
@@ -74,16 +71,12 @@ const payoutSchema = new mongoose.Schema(
       type: String,
       enum: CurrencyCodesValues,
       required: true,
-      minlength: 3,
-      maxlength: 3,
     },
 
     payoutCurrency: {
       type: String,
       enum: CurrencyCodesValues,
       required: true,
-      minlength: 3,
-      maxlength: 3,
     },
 
     payoutIdFromPartner: {
@@ -97,6 +90,7 @@ const payoutSchema = new mongoose.Schema(
         return value.payoutId !== undefined;
       },
     },
+    
     payoutStatus: {
       type: String,
       enum: PayoutStatusValues,

@@ -1,9 +1,6 @@
 import { ComplianceDecisions } from "../../enums/complianceDecisions.js";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
-import {
-  assertTransferStatusTransition,
-  TransferStatus,
-} from "../../enums/transferStatus.enum.js";
+import { TransferStatus } from "../../enums/transferStatus.enum.js";
 import { Task } from "../../models/task.js";
 import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 import { TasksService } from "../tasks.service.js";
@@ -18,11 +15,6 @@ export async function approveTransfer(
 
   const transfer = await transfersRepository.findById(id);
   if (!transfer) throw Error("Transfer not found");
-
-  assertTransferStatusTransition(
-    transfer.status as TransferStatus,
-    TransferStatus.COMPLIANCE_APPROVED,
-  );
 
   transfer.status = TransferStatus.COMPLIANCE_APPROVED;
   const decision = reviewerId

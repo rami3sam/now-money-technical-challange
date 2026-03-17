@@ -3,6 +3,11 @@ export function isValidMoney(value: string): boolean {
   return moneyRegex.test(value);
 }
 
+export function isValidFloat(value: string): boolean {
+  const floatRegex = /^\d+(\.\d+)?$/;
+  return floatRegex.test(value);
+}
+
 export function allValuesProvidedValidator(objectKeys: string[]) {
   return (value: Record<string, any>) => {
     const keys = objectKeys.filter((key) => !["_id", "__v"].includes(key));

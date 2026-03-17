@@ -1,9 +1,5 @@
 import currency from "currency.js";
 import { TaskHandlers } from "../../enums/taskHandlers.enum.js";
-import {
-  assertTransferStatusTransition,
-  TransferStatus,
-} from "../../enums/transferStatus.enum.js";
 import { Task } from "../../models/task.js";
 import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 import type { TasksService } from "../tasks.service.js";

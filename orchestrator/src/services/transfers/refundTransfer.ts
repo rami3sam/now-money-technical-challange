@@ -1,11 +1,9 @@
 import currency from "currency.js";
-import type { TransfersRepository } from "../../repositories/transfers.repository.js";
-import {
-  assertTransferStatusTransition,
-  TransferStatus,
-} from "../../enums/transferStatus.enum.js";
 import { EnvVariables } from "../../constants/config.js";
-import { Transfer } from "../../models/transfer.js";
+import {
+  TransferStatus
+} from "../../enums/transferStatus.enum.js";
+import type { TransfersRepository } from "../../repositories/transfers.repository.js";
 
 export async function refundTransfer(
   transfersRepository: TransfersRepository,
@@ -13,11 +11,6 @@ export async function refundTransfer(
 ) {
   const transfer = await transfersRepository.findById(id);
   if (!transfer) throw Error("Transfer not found");
-
-  assertTransferStatusTransition(
-    transfer.status as TransferStatus,
-    TransferStatus.REFUNDED,
-  );
 
   if (!transfer.final?.paidAmount) throw new Error("No paid amount to refund");
 

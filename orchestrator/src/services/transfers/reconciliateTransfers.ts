@@ -7,6 +7,7 @@ import { payoutSchema } from "../../validations/payout.js";
 import { calculateReconciliationDifference } from "../../utils/reconciliationUtils.js";
 import { Reconciliation } from "../../models/reconciliation.js";
 import { uuidv7 } from "zod";
+import { EnvVariables } from "../../constants/config.js";
 
 export async function reconciliateTransfers(
   transfersRepository: TransfersRepository,
@@ -25,7 +26,7 @@ export async function reconciliateTransfers(
   }[] = [];
 
   const payoutsResponse = await axios.get(
-    `${process.env.PAYOUT_PARTNER_SIMULATOR_SERVICE_URL}/payouts`,
+    `${EnvVariables.PAYOUT_PARTNER_SIMULATOR_SERVICE_URL}/payouts`,
     {
       params: {
         startDate: startDate.toISOString(),

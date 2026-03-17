@@ -1,6 +1,10 @@
 import mongoose, { Mongoose, Schema, type InferSchemaType } from "mongoose";
 import { PayoutMethodsValues } from "../enums/payoutMethods.enum.js";
-import { TransferStatusValues } from "../enums/transferStatus.enum.js";
+import {
+  assertTransferStatusTransition,
+  TransferStatus,
+  TransferStatusValues,
+} from "../enums/transferStatus.enum.js";
 import { CountryCodesValues } from "../enums/countryCodes.enum.js";
 import { CurrencyCodesValues } from "../enums/currencyCodes.enum.js";
 import {
@@ -42,7 +46,6 @@ export const transferSchema = new mongoose.Schema(
           type: String,
           enum: CountryCodesValues,
           required: true,
-          minlength: 2,
         },
         payoutMethod: {
           type: String,
@@ -132,16 +135,12 @@ export const transferSchema = new mongoose.Schema(
       type: String,
       enum: CurrencyCodesValues,
       required: true,
-      minlength: 3,
-      maxlength: 3,
     },
 
     payoutCurrency: {
       type: String,
       enum: CurrencyCodesValues,
       required: true,
-      minlength: 3,
-      maxlength: 3,
     },
 
     status: {
@@ -187,6 +186,30 @@ export const transferSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+transferSchema.pre("findOneAndUpdate", async function () {
+  const query = this.getQuery();
+  const update = this.getUpdate() as any;
+  const docToUpdate = await this.model.findOne(query);
+
+  if (!docToUpdate) return;
+
+  const isPipeline = Array.isArray(update);
+
+  if (!isPipeline && update.$set && update.$set.status) {
+    assertTransferStatusTransition(docToUpdate.status, update.$set.status);
+  } else if (isPipeline) {
+    const setStatusUpdate = update.find(
+      (stage) => stage.$set && stage.$set.status,
+    );
+    if (setStatusUpdate) {
+      assertTransferStatusTransition(
+        docToUpdate.status,
+        setStatusUpdate.$set.status,
+      );
+    }
+  }
+});
 
 export const Transfer = mongoose.model("Transfers", transferSchema);
 export type TransferType = InferSchemaType<typeof transferSchema>;

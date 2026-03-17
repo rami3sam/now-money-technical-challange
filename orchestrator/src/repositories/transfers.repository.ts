@@ -1,9 +1,6 @@
 import { ComplianceDecisions } from "../enums/complianceDecisions.js";
 import { PayoutStatus } from "../enums/payoutStatus.enum.js";
-import {
-  assertTransferStatusTransition,
-  TransferStatus,
-} from "../enums/transferStatus.enum.js";
+import { TransferStatus } from "../enums/transferStatus.enum.js";
 import type { QuoteType } from "../models/quote.js";
 import { Transfer, type TransferType } from "../models/transfer.js";
 
@@ -21,6 +18,7 @@ export class TransfersRepository {
   }
 
   async markPayoutPending(id: string, payoutId: string) {
+    debugger
     return await Transfer.findOneAndUpdate(
       {
         _id: id,

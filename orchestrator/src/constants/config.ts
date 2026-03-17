@@ -12,4 +12,4 @@ export const EnvVariables = {
   FX_QUOTE_SERVICE_URL: process.env.FX_QUOTE_SERVICE_URL!,
   PAYOUT_PARTNER_SIMULATOR_SERVICE_URL:
     process.env.PAYOUT_PARTNER_SIMULATOR_SERVICE_URL,
-};
+} as const;

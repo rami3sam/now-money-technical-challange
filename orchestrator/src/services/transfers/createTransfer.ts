@@ -26,7 +26,7 @@ export async function createTransfer(
 
   const transfer = new Transfer();
   transfer.sender = createTransferType.sender;
-  // @ts-ignore
+  
   transfer.recipient = createTransferType.recipient;
   transfer.sendAmount = createTransferType.sendAmount;
   transfer.sendCurrency = createTransferType.sendCurrency;
